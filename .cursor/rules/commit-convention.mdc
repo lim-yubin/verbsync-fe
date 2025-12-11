@@ -1,0 +1,438 @@
+---
+alwaysApply: true
+---
+
+# Git Commit Convention
+
+이 프로젝트는 Conventional Commits 기반의 커밋 컨벤션을 따릅니다.
+
+## 1. 커밋 메시지 구조
+
+```
+<type>(<scope>): <subject>
+(빈 줄)
+<body>
+(빈 줄)
+<footer>
+```
+
+### 필수 요소
+
+- **type**: 변경 유형 (필수)
+- **subject**: 변경 내용 요약 (필수, 50자 이내)
+
+### 선택 요소
+
+- **scope**: 변경 범위 (권장)
+- **body**: 상세 설명 (복잡한 변경사항에 권장)
+- **footer**: 이슈 번호, Breaking Changes (필요시)
+
+### 1인 프로젝트에서의 권장사항
+
+**제목(subject) + 본문(body) 작성을 권장합니다.**
+
+- 제목: **무엇을** 변경했는지 (What)
+- 본문: **왜** 변경했는지, **어떻게** 변경했는지 (Why, How)
+
+나중에 커밋 히스토리를 볼 때 맥락을 이해하기 훨씬 쉽습니다.
+
+**권장 형식:**
+
+```
+feat(auth): JWT 인증 기능 구현
+
+- Access token 7일 만료 기간 설정
+- Refresh token rotation 메커니즘 추가
+- 토큰 검증 미들웨어 구현
+
+사용자 인증 보안을 강화했습니다.
+```
+
+**간단한 변경의 경우 제목만:**
+
+```
+fix(auth): 오타 수정
+style(auth): 코드 포맷팅
+chore: 패키지 버전 업데이트
+docs: README 오타 수정
+```
+
+Footer는 거의 사용하지 않습니다.
+
+### 실제 작성 방법
+
+#### 방법 1: 에디터 사용 (권장)
+
+```bash
+git commit
+# 에디터가 열리면 여러 줄 작성 가능
+```
+
+#### 방법 2: -m 플래그 여러 번 사용
+
+```bash
+git commit -m "feat(auth): JWT 인증 기능 구현" \
+           -m "- Access token 7일 만료 구현
+- Refresh token rotation 추가
+- 토큰 검증 미들웨어 구현" \
+           -m "Closes #45"
+```
+
+#### 방법 3: heredoc 사용
+
+```bash
+git commit -F- <<EOF
+feat(auth): JWT 인증 기능 구현
+
+- Access token 7일 만료 구현
+- Refresh token rotation 추가
+- 토큰 검증 미들웨어 구현
+
+이 변경으로 보안을 강화했습니다.
+
+Closes #45
+EOF
+```
+
+**중요**: Subject와 Body 사이에 **빈 줄 한 줄**을 반드시 넣어야 합니다!
+
+## 2. Type 종류
+
+### 프로덕션 코드 변경
+
+- `feat`: 새로운 기능 추가
+- `fix`: 버그 수정
+- `perf`: 성능 개선
+- `refactor`: 코드 리팩토링 (기능 변경 없음)
+
+### 프로덕션 외 변경
+
+- `docs`: 문서 수정 (README, API 문서 등)
+- `style`: 코드 포맷팅, 세미콜론 누락 등 (코드 동작 변경 없음)
+- `test`: 테스트 코드 추가/수정
+- `chore`: 빌드, 패키지 매니저, 설정 파일 등
+- `ci`: CI/CD 설정 변경
+
+### 특수 케이스
+
+- `revert`: 이전 커밋 되돌리기
+- `wip`: Work In Progress (개발 중, 최종 커밋 아님)
+
+## 3. Scope 가이드
+
+모듈/도메인 단위로 작성:
+
+- `auth`: 인증 관련
+- `project`: 프로젝트 관련
+- `locale`: 언어 관련
+- `key`: 번역 키 관련
+- `translation`: 번역 값 관련
+- `prisma`: 데이터베이스/ORM
+- `api`: API 공통/전역
+- `config`: 설정 파일
+
+## 4. Subject 작성 규칙
+
+1. **한글로 작성**
+
+   - ✅ "사용자 인증 기능 추가"
+   - ❌ "Add user authentication"
+
+2. **명령형/서술형 모두 가능**
+
+   - ✅ "로그인 버그 수정"
+   - ✅ "로그인 버그를 수정"
+   - ✅ "로그인 버그 해결"
+
+3. **마침표(.) 사용 금지**
+
+   - ✅ "README 업데이트"
+   - ❌ "README 업데이트."
+
+4. **50자 이내 권장**
+
+5. **명확하고 구체적으로**
+   - ✅ "JWT 인증 미들웨어 추가"
+   - ❌ "인증 수정"
+
+## 5. Body 작성 규칙
+
+1. **무엇을, 왜 변경했는지** 설명 (어떻게는 코드가 설명)
+2. **불릿 포인트로 주요 변경사항 나열** (-, \*, +)
+3. **72자마다 줄바꿈** 권장
+4. **Subject와 한 줄 띄우기** (필수)
+5. **선택적으로 마지막에 맥락/이유 추가**
+
+### 좋은 Body 작성 예시
+
+```
+feat(auth): 회원가입 API 구현
+
+- 이메일, 비밀번호, 이름 검증 추가
+- bcrypt로 비밀번호 해싱 (10 rounds)
+- 이메일 중복 시 409 에러 반환
+
+사용자가 계정을 생성할 수 있도록 하는 첫 번째 단계입니다.
+```
+
+### 나쁜 Body 작성 예시
+
+```
+feat(auth): 회원가입 API 구현
+
+RegisterDto 만들고 AuthService에 register 메소드 추가함.
+AuthController에도 엔드포인트 만듦.
+```
+
+→ **어떻게**만 설명하고 **왜**가 없음
+
+## 6. Footer 작성 규칙
+
+**⚠️ 1인 프로젝트의 경우 Footer는 거의 사용하지 않습니다. 필요한 경우에만 선택적으로 사용하세요.**
+
+Footer는 선택 사항이며, 주로 다음과 같은 메타데이터를 포함합니다:
+
+### 1. 이슈 참조 (Issue References)
+
+이슈를 자동으로 닫거나 연결할 때 사용:
+
+```
+Closes #123          # 이슈를 닫음
+Fixes #456           # 버그 이슈를 수정하고 닫음
+Resolves #789        # 이슈를 해결하고 닫음
+Refs #321            # 이슈를 참조만 함 (닫지 않음)
+Related to #111      # 관련 이슈
+```
+
+**여러 이슈 참조:**
+
+```
+Closes #123, #456
+Fixes #789
+Refs #100, #200, #300
+```
+
+### 2. Breaking Changes (중대한 변경사항)
+
+기존 API나 동작을 깨뜨리는 변경사항:
+
+```
+BREAKING CHANGE: API endpoint /auth/login이 이제 이메일 인증을 필수로 요구합니다.
+클라이언트 코드를 업데이트해야 합니다.
+```
+
+### 3. 공동 작업자 (Co-authored-by)
+
+페어 프로그래밍이나 협업 시:
+
+```
+Co-authored-by: 홍길동 <hong@example.com>
+Co-authored-by: 김철수 <kim@example.com>
+```
+
+### 4. 리뷰어 (Reviewed-by)
+
+코드 리뷰를 받은 경우:
+
+```
+Reviewed-by: 이영희 <lee@example.com>
+```
+
+### 5. 기타 메타데이터
+
+```
+See-also: #123                    # 참고할 이슈/PR
+Signed-off-by: 이름 <email>       # DCO 서명
+Acked-by: 이름 <email>            # 승인
+Tested-by: 이름 <email>           # 테스트 완료
+```
+
+### 전체 예시
+
+```
+feat(auth): OAuth2 로그인 기능 추가
+
+Google, GitHub OAuth2 연동을 구현했습니다.
+- Google OAuth2 provider 추가
+- GitHub OAuth2 provider 추가
+- 소셜 로그인 UI 컴포넌트 구현
+
+BREAKING CHANGE: 기존 로그인 API 엔드포인트가 /auth/login에서
+/auth/local/login으로 변경되었습니다.
+
+Closes #123, #456
+Refs #789
+Co-authored-by: 홍길동 <hong@example.com>
+Reviewed-by: 이영희 <lee@example.com>
+```
+
+## 7. 실제 예시
+
+### 1인 프로젝트 - 제목 + 본문 작성 (권장) ⭐
+
+**기본 형식 (대부분의 경우):**
+
+```
+feat(auth): 사용자 회원가입 API 구현
+
+- 이메일, 비밀번호, 이름 필수 입력
+- bcrypt로 비밀번호 해싱 처리
+- 이메일 중복 체크 로직 추가
+
+회원가입 기능을 완성했습니다.
+```
+
+```
+fix(auth): 로그인 타임아웃 이슈 해결
+
+JWT 토큰 만료 시간을 7일에서 30일로 변경하여
+사용자가 자주 로그아웃되는 문제를 수정했습니다.
+```
+
+**간단한 변경 (제목만 작성해도 충분):**
+
+```
+fix(auth): 오타 수정
+style(prisma): 코드 포맷팅
+chore(deps): 패키지 버전 업데이트
+docs: README 오타 수정
+```
+
+**복잡한 기능 추가:**
+
+```
+feat(auth): JWT 기반 인증 시스템 구현
+
+- JwtModule 설정 (7일 만료)
+- JwtStrategy 및 JwtAuthGuard 구현
+- /auth/me 엔드포인트 추가
+- Passport-jwt 통합
+
+이제 모든 보호된 라우트에 @UseGuards(JwtAuthGuard)를
+사용하여 인증을 요구할 수 있습니다.
+```
+
+### Body 포함 (복잡한 변경)
+
+```
+feat(auth): Refresh Token을 포함한 JWT 인증 구현
+
+- 7일 만료 기간을 가진 access token 구현
+- Refresh token rotation 메커니즘 추가
+- User 스키마에 refreshToken 필드 추가
+- 토큰 검증 미들웨어 구현
+
+이 변경으로 access token과 refresh token의 생명주기를
+분리하여 보안을 강화했습니다.
+
+Closes #45
+```
+
+### Breaking Change
+
+```
+feat(api): 프로젝트 생성 응답 형식 변경
+
+BREAKING CHANGE: 응답에서 'api_key' 대신 'apiKey' 필드를
+사용하도록 변경. 클라이언트 코드 수정 필요.
+
+변경 전: { "id": 1, "api_key": "xxx" }
+변경 후: { "id": 1, "apiKey": "xxx" }
+
+Closes #78
+```
+
+### Revert
+
+```
+revert: feat(auth): OAuth2 연동 기능 추가
+
+커밋 abc123def456을 되돌립니다.
+
+사유: OAuth2 연동으로 인해 프로덕션 환경에서 성능 저하 발생.
+v2에서 재검토 예정.
+```
+
+## 8. 안티 패턴 (피해야 할 것들)
+
+❌ 너무 애매한 메시지
+
+```
+fix: 버그 수정
+update: 파일 수정
+chore: 기타 변경사항
+```
+
+❌ 여러 변경사항을 하나의 커밋에
+
+```
+feat: 로그인, 회원가입, 비밀번호 재설정 기능 추가
+```
+
+→ 3개의 커밋으로 분리해야 함
+
+❌ WIP 커밋을 그대로 남기기
+
+```
+wip: 테스트 중
+wip: 작업중
+```
+
+→ 완성 후 squash하여 의미있는 커밋으로 변경
+
+❌ 과도한 상세 설명
+
+```
+fix: 사용자가 로그인할 수 없는 버그를 수정했는데 이유는...
+(subject에 50자 이상의 긴 설명)
+```
+
+→ body에 작성해야 함
+
+❌ 영어와 한글 혼용
+
+```
+feat: User authentication 추가
+fix: 로그인 bug 수정
+```
+
+→ 한글로 통일 ("사용자 인증 추가", "로그인 버그 수정")
+
+## 9. 커밋 전 체크리스트
+
+- [ ] 단일 책임: 하나의 커밋은 하나의 논리적 변경만
+- [ ] 빌드 성공: 커밋 시점에 빌드가 되고 테스트가 통과하는가
+- [ ] 원자성: 이 커밋을 revert해도 시스템이 정상 작동하는가
+- [ ] Type이 정확한가
+- [ ] Subject가 명확한가 (50자 이내)
+- [ ] 필요시 Body로 상세 설명 추가했는가
+
+## 10. 팀 협업 시 권장사항
+
+### 브랜치 전략
+
+- `main`: 프로덕션 릴리즈
+- `develop`: 개발 통합 브랜치
+- `feature/feature-name`: 기능 개발
+- `fix/bug-name`: 버그 수정
+- `hotfix/critical-bug`: 긴급 수정
+
+### PR/MR 제목
+
+커밋 컨벤션과 동일하게 한글로 작성:
+
+```
+feat(auth): OAuth2 연동 기능 구현
+fix(api): Rate limiting 이슈 해결
+```
+
+### 커밋 스쿼시
+
+- Feature 브랜치 merge 시 관련 커밋들을 의미있게 스쿼시
+- WIP, fixup 커밋은 반드시 정리
+
+### 커밋 히스토리
+
+- 깔끔하고 읽기 쉬운 히스토리 유지
+- 각 커밋이 독립적으로 빌드 가능해야 함
+- Bisect 디버깅 시 유용하도록 작성
