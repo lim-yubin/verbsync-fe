@@ -4,24 +4,24 @@ import { ROUTES } from "@/lib/constants";
 // Temporary placeholder pages
 function LandingPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
       <div className="text-center">
-        <h1 className="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+        <h1 className="text-5xl font-bold mb-4 text-gray-900 dark:text-gray-100">
           Verbasync
         </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
+        <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
           개발자를 위한 다국어 관리 플랫폼
         </p>
         <div className="space-x-4">
           <a
             href="/login"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="inline-block px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200 transition"
           >
             로그인
           </a>
           <a
             href="/register"
-            className="inline-block px-6 py-3 bg-white text-blue-600 rounded-lg border-2 border-blue-600 hover:bg-blue-50 transition"
+            className="inline-block px-6 py-3 bg-white text-gray-900 rounded-lg border-2 border-gray-900 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-100 dark:hover:bg-gray-700 transition"
           >
             회원가입
           </a>
