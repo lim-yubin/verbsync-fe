@@ -31,17 +31,17 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   filterKeys,
-  groupKeysByNamespace,
+  groupKeysByNamespaceHierarchical,
   extractNamespaces,
   sortKeys,
 } from "@/lib/translation-utils";
 import {
   TranslationFilters,
   TranslationTableHeader,
-  TranslationGroupHeader,
   TranslationKeyRow,
   AddKeyRow,
   TranslationEmptyState,
+  TranslationNamespaceTree,
 } from "@/components/translation";
 
 export function TranslationsPage() {
@@ -157,12 +157,12 @@ export function TranslationsPage() {
     return extractNamespaces(sortedMatrix.rows);
   }, [sortedMatrix]);
 
-  // 그룹화된 매트릭스
-  const groupedMatrix = useMemo(() => {
+  // 그룹화된 매트릭스 (계층적)
+  const groupedMatrixHierarchical = useMemo(() => {
     if (!filteredAndSortedMatrix || !groupByNamespace) {
       return null;
     }
-    return groupKeysByNamespace(filteredAndSortedMatrix.rows);
+    return groupKeysByNamespaceHierarchical(filteredAndSortedMatrix.rows);
   }, [filteredAndSortedMatrix, groupByNamespace]);
 
   // 그룹 접기/펼치기 토글
@@ -358,18 +358,6 @@ export function TranslationsPage() {
   };
 
   // 행 선택 관련 함수들
-  const toggleKeySelection = (key: string) => {
-    setSelectedKeys((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(key)) {
-        newSet.delete(key);
-      } else {
-        newSet.add(key);
-      }
-      return newSet;
-    });
-  };
-
   const toggleSelectAll = () => {
     if (!displayMatrix?.rows) return;
 
@@ -573,85 +561,57 @@ export function TranslationsPage() {
               onSelectAll={toggleSelectAll}
             />
             <TableBody>
-              {groupByNamespace && groupedMatrix
-                ? // 그룹화된 렌더링
-                  Array.from(groupedMatrix.entries())
+              {groupByNamespace && groupedMatrixHierarchical
+                ? // 계층적 그룹화된 렌더링
+                  Array.from(groupedMatrixHierarchical.entries())
                     .sort(([a], [b]) => {
                       // (root) 그룹을 맨 위로
                       if (a === "(root)") return -1;
                       if (b === "(root)") return 1;
                       return a.localeCompare(b);
                     })
-                    .map(([namespace, rows]) => {
-                      const isCollapsed = collapsedGroups.has(namespace);
-                      const groupKeyCount = rows.length;
-
-                      return (
-                        <React.Fragment key={namespace}>
-                          {/* 그룹 헤더 */}
-                          <TranslationGroupHeader
-                            namespace={namespace}
-                            keyCount={groupKeyCount}
-                            isCollapsed={isCollapsed}
-                            onToggle={() => toggleGroup(namespace)}
-                            colSpan={displayMatrix.locales.length + 2}
-                          />
-
-                          {/* 그룹 내 키들 */}
-                          {!isCollapsed &&
-                            rows.map((row) => {
-                              const keyData = keys?.find(
-                                (k) => k.name === row.key
-                              );
-                              const isEditing = editingKey?.key === row.key;
-
-                              return (
-                                <TranslationKeyRow
-                                  key={row.key}
-                                  row={row}
-                                  locales={displayMatrix.locales}
-                                  keyData={keyData}
-                                  isSelected={selectedKeys.has(row.key)}
-                                  isEditing={isEditing}
-                                  editingName={editingKey?.name || ""}
-                                  editingDescription={
-                                    editingKey?.description || null
-                                  }
-                                  changes={changes}
-                                  onSelect={(checked) => {
-                                    if (checked) {
-                                      toggleKeySelection(row.key);
-                                    } else {
-                                      toggleKeySelection(row.key);
-                                    }
-                                  }}
-                                  onStartEdit={() =>
-                                    handleStartEditKey(row.key)
-                                  }
-                                  onEditNameChange={(name) =>
-                                    setEditingKey((prev) =>
-                                      prev ? { ...prev, name } : null
-                                    )
-                                  }
-                                  onEditDescriptionChange={(description) =>
-                                    setEditingKey((prev) =>
-                                      prev ? { ...prev, description } : null
-                                    )
-                                  }
-                                  onSaveEdit={handleSaveEditKey}
-                                  onCancelEdit={handleCancelEditKey}
-                                  onDelete={() => setDeleteDialogKey(row.key)}
-                                  onCellChange={(locale, value) =>
-                                    handleCellChange(row.key, locale, value)
-                                  }
-                                  isUpdatingKey={isUpdatingKey}
-                                  isDeletingKey={isDeletingKey}
-                                />
-                              );
-                            })}
-                        </React.Fragment>
-                      );
-                    })
+                    .map(([, rootNode]) => (
+                      <TranslationNamespaceTree
+                        key={rootNode.fullPath}
+                        node={rootNode}
+                        locales={displayMatrix.locales}
+                        keys={keys}
+                        selectedKeys={selectedKeys}
+                        editingKey={editingKey}
+                        changes={changes}
+                        collapsedGroups={collapsedGroups}
+                        onToggleGroup={toggleGroup}
+                        onSelect={(key, checked) => {
+                          if (checked) {
+                            setSelectedKeys((prev) => new Set(prev).add(key));
+                          } else {
+                            setSelectedKeys((prev) => {
+                              const newSet = new Set(prev);
+                              newSet.delete(key);
+                              return newSet;
+                            });
+                          }
+                        }}
+                        onStartEdit={handleStartEditKey}
+                        onEditNameChange={(name) =>
+                          setEditingKey((prev) =>
+                            prev ? { ...prev, name } : null
+                          )
+                        }
+                        onEditDescriptionChange={(description) =>
+                          setEditingKey((prev) =>
+                            prev ? { ...prev, description } : null
+                          )
+                        }
+                        onSaveEdit={handleSaveEditKey}
+                        onCancelEdit={handleCancelEditKey}
+                        onDelete={(key) => setDeleteDialogKey(key)}
+                        onCellChange={handleCellChange}
+                        isUpdatingKey={isUpdatingKey}
+                        isDeletingKey={isDeletingKey}
+                        colSpan={displayMatrix.locales.length + 2}
+                      />
+                    ))
                 : // 일반 렌더링 (그룹화 없음)
                   displayMatrix.rows.map((row) => {
                     const keyData = keys?.find((k) => k.name === row.key);

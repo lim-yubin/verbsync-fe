@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -45,6 +46,17 @@ export function TranslationFilters({
   filteredCount,
   isFiltered,
 }: TranslationFiltersProps) {
+  // 최상위 namespace만 추출 (필터용)
+  const rootNamespaces = useMemo(() => {
+    const rootSet = new Set<string>();
+    availableNamespaces.forEach((namespace) => {
+      // 첫 번째 부분만 추출 (최상위 namespace)
+      const rootNamespace = namespace.split(".")[0];
+      rootSet.add(rootNamespace);
+    });
+    return Array.from(rootSet).sort();
+  }, [availableNamespaces]);
+
   return (
     <Card className="p-4">
       <div className="flex flex-col gap-4">
@@ -62,13 +74,13 @@ export function TranslationFilters({
           </div>
 
           {/* Namespace 필터 */}
-          {availableNamespaces.length > 0 && (
+          {rootNamespaces.length > 0 && (
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm text-muted-foreground whitespace-nowrap">
                 Namespace:
               </span>
               <div className="flex flex-wrap gap-2">
-                {availableNamespaces.map((namespace) => {
+                {rootNamespaces.map((namespace) => {
                   const isSelected = selectedNamespaces.includes(namespace);
                   return (
                     <Badge
@@ -153,12 +165,10 @@ export function TranslationFilters({
 
           {/* 결과 개수 */}
           <div className="text-sm text-muted-foreground ml-auto">
-            {filteredCount}개 키
-            {isFiltered ? ` (필터링됨)` : ""}
+            {filteredCount}개 키{isFiltered ? ` (필터링됨)` : ""}
           </div>
         </div>
       </div>
     </Card>
   );
 }
-

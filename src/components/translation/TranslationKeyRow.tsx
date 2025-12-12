@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Edit2, Trash2, Check, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,7 @@ interface TranslationKeyRowProps {
   isDeletingKey: boolean;
 }
 
-export function TranslationKeyRow({
+function TranslationKeyRowComponent({
   row,
   locales,
   keyData,
@@ -152,4 +153,8 @@ export function TranslationKeyRow({
     </TableRow>
   );
 }
+
+// React.memo로 불필요한 리렌더링 방지 (성능 최적화)
+ 
+export const TranslationKeyRow = memo(TranslationKeyRowComponent);
 
