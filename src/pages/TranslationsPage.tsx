@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Save, Plus, Edit2, Trash2, Check, X, Info } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -614,7 +614,7 @@ export function TranslationsPage() {
 
         {/* 새 키 추가 버튼 */}
         {!isAddingKey && (
-          <div className="flex justify-center pt-4 border-t">
+          <div className="flex flex-col items-center gap-2 pt-4 border-t">
             <Button
               variant="outline"
               onClick={() => setIsAddingKey(true)}
@@ -622,6 +622,13 @@ export function TranslationsPage() {
             >
               <Plus className="mr-2 h-4 w-4" />새 번역 키 추가
             </Button>
+            <span className="text-xs text-muted-foreground">
+              {navigator.platform.includes("Mac") ||
+              navigator.userAgent.includes("Mac")
+                ? "Cmd+N"
+                : "Ctrl+N"}
+              으로 빠르게 추가
+            </span>
           </div>
         )}
 
