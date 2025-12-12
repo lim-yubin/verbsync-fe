@@ -14,15 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useTranslationMatrix, useUpdateTranslations } from "@/hooks/useTranslations";
@@ -38,8 +30,7 @@ export function TranslationsPage() {
   // 변경사항 추적: "key|locale" -> "value"
   const [changes, setChanges] = useState<Record<string, string>>({});
   
-  // 키 추가 Dialog
-  const [keyDialogOpen, setKeyDialogOpen] = useState(false);
+  // 키 추가 (테이블 하단 행)
   const [keyName, setKeyName] = useState("");
   const [keyDescription, setKeyDescription] = useState("");
 
@@ -97,7 +88,6 @@ export function TranslationsPage() {
       {
         onSuccess: () => {
           toast.success("번역 키가 추가되었습니다");
-          setKeyDialogOpen(false);
           setKeyName("");
           setKeyDescription("");
         },
@@ -172,11 +162,10 @@ export function TranslationsPage() {
     );
   }
 
-  // 언어나 키가 없는 경우
+  // 언어가 없는 경우
   const hasNoLocales = !matrix.locales || matrix.locales.length === 0;
-  const hasNoKeys = !matrix.rows || matrix.rows.length === 0;
 
-  if (hasNoLocales || hasNoKeys) {
+  if (hasNoLocales) {
     return (
       <AppLayout>
         <div className="mx-auto max-w-7xl space-y-6">
@@ -188,15 +177,11 @@ export function TranslationsPage() {
             <div className="text-center">
               <p className="text-lg font-semibold mb-2">번역을 시작하려면</p>
               <p className="text-sm text-muted-foreground mb-4">
-                {hasNoLocales && hasNoKeys
-                  ? "먼저 언어와 번역 키를 추가해주세요"
-                  : hasNoLocales
-                  ? "먼저 언어를 추가해주세요"
-                  : "먼저 번역 키를 추가해주세요"}
+                먼저 언어를 추가해주세요
               </p>
               <div className="flex justify-center gap-2">
                 <Button variant="outline" onClick={() => window.history.back()}>
-                  {hasNoLocales ? "언어 추가하기" : "번역 키 추가하기"}
+                  언어 추가하기
                 </Button>
               </div>
             </div>
@@ -206,6 +191,9 @@ export function TranslationsPage() {
     );
   }
 
+  // 키가 없는 경우도 테이블 구조는 보여주기 (하단에 추가 행 포함)
+  const hasNoKeys = !matrix.rows || matrix.rows.length === 0;
+
   return (
     <AppLayout>
       <div className="mx-auto max-w-full space-y-6">
@@ -213,23 +201,14 @@ export function TranslationsPage() {
           title="번역"
           description={`${matrix.rows.length}개 키 × ${matrix.locales.length}개 언어`}
           action={
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setKeyDialogOpen(true)}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                키 추가
-              </Button>
-              <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
-                <Save className="mr-2 h-4 w-4" />
-                {isSaving
-                  ? "저장 중..."
-                  : hasChanges
-                  ? `저장 (${Object.keys(changes).length})`
-                  : "저장"}
-              </Button>
-            </div>
+            <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
+              <Save className="mr-2 h-4 w-4" />
+              {isSaving
+                ? "저장 중..."
+                : hasChanges
+                ? `저장 (${Object.keys(changes).length})`
+                : "저장"}
+            </Button>
           }
         />
 
@@ -251,7 +230,18 @@ export function TranslationsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {matrix.rows.map((row) => (
+              {hasNoKeys ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={matrix.locales.length + 1}
+                    className="text-center py-8 text-muted-foreground"
+                  >
+                    <p className="text-sm">아직 번역 키가 없습니다</p>
+                    <p className="text-xs mt-1">아래에서 첫 번째 키를 추가하세요</p>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                matrix.rows.map((row) => (
                 <TableRow key={row.key}>
                   <TableCell className="sticky left-0 bg-background z-10 border-r">
                     <div className="font-mono text-sm font-semibold">
@@ -284,7 +274,60 @@ export function TranslationsPage() {
                     );
                   })}
                 </TableRow>
-              ))}
+                ))
+              )}
+              
+              {/* 새 키 추가 행 */}
+              <TableRow className="bg-muted/30">
+                <TableCell className="sticky left-0 bg-muted/30 z-10 border-r">
+                  <div className="space-y-2">
+                    <Input
+                      placeholder="새 키 이름 (예: login.title)"
+                      value={keyName}
+                      onChange={(e) => setKeyName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && keyName.trim()) {
+                          e.preventDefault();
+                          handleAddKey();
+                        }
+                      }}
+                      className="font-mono text-sm h-9"
+                    />
+                    <Textarea
+                      placeholder="설명 (선택)"
+                      value={keyDescription}
+                      onChange={(e) => setKeyDescription(e.target.value)}
+                      rows={2}
+                      className="text-xs resize-none"
+                    />
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        onClick={handleAddKey}
+                        disabled={isCreatingKey || !keyName.trim()}
+                        className="h-7"
+                      >
+                        <Plus className="h-3 w-3 mr-1" />
+                        추가
+                      </Button>
+                      {keyName && (
+                        <span className="text-xs text-muted-foreground">
+                          Enter로 추가
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </TableCell>
+                {matrix.locales.map((locale) => (
+                  <TableCell key={locale.code} className="p-2">
+                    <div className="min-h-[60px] p-3 rounded bg-muted/50 flex items-center justify-center">
+                      <span className="text-xs text-muted-foreground italic">
+                        키 추가 후 번역 가능
+                      </span>
+                    </div>
+                  </TableCell>
+                ))}
+              </TableRow>
             </TableBody>
           </Table>
         </div>
@@ -298,65 +341,6 @@ export function TranslationsPage() {
           </div>
         )}
 
-        {/* 키 추가 다이얼로그 */}
-        <Dialog open={keyDialogOpen} onOpenChange={setKeyDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>새 번역 키 추가</DialogTitle>
-              <DialogDescription>
-                번역에 사용할 키를 추가하세요 (예: login.title, home.hero.subtitle)
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="key-name">
-                  키 이름 <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="key-name"
-                  placeholder="login.title"
-                  value={keyName}
-                  onChange={(e) => setKeyName(e.target.value)}
-                  className="font-mono"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleAddKey();
-                    }
-                  }}
-                />
-                <p className="text-xs text-muted-foreground">
-                  점(.)으로 구분된 키 이름을 사용하세요
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="key-description">설명 (선택)</Label>
-                <Textarea
-                  id="key-description"
-                  placeholder="로그인 페이지의 제목"
-                  value={keyDescription}
-                  onChange={(e) => setKeyDescription(e.target.value)}
-                  rows={3}
-                />
-              </div>
-              <div className="flex justify-end gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setKeyDialogOpen(false);
-                    setKeyName("");
-                    setKeyDescription("");
-                  }}
-                >
-                  취소
-                </Button>
-                <Button onClick={handleAddKey} disabled={isCreatingKey || !keyName.trim()}>
-                  {isCreatingKey ? "추가 중..." : "추가"}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
     </AppLayout>
   );
