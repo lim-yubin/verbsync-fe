@@ -35,9 +35,8 @@ export function ProjectSidebar() {
     },
     {
       title: "설정",
-      href: `/projects/${projectId}/settings`,
+      href: ROUTES.PROJECT_SETTINGS(projectId),
       icon: Settings,
-      disabled: true, // 아직 구현 안 됨
     },
   ];
 

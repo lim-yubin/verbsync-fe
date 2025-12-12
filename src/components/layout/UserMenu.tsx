@@ -1,4 +1,4 @@
-import { LogOut, User as UserIcon, Settings } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { useLogout } from "@/hooks/useAuth";
@@ -58,11 +58,7 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem disabled>
-          <UserIcon className="mr-2 h-4 w-4" />
-          <span>프로필</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem disabled>
+        <DropdownMenuItem onClick={() => navigate(ROUTES.SETTINGS)}>
           <Settings className="mr-2 h-4 w-4" />
           <span>설정</span>
         </DropdownMenuItem>

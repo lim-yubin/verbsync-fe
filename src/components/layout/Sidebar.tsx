@@ -18,9 +18,8 @@ const navItems: NavItem[] = [
   },
   {
     title: "설정",
-    href: "/settings",
+    href: ROUTES.SETTINGS,
     icon: Settings,
-    disabled: true,
   },
 ];
 

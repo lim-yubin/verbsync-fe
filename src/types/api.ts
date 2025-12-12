@@ -24,6 +24,16 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface UpdateProfileDto {
+  name?: string;
+  email?: string;
+}
+
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+}
+
 // ========== Project ==========
 export interface Project {
   id: string;
@@ -38,6 +48,11 @@ export interface Project {
 export interface CreateProjectDto {
   name: string;
   defaultLocale: string;
+}
+
+export interface UpdateProjectDto {
+  name?: string;
+  defaultLocale?: string;
 }
 
 // ========== Locale ==========
@@ -75,6 +90,11 @@ export interface CreateKeyDto {
   description?: string;
 }
 
+export interface UpdateKeyDto {
+  name?: string;
+  description?: string;
+}
+
 // ========== Translation ==========
 export interface Translation {
   id: string;
@@ -109,4 +129,3 @@ export interface TranslationMatrix {
     };
   }>;
 }
-

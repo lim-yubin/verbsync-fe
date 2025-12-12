@@ -1,8 +1,15 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 import { QUERY_KEYS } from "@/lib/constants";
-import type { LoginDto, RegisterDto, AuthResponse, User } from "@/types/api";
+import type {
+  LoginDto,
+  RegisterDto,
+  AuthResponse,
+  User,
+  UpdateProfileDto,
+  ChangePasswordDto,
+} from "@/types/api";
 
 // 로그인
 export function useLogin() {
@@ -59,6 +66,56 @@ export function useLogout() {
     },
     onSettled: () => {
       // 성공/실패 상관없이 로컬 상태 클리어
+      logout();
+    },
+  });
+}
+
+// 프로필 수정
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+  const setUser = useAuthStore((state) => state.setUser);
+
+  return useMutation({
+    mutationFn: async (dto: UpdateProfileDto) => {
+      const { data } = await api.patch<User>("/auth/me", dto);
+      return data;
+    },
+    onSuccess: (data) => {
+      // 사용자 정보 갱신
+      queryClient.setQueryData(QUERY_KEYS.AUTH_ME, data);
+      setUser(data);
+    },
+  });
+}
+
+// 비밀번호 변경
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: async (dto: ChangePasswordDto) => {
+      const { data } = await api.patch<{ message: string }>(
+        "/auth/me/password",
+        dto
+      );
+      return data;
+    },
+  });
+}
+
+// 계정 삭제
+export function useDeleteAccount() {
+  const logout = useAuthStore((state) => state.logout);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await api.delete<{ message: string }>("/auth/me");
+      return data;
+    },
+    onSuccess: () => {
+      // 모든 쿼리 캐시 클리어
+      queryClient.clear();
+      // 로컬 상태 클리어
       logout();
     },
   });
