@@ -73,40 +73,6 @@ export function TranslationFilters({
             />
           </div>
 
-          {/* Namespace 필터 */}
-          {rootNamespaces.length > 0 && (
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm text-muted-foreground whitespace-nowrap">
-                Namespace:
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {rootNamespaces.map((namespace) => {
-                  const isSelected = selectedNamespaces.includes(namespace);
-                  return (
-                    <Badge
-                      key={namespace}
-                      variant={isSelected ? "default" : "outline"}
-                      className="cursor-pointer"
-                      onClick={() => onNamespaceToggle(namespace)}
-                    >
-                      {namespace}
-                    </Badge>
-                  );
-                })}
-                {selectedNamespaces.length > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 px-2 text-xs"
-                    onClick={onNamespaceClear}
-                  >
-                    모두 해제
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
-
           {/* 빈 번역 필터 */}
           <div className="flex items-center gap-2">
             <Checkbox
@@ -162,6 +128,39 @@ export function TranslationFilters({
               Namespace별 그룹화
             </label>
           </div>
+          {/* Namespace 필터 */}
+          {rootNamespaces.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-muted-foreground whitespace-nowrap">
+                Namespace:
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {rootNamespaces.map((namespace) => {
+                  const isSelected = selectedNamespaces.includes(namespace);
+                  return (
+                    <Badge
+                      key={namespace}
+                      variant={isSelected ? "default" : "outline"}
+                      className="cursor-pointer"
+                      onClick={() => onNamespaceToggle(namespace)}
+                    >
+                      {namespace}
+                    </Badge>
+                  );
+                })}
+                {selectedNamespaces.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs"
+                    onClick={onNamespaceClear}
+                  >
+                    모두 해제
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* 결과 개수 */}
           <div className="text-sm text-muted-foreground ml-auto">

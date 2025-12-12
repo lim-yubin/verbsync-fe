@@ -2,6 +2,11 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { TableCell, TableRow } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { KeyAutocomplete } from "./KeyAutocomplete";
 import type { TranslationMatrix } from "@/types/api";
 
@@ -15,7 +20,9 @@ interface AddKeyRowProps {
   onKeyDescriptionChange: (value: string) => void;
   onAdd: () => void;
   onCancel: () => void;
-  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onKeyDown?: (
+    e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
 }
 
 export function AddKeyRow({
@@ -31,12 +38,14 @@ export function AddKeyRow({
   onKeyDown,
 }: AddKeyRowProps) {
   const isMac =
-    navigator.platform.includes("Mac") ||
-    navigator.userAgent.includes("Mac");
+    navigator.platform.includes("Mac") || navigator.userAgent.includes("Mac");
+
+  // dot(.)이 있는지 확인
+  const isValidKeyName = keyName.trim().includes(".");
 
   return (
-    <TableRow className="bg-muted/30 border-t-2 border-primary/20">
-      <TableCell className="sticky left-0 bg-muted/30 z-10 border-r w-[50px]">
+    <TableRow className="bg-background border-t-2 border-primary/20">
+      <TableCell className="sticky left-0 bg-background z-10 border-r w-[50px]">
         {/* 체크박스 셀은 비워둠 */}
       </TableCell>
       <TableCell className="sticky left-0 bg-background z-10 border-r">
@@ -53,30 +62,43 @@ export function AddKeyRow({
             placeholder="설명 (선택)"
             value={keyDescription}
             onChange={(e) => onKeyDescriptionChange(e.target.value)}
-            onKeyDown={(e) => {
-              // Cmd+Enter (Mac) 또는 Ctrl+Enter (Windows)로 추가
-              if (
-                e.key === "Enter" &&
-                (e.metaKey || e.ctrlKey) &&
-                keyName.trim()
-              ) {
-                e.preventDefault();
-                onAdd();
-              }
-            }}
+            onKeyDown={onKeyDown}
             rows={2}
             className="text-xs resize-none"
           />
           <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              onClick={onAdd}
-              disabled={isCreating || !keyName.trim()}
-              className="h-7"
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              {isCreating ? "추가 중..." : "추가"}
-            </Button>
+            {!isValidKeyName && keyName.trim() ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div>
+                    <Button
+                      size="sm"
+                      onClick={onAdd}
+                      disabled={
+                        isCreating || !keyName.trim() || !isValidKeyName
+                      }
+                      className="h-7"
+                    >
+                      <Plus className="h-3 w-3 mr-1" />
+                      {isCreating ? "추가 중..." : "추가"}
+                    </Button>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>키 이름은 dot notation이어야 합니다 (예: login.title)</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <Button
+                size="sm"
+                onClick={onAdd}
+                disabled={isCreating || !keyName.trim() || !isValidKeyName}
+                className="h-7"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                {isCreating ? "추가 중..." : "추가"}
+              </Button>
+            )}
             <Button
               size="sm"
               variant="ghost"
@@ -106,4 +128,3 @@ export function AddKeyRow({
     </TableRow>
   );
 }
-

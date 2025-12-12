@@ -217,13 +217,21 @@ export function TranslationsPage() {
   };
 
   const handleAddKey = () => {
-    if (!keyName.trim()) {
+    const trimmedKeyName = keyName.trim();
+
+    if (!trimmedKeyName) {
       toast.error("키 이름을 입력해주세요");
       return;
     }
 
+    // dot(.)이 없으면 namespace가 없는 키이므로 추가 불가
+    if (!trimmedKeyName.includes(".")) {
+      toast.error("키 이름은 namespace를 포함해야 합니다 (예: login.title)");
+      return;
+    }
+
     createKey(
-      { name: keyName.trim(), description: keyDescription.trim() || undefined },
+      { name: trimmedKeyName, description: keyDescription.trim() || undefined },
       {
         onSuccess: () => {
           toast.success("번역 키가 추가되었습니다");
@@ -678,13 +686,20 @@ export function TranslationsPage() {
                   onCancel={handleCancelAddKey}
                   onKeyDown={(e) => {
                     // Cmd+Enter (Mac) 또는 Ctrl+Enter (Windows)로 추가
+                    const trimmedKeyName = keyName.trim();
                     if (
                       e.key === "Enter" &&
                       (e.metaKey || e.ctrlKey) &&
-                      keyName.trim()
+                      trimmedKeyName
                     ) {
                       e.preventDefault();
-                      handleAddKey();
+                      if (trimmedKeyName.includes(".")) {
+                        handleAddKey();
+                      } else {
+                        toast.error(
+                          "키 이름은 dot notation이어야 합니다 (예: login.title)"
+                        );
+                      }
                     } else if (e.key === "Escape") {
                       handleCancelAddKey();
                     }
