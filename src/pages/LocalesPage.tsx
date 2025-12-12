@@ -215,16 +215,35 @@ function LocaleItem({ locale, projectId, isDefault }: LocaleItemProps) {
   };
 
   return (
-    <Card className="p-6">
+    <Card
+      className={`p-6 transition-opacity ${
+        !locale.isActive ? "opacity-60" : ""
+      }`}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted font-semibold text-lg">
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded-lg font-semibold text-lg ${
+              locale.isActive ? "bg-muted" : "bg-muted/50"
+            }`}
+          >
             {locale.code}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold">{locale.name}</h3>
+              <h3
+                className={`font-semibold ${
+                  !locale.isActive ? "text-muted-foreground" : ""
+                }`}
+              >
+                {locale.name}
+              </h3>
               {isDefault && <Badge variant="secondary">기본 언어</Badge>}
+              {!locale.isActive && (
+                <Badge variant="outline" className="text-xs">
+                  비활성화
+                </Badge>
+              )}
             </div>
             <p className="text-sm text-muted-foreground">
               {locale.code.toUpperCase()}
@@ -232,10 +251,22 @@ function LocaleItem({ locale, projectId, isDefault }: LocaleItemProps) {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Label htmlFor={`switch-${locale.id}`} className="text-sm">
-              {locale.isActive ? "활성화됨" : "비활성화됨"}
-            </Label>
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <Label
+                htmlFor={`switch-${locale.id}`}
+                className={`text-sm cursor-pointer ${
+                  !locale.isActive ? "text-muted-foreground" : ""
+                }`}
+              >
+                {locale.isActive ? "활성화됨" : "비활성화됨"}
+              </Label>
+              {!locale.isActive && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  번역 테이블에서 숨김
+                </p>
+              )}
+            </div>
             <Switch
               id={`switch-${locale.id}`}
               checked={locale.isActive}
