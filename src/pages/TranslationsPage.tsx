@@ -510,11 +510,11 @@ export function TranslationsPage() {
                     className="cursor-pointer"
                   />
                 </TableHead>
-                <TableHead className="w-[200px] sticky left-[50px] bg-background z-10 border-r">
+                <TableHead className="w-[200px] sticky left-0 bg-background z-10 border-r">
                   키
                 </TableHead>
                 {displayMatrix.locales.map((locale) => (
-                  <TableHead key={locale.code} className="min-w-[250px]">
+                  <TableHead key={locale.code} className="min-w-[300px]">
                     <div className="font-semibold">{locale.name}</div>
                     <div className="text-xs text-muted-foreground font-normal">
                       {locale.code}
@@ -555,7 +555,7 @@ export function TranslationsPage() {
                           className="cursor-pointer"
                         />
                       </TableCell>
-                      <TableCell className="sticky left-[50px] bg-background z-10 border-r min-w-[250px]">
+                      <TableCell className="sticky left-0 bg-background z-10 border-r min-w-[300px]">
                         {isEditing && keyData ? (
                           <div className="space-y-2">
                             <Input
@@ -646,7 +646,7 @@ export function TranslationsPage() {
                         return (
                           <TableCell
                             key={locale.code}
-                            className="p-2 max-w-[250px]"
+                            className="p-2 max-w-[300px]"
                           >
                             <EditableCell
                               value={currentValue}
@@ -666,6 +666,9 @@ export function TranslationsPage() {
               {/* 새 키 추가 행 */}
               {isAddingKey && (
                 <TableRow className="bg-muted/30 border-t-2 border-primary/20">
+                  <TableCell className="sticky left-0 bg-muted/30 z-10 border-r w-[50px]">
+                    {/* 체크박스 셀은 비워둠 */}
+                  </TableCell>
                   <TableCell className="sticky left-0 bg-background z-10 border-r">
                     <div className="space-y-2">
                       <KeyAutocomplete
@@ -793,8 +796,7 @@ export function TranslationsPage() {
               <AlertDialogTitle>선택한 키 삭제</AlertDialogTitle>
               <AlertDialogDescription>
                 선택한 {selectedKeys.size}개의 번역 키를 삭제하시겠습니까?
-                <br />
-                이 작업은 되돌릴 수 없습니다.
+                <br />이 작업은 되돌릴 수 없습니다.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
