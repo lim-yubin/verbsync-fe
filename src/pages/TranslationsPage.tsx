@@ -17,8 +17,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { useTranslationMatrix, useUpdateTranslations } from "@/hooks/useTranslations";
-import { useCreateKey, useKeys, useUpdateKey, useDeleteKey } from "@/hooks/useKeys";
+import {
+  useTranslationMatrix,
+  useUpdateTranslations,
+} from "@/hooks/useTranslations";
+import {
+  useCreateKey,
+  useKeys,
+  useUpdateKey,
+  useDeleteKey,
+} from "@/hooks/useKeys";
 import { EditableCell } from "@/components/translation/EditableCell";
 import {
   AlertDialog,
@@ -35,14 +43,21 @@ export function TranslationsPage() {
   const { id: projectId } = useParams<{ id: string }>();
   const { data: matrix, isLoading, error } = useTranslationMatrix(projectId!);
   const { data: keys } = useKeys(projectId!); // 키 목록 (createdAt 포함)
-  const { mutate: updateTranslations, isPending: isSaving } = useUpdateTranslations(projectId!);
-  const { mutate: createKey, isPending: isCreatingKey } = useCreateKey(projectId!);
-  const { mutate: updateKey, isPending: isUpdatingKey } = useUpdateKey(projectId!);
-  const { mutate: deleteKey, isPending: isDeletingKey } = useDeleteKey(projectId!);
+  const { mutate: updateTranslations, isPending: isSaving } =
+    useUpdateTranslations(projectId!);
+  const { mutate: createKey, isPending: isCreatingKey } = useCreateKey(
+    projectId!
+  );
+  const { mutate: updateKey, isPending: isUpdatingKey } = useUpdateKey(
+    projectId!
+  );
+  const { mutate: deleteKey, isPending: isDeletingKey } = useDeleteKey(
+    projectId!
+  );
 
   // 변경사항 추적: "key|locale" -> "value"
   const [changes, setChanges] = useState<Record<string, string>>({});
-  
+
   // 키 추가 (테이블 하단 행)
   const [keyName, setKeyName] = useState("");
   const [keyDescription, setKeyDescription] = useState("");
@@ -128,7 +143,9 @@ export function TranslationsPage() {
           setIsAddingKey(false);
         },
         onError: (error: any) => {
-          toast.error(error.response?.data?.message || "키 추가에 실패했습니다");
+          toast.error(
+            error.response?.data?.message || "키 추가에 실패했습니다"
+          );
         },
       }
     );
@@ -248,7 +265,9 @@ export function TranslationsPage() {
                 데이터를 불러올 수 없습니다
               </p>
               <p className="text-sm text-muted-foreground mb-4">
-                {error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다"}
+                {error instanceof Error
+                  ? error.message
+                  : "알 수 없는 오류가 발생했습니다"}
               </p>
             </div>
           </Card>
@@ -288,7 +307,8 @@ export function TranslationsPage() {
   const displayMatrix = sortedMatrix || matrix;
 
   // 언어가 없는 경우
-  const hasNoLocales = !displayMatrix?.locales || displayMatrix.locales.length === 0;
+  const hasNoLocales =
+    !displayMatrix?.locales || displayMatrix.locales.length === 0;
 
   if (hasNoLocales) {
     return (
@@ -362,7 +382,9 @@ export function TranslationsPage() {
                     className="text-center py-8 text-muted-foreground"
                   >
                     <p className="text-sm">아직 번역 키가 없습니다</p>
-                    <p className="text-xs mt-1">아래 버튼을 클릭하여 첫 번째 키를 추가하세요</p>
+                    <p className="text-xs mt-1">
+                      아래 버튼을 클릭하여 첫 번째 키를 추가하세요
+                    </p>
                   </TableCell>
                 </TableRow>
               ) : (
@@ -452,31 +474,31 @@ export function TranslationsPage() {
                           </div>
                         )}
                       </TableCell>
-                    {displayMatrix.locales.map((locale) => {
-                      const changeKey = `${row.key}|${locale.code}`;
-                      const currentValue =
-                        changeKey in changes
-                          ? changes[changeKey]
-                          : row.translations[locale.code] || "";
-                      const isModified = changeKey in changes;
+                      {displayMatrix.locales.map((locale) => {
+                        const changeKey = `${row.key}|${locale.code}`;
+                        const currentValue =
+                          changeKey in changes
+                            ? changes[changeKey]
+                            : row.translations[locale.code] || "";
+                        const isModified = changeKey in changes;
 
-                      return (
-                        <TableCell key={locale.code} className="p-2">
-                          <EditableCell
-                            value={currentValue}
-                            onChange={(value) =>
-                              handleCellChange(row.key, locale.code, value)
-                            }
-                            isModified={isModified}
-                          />
-                        </TableCell>
-                      );
-                    })}
+                        return (
+                          <TableCell key={locale.code} className="p-2">
+                            <EditableCell
+                              value={currentValue}
+                              onChange={(value) =>
+                                handleCellChange(row.key, locale.code, value)
+                              }
+                              isModified={isModified}
+                            />
+                          </TableCell>
+                        );
+                      })}
                     </TableRow>
                   );
                 })
               )}
-              
+
               {/* 새 키 추가 행 */}
               {isAddingKey && (
                 <TableRow className="bg-muted/30 border-t-2 border-primary/20">
@@ -487,7 +509,11 @@ export function TranslationsPage() {
                         value={keyName}
                         onChange={(e) => setKeyName(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter" && keyName.trim() && !e.shiftKey) {
+                          if (
+                            e.key === "Enter" &&
+                            keyName.trim() &&
+                            !e.shiftKey
+                          ) {
                             e.preventDefault();
                             handleAddKey();
                           } else if (e.key === "Escape") {
@@ -554,8 +580,7 @@ export function TranslationsPage() {
               onClick={() => setIsAddingKey(true)}
               className="w-full max-w-md"
             >
-              <Plus className="mr-2 h-4 w-4" />
-              새 번역 키 추가
+              <Plus className="mr-2 h-4 w-4" />새 번역 키 추가
             </Button>
           </div>
         )}
@@ -564,7 +589,9 @@ export function TranslationsPage() {
           <div className="fixed bottom-6 right-6">
             <Button size="lg" onClick={handleSave} disabled={isSaving}>
               <Save className="mr-2 h-5 w-5" />
-              {isSaving ? "저장 중..." : `${Object.keys(changes).length}개 저장`}
+              {isSaving
+                ? "저장 중..."
+                : `${Object.keys(changes).length}개 저장`}
             </Button>
           </div>
         )}
@@ -578,20 +605,22 @@ export function TranslationsPage() {
             <AlertDialogHeader>
               <AlertDialogTitle>번역 키 삭제 확인</AlertDialogTitle>
               <AlertDialogDescription>
-                <span className="font-mono font-semibold">{deleteDialogKey}</span>{" "}
+                <span className="font-mono font-semibold">
+                  {deleteDialogKey}
+                </span>{" "}
                 키를 삭제하시겠습니까?
                 <br />
-                <br />
-                이 작업은 되돌릴 수 없으며, 해당 키의 모든 번역 데이터가
+                <br />이 작업은 되돌릴 수 없으며, 해당 키의 모든 번역 데이터가
                 영구적으로 삭제됩니다.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isDeletingKey}>취소</AlertDialogCancel>
+              <AlertDialogCancel disabled={isDeletingKey}>
+                취소
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteKey}
                 disabled={isDeletingKey}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
                 {isDeletingKey ? "삭제 중..." : "삭제"}
               </AlertDialogAction>
@@ -602,4 +631,3 @@ export function TranslationsPage() {
     </AppLayout>
   );
 }
-

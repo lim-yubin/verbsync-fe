@@ -359,7 +359,6 @@ function LocaleItem({ locale, projectId, isDefault }: LocaleItemProps) {
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? "삭제 중..." : "삭제"}
             </AlertDialogAction>
