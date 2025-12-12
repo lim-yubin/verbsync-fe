@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -13,38 +13,64 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProject } from "@/hooks/useProjects";
+import { SUPPORTED_LOCALES } from "@/lib/locales";
 
 export function LocalesPage() {
   const { id: projectId } = useParams<{ id: string }>();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [localeName, setLocaleName] = useState("");
-  const [localeCode, setLocaleCode] = useState("");
+  const [selectedLocaleCode, setSelectedLocaleCode] = useState<string>("");
 
   const { data: project } = useProject(projectId!);
   const { data: locales, isLoading } = useLocales(projectId!);
   const { mutate: createLocale, isPending: isCreating } = useCreateLocale(projectId!);
 
+  // 이미 추가된 언어 코드 목록
+  const addedLocaleCodes = useMemo(
+    () => new Set(locales?.map((l) => l.code) || []),
+    [locales]
+  );
+
+  // 선택 가능한 언어 목록 (이미 추가된 언어 제외)
+  const availableLocales = useMemo(
+    () => SUPPORTED_LOCALES.filter((locale) => !addedLocaleCodes.has(locale.code)),
+    [addedLocaleCodes]
+  );
+
   const handleCreate = () => {
-    if (!localeCode || !localeName) {
-      toast.error("언어 코드와 이름을 입력해주세요");
+    if (!selectedLocaleCode) {
+      toast.error("언어를 선택해주세요");
+      return;
+    }
+
+    const selectedLocale = SUPPORTED_LOCALES.find(
+      (l) => l.code === selectedLocaleCode
+    );
+
+    if (!selectedLocale) {
+      toast.error("선택한 언어를 찾을 수 없습니다");
       return;
     }
 
     createLocale(
-      { code: localeCode, name: localeName },
+      { code: selectedLocale.code, name: selectedLocale.name },
       {
         onSuccess: () => {
           toast.success("언어가 추가되었습니다");
           setDialogOpen(false);
-          setLocaleCode("");
-          setLocaleName("");
+          setSelectedLocaleCode("");
         },
         onError: (error: any) => {
           toast.error(error.response?.data?.message || "언어 추가에 실패했습니다");
@@ -106,28 +132,45 @@ export function LocalesPage() {
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div className="space-y-2">
-              <Label htmlFor="code">언어 코드</Label>
-              <Input
-                id="code"
-                placeholder="en, ko, ja..."
-                value={localeCode}
-                onChange={(e) => setLocaleCode(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="name">언어 이름</Label>
-              <Input
-                id="name"
-                placeholder="English, 한국어, 日本語..."
-                value={localeName}
-                onChange={(e) => setLocaleName(e.target.value)}
-              />
+              <Label htmlFor="locale">
+                언어 선택 <span className="text-destructive">*</span>
+              </Label>
+              {availableLocales.length === 0 ? (
+                <div className="rounded-md border p-4 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    추가 가능한 언어가 없습니다
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    모든 지원 언어가 이미 추가되었습니다
+                  </p>
+                </div>
+              ) : (
+                <Select
+                  value={selectedLocaleCode}
+                  onValueChange={setSelectedLocaleCode}
+                  disabled={isCreating}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="언어를 선택하세요" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableLocales.map((locale) => (
+                      <SelectItem key={locale.code} value={locale.code}>
+                        {locale.name} ({locale.code.toUpperCase()})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             <div className="flex justify-end gap-3">
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
                 취소
               </Button>
-              <Button onClick={handleCreate} disabled={isCreating}>
+              <Button
+                onClick={handleCreate}
+                disabled={isCreating || !selectedLocaleCode || availableLocales.length === 0}
+              >
                 {isCreating ? "추가 중..." : "추가"}
               </Button>
             </div>

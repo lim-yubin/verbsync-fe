@@ -22,16 +22,7 @@ import {
 } from "@/components/ui/select";
 import { useCreateProject } from "@/hooks/useProjects";
 import { ROUTES } from "@/lib/constants";
-
-const SUPPORTED_LOCALES = [
-  { value: "en", label: "English (en)" },
-  { value: "ko", label: "한국어 (ko)" },
-  { value: "ja", label: "日本語 (ja)" },
-  { value: "zh", label: "中文 (zh)" },
-  { value: "es", label: "Español (es)" },
-  { value: "fr", label: "Français (fr)" },
-  { value: "de", label: "Deutsch (de)" },
-] as const;
+import { SUPPORTED_LOCALES } from "@/lib/locales";
 
 const projectSchema = z.object({
   name: z
@@ -129,8 +120,8 @@ export function ProjectCreateDialog({
               </SelectTrigger>
               <SelectContent>
                 {SUPPORTED_LOCALES.map((locale) => (
-                  <SelectItem key={locale.value} value={locale.value}>
-                    {locale.label}
+                  <SelectItem key={locale.code} value={locale.code}>
+                    {locale.name} ({locale.code.toUpperCase()})
                   </SelectItem>
                 ))}
               </SelectContent>
