@@ -1,6 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ROUTES } from "@/lib/constants";
-import { LandingPage, LoginPage, RegisterPage, DashboardPage } from "@/pages";
+import { 
+  LandingPage, 
+  LoginPage, 
+  RegisterPage, 
+  DashboardPage,
+  ProjectDetailPage 
+} from "@/pages";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { PublicRoute } from "@/components/auth/PublicRoute";
 
@@ -40,6 +46,14 @@ function App() {
           element={
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects/:id"
+          element={
+            <ProtectedRoute>
+              <ProjectDetailPage />
             </ProtectedRoute>
           }
         />
