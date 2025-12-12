@@ -625,9 +625,9 @@ export function TranslationsPage() {
             <span className="text-xs text-muted-foreground">
               {navigator.platform.includes("Mac") ||
               navigator.userAgent.includes("Mac")
-                ? "Cmd+N"
-                : "Ctrl+N"}
-              으로 빠르게 추가
+                ? "Cmd+Shift+Enter"
+                : "Ctrl+Shift+Enter"}
+              로 빠르게 추가
             </span>
           </div>
         )}
