@@ -1,15 +1,48 @@
 import { useParams } from "react-router-dom";
+import { useMemo } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiKeyDisplay } from "@/components/project/ApiKeyDisplay";
 import { ProjectStats } from "@/components/project/ProjectStats";
 import { useProject } from "@/hooks/useProjects";
+import { useLocales } from "@/hooks/useLocales";
+import { useKeys } from "@/hooks/useKeys";
+import { useTranslationMatrix } from "@/hooks/useTranslations";
 import { Badge } from "@/components/ui/badge";
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { data: project, isLoading } = useProject(id!);
+  const { data: project, isLoading: isProjectLoading } = useProject(id!);
+  const { data: locales, isLoading: isLocalesLoading } = useLocales(id!);
+  const { data: keys, isLoading: isKeysLoading } = useKeys(id!);
+  const { data: translationMatrix, isLoading: isMatrixLoading } =
+    useTranslationMatrix(id!);
+
+  // 통계 계산
+  const stats = useMemo(() => {
+    // 활성화된 언어 수
+    const localesCount =
+      locales?.filter((locale) => locale.isActive).length || 0;
+
+    // 번역 키 수
+    const keysCount = keys?.length || 0;
+
+    // 작성된 번역 수 (비어있지 않은 번역 값의 개수)
+    const translationsCount =
+      translationMatrix?.rows.reduce((count, row) => {
+        return (
+          count +
+          Object.values(row.translations).filter((value) => value.trim() !== "")
+            .length
+        );
+      }, 0) || 0;
+
+    return { localesCount, keysCount, translationsCount };
+  }, [locales, keys, translationMatrix]);
+
+  const isLoading =
+    isProjectLoading || isLocalesLoading || isKeysLoading || isMatrixLoading;
 
   if (isLoading) {
     return (
@@ -58,9 +91,9 @@ export function ProjectDetailPage() {
 
         {/* Stats */}
         <ProjectStats
-          localesCount={0}
-          keysCount={0}
-          translationsCount={0}
+          localesCount={stats.localesCount}
+          keysCount={stats.keysCount}
+          translationsCount={stats.translationsCount}
         />
 
         {/* API Key */}
