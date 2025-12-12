@@ -540,6 +540,17 @@ export function TranslationsPage() {
                         placeholder="설명 (선택)"
                         value={keyDescription}
                         onChange={(e) => setKeyDescription(e.target.value)}
+                        onKeyDown={(e) => {
+                          // Cmd+Enter (Mac) 또는 Ctrl+Enter (Windows)로 추가
+                          if (
+                            e.key === "Enter" &&
+                            (e.metaKey || e.ctrlKey) &&
+                            keyName.trim()
+                          ) {
+                            e.preventDefault();
+                            handleAddKey();
+                          }
+                        }}
                         rows={2}
                         className="text-xs resize-none"
                       />
