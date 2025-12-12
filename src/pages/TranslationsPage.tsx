@@ -575,7 +575,11 @@ export function TranslationsPage() {
                         </Button>
                         {keyName && (
                           <span className="text-xs text-muted-foreground">
-                            Enter: 추가, Esc: 취소
+                            {navigator.platform.includes("Mac") ||
+                            navigator.userAgent.includes("Mac")
+                              ? "Cmd+Enter"
+                              : "Ctrl+Enter"}
+                            : 추가, Esc: 취소
                           </span>
                         )}
                       </div>
