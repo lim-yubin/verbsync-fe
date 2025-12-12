@@ -92,7 +92,9 @@ export function LocalesPage() {
           setSelectedLocaleCode("");
         },
         onError: (error: Error) => {
-          const axiosError = error as { response?: { data?: { message?: string } } };
+          const axiosError = error as {
+            response?: { data?: { message?: string } };
+          };
           toast.error(
             axiosError.response?.data?.message || "언어 추가에 실패했습니다"
           );
@@ -219,9 +221,8 @@ function LocaleItem({ locale, projectId, isDefault }: LocaleItemProps) {
     projectId,
     locale.id
   );
-  const { mutate: deleteLocale, isPending: isDeleting } = useDeleteLocale(
-    projectId
-  );
+  const { mutate: deleteLocale, isPending: isDeleting } =
+    useDeleteLocale(projectId);
 
   const handleToggle = (checked: boolean) => {
     if (isDefault && !checked) {
@@ -238,7 +239,9 @@ function LocaleItem({ locale, projectId, isDefault }: LocaleItemProps) {
           );
         },
         onError: (error: Error) => {
-          const axiosError = error as { response?: { data?: { message?: string } } };
+          const axiosError = error as {
+            response?: { data?: { message?: string } };
+          };
           toast.error(
             axiosError.response?.data?.message || "상태 변경에 실패했습니다"
           );
@@ -254,7 +257,9 @@ function LocaleItem({ locale, projectId, isDefault }: LocaleItemProps) {
         setDeleteDialogOpen(false);
       },
       onError: (error: Error) => {
-        const axiosError = error as { response?: { data?: { message?: string } } };
+        const axiosError = error as {
+          response?: { data?: { message?: string } };
+        };
         toast.error(
           axiosError.response?.data?.message || "언어 삭제에 실패했습니다"
         );
@@ -345,8 +350,7 @@ function LocaleItem({ locale, projectId, isDefault }: LocaleItemProps) {
               <span className="font-semibold">{locale.name}</span> (
               {locale.code.toUpperCase()}) 언어를 삭제하시겠습니까?
               <br />
-              <br />
-              이 작업은 되돌릴 수 없으며, 해당 언어의 모든 번역 데이터가
+              <br />이 작업은 되돌릴 수 없으며, 해당 언어의 모든 번역 데이터가
               영구적으로 삭제됩니다.
             </AlertDialogDescription>
           </AlertDialogHeader>

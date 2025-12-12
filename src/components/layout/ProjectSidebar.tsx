@@ -1,5 +1,5 @@
 import { Link, useLocation, useParams } from "react-router-dom";
-import { Home, Globe, Key, Languages, Settings, ChevronLeft } from "lucide-react";
+import { Home, Globe, Languages, Settings, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
@@ -27,11 +27,6 @@ export function ProjectSidebar() {
       title: "언어",
       href: ROUTES.PROJECT_LOCALES(projectId),
       icon: Globe,
-    },
-    {
-      title: "번역 키",
-      href: ROUTES.PROJECT_KEYS(projectId),
-      icon: Key,
     },
     {
       title: "번역",
