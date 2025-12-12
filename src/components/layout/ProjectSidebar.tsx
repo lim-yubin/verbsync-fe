@@ -37,7 +37,6 @@ export function ProjectSidebar() {
       title: "번역",
       href: ROUTES.PROJECT_TRANSLATIONS(projectId),
       icon: Languages,
-      disabled: true, // 아직 구현 안 됨
     },
     {
       title: "설정",
