@@ -33,6 +33,7 @@ export function TranslationsPage() {
   // 키 추가 (테이블 하단 행)
   const [keyName, setKeyName] = useState("");
   const [keyDescription, setKeyDescription] = useState("");
+  const [isAddingKey, setIsAddingKey] = useState(false);
 
   // 디버깅용 로그
   console.log("TranslationsPage Debug:", {
@@ -90,12 +91,19 @@ export function TranslationsPage() {
           toast.success("번역 키가 추가되었습니다");
           setKeyName("");
           setKeyDescription("");
+          setIsAddingKey(false);
         },
         onError: (error: any) => {
           toast.error(error.response?.data?.message || "키 추가에 실패했습니다");
         },
       }
     );
+  };
+
+  const handleCancelAddKey = () => {
+    setKeyName("");
+    setKeyDescription("");
+    setIsAddingKey(false);
   };
 
   const hasChanges = Object.keys(changes).length > 0;
@@ -230,107 +238,135 @@ export function TranslationsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {hasNoKeys ? (
+              {hasNoKeys && !isAddingKey ? (
                 <TableRow>
                   <TableCell
                     colSpan={matrix.locales.length + 1}
                     className="text-center py-8 text-muted-foreground"
                   >
                     <p className="text-sm">아직 번역 키가 없습니다</p>
-                    <p className="text-xs mt-1">아래에서 첫 번째 키를 추가하세요</p>
+                    <p className="text-xs mt-1">아래 버튼을 클릭하여 첫 번째 키를 추가하세요</p>
                   </TableCell>
                 </TableRow>
               ) : (
                 matrix.rows.map((row) => (
-                <TableRow key={row.key}>
-                  <TableCell className="sticky left-0 bg-background z-10 border-r">
-                    <div className="font-mono text-sm font-semibold">
-                      {row.key}
-                    </div>
-                    {row.description && (
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {row.description}
+                  <TableRow key={row.key}>
+                    <TableCell className="sticky left-0 bg-background z-10 border-r">
+                      <div className="font-mono text-sm font-semibold">
+                        {row.key}
                       </div>
-                    )}
-                  </TableCell>
-                  {matrix.locales.map((locale) => {
-                    const changeKey = `${row.key}|${locale.code}`;
-                    const currentValue =
-                      changeKey in changes
-                        ? changes[changeKey]
-                        : row.translations[locale.code] || "";
-                    const isModified = changeKey in changes;
+                      {row.description && (
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {row.description}
+                        </div>
+                      )}
+                    </TableCell>
+                    {matrix.locales.map((locale) => {
+                      const changeKey = `${row.key}|${locale.code}`;
+                      const currentValue =
+                        changeKey in changes
+                          ? changes[changeKey]
+                          : row.translations[locale.code] || "";
+                      const isModified = changeKey in changes;
 
-                    return (
-                      <TableCell key={locale.code} className="p-2">
-                        <EditableCell
-                          value={currentValue}
-                          onChange={(value) =>
-                            handleCellChange(row.key, locale.code, value)
-                          }
-                          isModified={isModified}
-                        />
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
+                      return (
+                        <TableCell key={locale.code} className="p-2">
+                          <EditableCell
+                            value={currentValue}
+                            onChange={(value) =>
+                              handleCellChange(row.key, locale.code, value)
+                            }
+                            isModified={isModified}
+                          />
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
                 ))
               )}
               
               {/* 새 키 추가 행 */}
-              <TableRow className="bg-muted/30">
-                <TableCell className="sticky left-0 bg-muted/30 z-10 border-r">
-                  <div className="space-y-2">
-                    <Input
-                      placeholder="새 키 이름 (예: login.title)"
-                      value={keyName}
-                      onChange={(e) => setKeyName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && keyName.trim()) {
-                          e.preventDefault();
-                          handleAddKey();
-                        }
-                      }}
-                      className="font-mono text-sm h-9"
-                    />
-                    <Textarea
-                      placeholder="설명 (선택)"
-                      value={keyDescription}
-                      onChange={(e) => setKeyDescription(e.target.value)}
-                      rows={2}
-                      className="text-xs resize-none"
-                    />
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        onClick={handleAddKey}
-                        disabled={isCreatingKey || !keyName.trim()}
-                        className="h-7"
-                      >
-                        <Plus className="h-3 w-3 mr-1" />
-                        추가
-                      </Button>
-                      {keyName && (
-                        <span className="text-xs text-muted-foreground">
-                          Enter로 추가
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </TableCell>
-                {matrix.locales.map((locale) => (
-                  <TableCell key={locale.code} className="p-2">
-                    <div className="min-h-[60px] p-3 rounded bg-muted/50 flex items-center justify-center">
-                      <span className="text-xs text-muted-foreground italic">
-                        키 추가 후 번역 가능
-                      </span>
+              {isAddingKey && (
+                <TableRow className="bg-muted/30 border-t-2 border-primary/20">
+                  <TableCell className="sticky left-0 bg-muted/30 z-10 border-r">
+                    <div className="space-y-2">
+                      <Input
+                        placeholder="새 키 이름 (예: login.title)"
+                        value={keyName}
+                        onChange={(e) => setKeyName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && keyName.trim() && !e.shiftKey) {
+                            e.preventDefault();
+                            handleAddKey();
+                          } else if (e.key === "Escape") {
+                            handleCancelAddKey();
+                          }
+                        }}
+                        className="font-mono text-sm h-9"
+                        autoFocus
+                      />
+                      <Textarea
+                        placeholder="설명 (선택)"
+                        value={keyDescription}
+                        onChange={(e) => setKeyDescription(e.target.value)}
+                        rows={2}
+                        className="text-xs resize-none"
+                      />
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          onClick={handleAddKey}
+                          disabled={isCreatingKey || !keyName.trim()}
+                          className="h-7"
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          {isCreatingKey ? "추가 중..." : "추가"}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleCancelAddKey}
+                          disabled={isCreatingKey}
+                          className="h-7"
+                        >
+                          취소
+                        </Button>
+                        {keyName && (
+                          <span className="text-xs text-muted-foreground">
+                            Enter: 추가, Esc: 취소
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </TableCell>
-                ))}
-              </TableRow>
+                  {matrix.locales.map((locale) => (
+                    <TableCell key={locale.code} className="p-2">
+                      <div className="min-h-[60px] p-3 rounded bg-muted/50 flex items-center justify-center border-2 border-dashed">
+                        <span className="text-xs text-muted-foreground italic">
+                          키 추가 후 번역 가능
+                        </span>
+                      </div>
+                    </TableCell>
+                  ))}
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
+
+        {/* 새 키 추가 버튼 */}
+        {!isAddingKey && (
+          <div className="flex justify-center pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={() => setIsAddingKey(true)}
+              className="w-full max-w-md"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              새 번역 키 추가
+            </Button>
+          </div>
+        )}
 
         {hasChanges && (
           <div className="fixed bottom-6 right-6">
