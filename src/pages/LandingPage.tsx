@@ -14,7 +14,7 @@ export function LandingPage() {
           <div className="flex items-center gap-3">
             <a
               href="/login"
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors cursor-pointer"
             >
               로그인
             </a>
