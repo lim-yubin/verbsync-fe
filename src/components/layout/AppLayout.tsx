@@ -11,7 +11,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <Sidebar />
       <div className="md:pl-60">
         <Navbar />
-        <main className="p-6">{children}</main>
+        <main className="p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );
