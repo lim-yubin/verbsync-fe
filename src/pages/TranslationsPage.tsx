@@ -66,6 +66,13 @@ export function TranslationsPage() {
   const [keyDescription, setKeyDescription] = useState("");
   const [isAddingKey, setIsAddingKey] = useState(false);
 
+  // 번역 키가 없을 때 자동으로 추가 모드 활성화
+  useEffect(() => {
+    if (matrix && (!matrix.rows || matrix.rows.length === 0) && !isAddingKey) {
+      setIsAddingKey(true);
+    }
+  }, [matrix, isAddingKey]);
+
   // 키 수정 상태
   const [editingKey, setEditingKey] = useState<{
     key: string;
@@ -510,7 +517,7 @@ export function TranslationsPage() {
                     className="cursor-pointer"
                   />
                 </TableHead>
-                <TableHead className="w-[200px] sticky left-0 bg-background z-10 border-r">
+                <TableHead className="min-w-[300px] sticky left-0 bg-background z-10 border-r">
                   키
                 </TableHead>
                 {displayMatrix.locales.map((locale) => (
@@ -524,144 +531,128 @@ export function TranslationsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {hasNoKeys && !isAddingKey ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={matrix.locales.length + 2}
-                    className="text-center py-8 text-muted-foreground"
+              {displayMatrix.rows.map((row) => {
+                const keyData = keys?.find((k) => k.name === row.key);
+                const isEditing = editingKey?.key === row.key;
+
+                return (
+                  <TableRow
+                    key={row.key}
+                    className={cn(selectedKeys.has(row.key) && "bg-accent/50")}
                   >
-                    <p className="text-sm">아직 번역 키가 없습니다</p>
-                    <p className="text-xs mt-1">
-                      아래 버튼을 클릭하여 첫 번째 키를 추가하세요
-                    </p>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                displayMatrix.rows.map((row) => {
-                  const keyData = keys?.find((k) => k.name === row.key);
-                  const isEditing = editingKey?.key === row.key;
-
-                  return (
-                    <TableRow
-                      key={row.key}
-                      className={cn(
-                        selectedKeys.has(row.key) && "bg-accent/50"
+                    <TableCell className="sticky left-0 bg-background z-10 border-r w-[50px]">
+                      <Checkbox
+                        checked={selectedKeys.has(row.key)}
+                        onCheckedChange={() => toggleKeySelection(row.key)}
+                        className="cursor-pointer"
+                      />
+                    </TableCell>
+                    <TableCell className="sticky left-0 bg-background z-10 border-r min-w-[300px]">
+                      {isEditing && keyData ? (
+                        <div className="space-y-2">
+                          <Input
+                            value={editingKey.name}
+                            onChange={(e) =>
+                              setEditingKey({
+                                ...editingKey,
+                                name: e.target.value,
+                              })
+                            }
+                            className="font-mono text-sm h-8"
+                            placeholder="키 이름"
+                          />
+                          <Textarea
+                            value={editingKey.description || ""}
+                            onChange={(e) =>
+                              setEditingKey({
+                                ...editingKey,
+                                description: e.target.value || null,
+                              })
+                            }
+                            placeholder="설명 (선택)"
+                            rows={2}
+                            className="text-xs resize-none"
+                          />
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={handleSaveEditKey}
+                              disabled={isUpdatingKey}
+                              className="h-7 px-2"
+                            >
+                              <Check className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={handleCancelEditKey}
+                              disabled={isUpdatingKey}
+                              className="h-7 px-2"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="group relative">
+                          <div className="font-mono text-sm font-semibold">
+                            {row.key}
+                          </div>
+                          {row.description && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {row.description}
+                            </div>
+                          )}
+                          <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleStartEditKey(row.key)}
+                              disabled={isDeletingKey}
+                              className="h-7 w-7 p-0"
+                            >
+                              <Edit2 className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setDeleteDialogKey(row.key)}
+                              disabled={isDeletingKey}
+                              className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
                       )}
-                    >
-                      <TableCell className="sticky left-0 bg-background z-10 border-r w-[50px]">
-                        <Checkbox
-                          checked={selectedKeys.has(row.key)}
-                          onCheckedChange={() => toggleKeySelection(row.key)}
-                          className="cursor-pointer"
-                        />
-                      </TableCell>
-                      <TableCell className="sticky left-0 bg-background z-10 border-r min-w-[300px]">
-                        {isEditing && keyData ? (
-                          <div className="space-y-2">
-                            <Input
-                              value={editingKey.name}
-                              onChange={(e) =>
-                                setEditingKey({
-                                  ...editingKey,
-                                  name: e.target.value,
-                                })
-                              }
-                              className="font-mono text-sm h-8"
-                              placeholder="키 이름"
-                            />
-                            <Textarea
-                              value={editingKey.description || ""}
-                              onChange={(e) =>
-                                setEditingKey({
-                                  ...editingKey,
-                                  description: e.target.value || null,
-                                })
-                              }
-                              placeholder="설명 (선택)"
-                              rows={2}
-                              className="text-xs resize-none"
-                            />
-                            <div className="flex items-center gap-2">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={handleSaveEditKey}
-                                disabled={isUpdatingKey}
-                                className="h-7 px-2"
-                              >
-                                <Check className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={handleCancelEditKey}
-                                disabled={isUpdatingKey}
-                                className="h-7 px-2"
-                              >
-                                <X className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="group relative">
-                            <div className="font-mono text-sm font-semibold">
-                              {row.key}
-                            </div>
-                            {row.description && (
-                              <div className="text-xs text-muted-foreground mt-1">
-                                {row.description}
-                              </div>
-                            )}
-                            <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleStartEditKey(row.key)}
-                                disabled={isDeletingKey}
-                                className="h-7 w-7 p-0"
-                              >
-                                <Edit2 className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => setDeleteDialogKey(row.key)}
-                                disabled={isDeletingKey}
-                                className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      </TableCell>
-                      {displayMatrix.locales.map((locale) => {
-                        const changeKey = `${row.key}|${locale.code}`;
-                        const currentValue =
-                          changeKey in changes
-                            ? changes[changeKey]
-                            : row.translations[locale.code] || "";
-                        const isModified = changeKey in changes;
+                    </TableCell>
+                    {displayMatrix.locales.map((locale) => {
+                      const changeKey = `${row.key}|${locale.code}`;
+                      const currentValue =
+                        changeKey in changes
+                          ? changes[changeKey]
+                          : row.translations[locale.code] || "";
+                      const isModified = changeKey in changes;
 
-                        return (
-                          <TableCell
-                            key={locale.code}
-                            className="p-2 max-w-[300px]"
-                          >
-                            <EditableCell
-                              value={currentValue}
-                              onChange={(value) =>
-                                handleCellChange(row.key, locale.code, value)
-                              }
-                              isModified={isModified}
-                            />
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
-                })
-              )}
+                      return (
+                        <TableCell
+                          key={locale.code}
+                          className="p-2 max-w-[300px]"
+                        >
+                          <EditableCell
+                            value={currentValue}
+                            onChange={(value) =>
+                              handleCellChange(row.key, locale.code, value)
+                            }
+                            isModified={isModified}
+                          />
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })}
 
               {/* 새 키 추가 행 */}
               {isAddingKey && (
@@ -756,7 +747,7 @@ export function TranslationsPage() {
         </div>
 
         {/* 새 키 추가 버튼 */}
-        {!isAddingKey && (
+        {!isAddingKey && !hasNoKeys && (
           <div className="flex flex-col items-center gap-2 pt-4 border-t">
             <Button
               variant="outline"
