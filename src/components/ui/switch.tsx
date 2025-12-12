@@ -13,7 +13,8 @@ function Switch({
       className={cn(
         "peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] cursor-pointer",
         "hover:data-[state=checked]:bg-primary/90 hover:data-[state=unchecked]:bg-input/80",
-        "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:opacity-60",
+        "disabled:cursor-not-allowed disabled:opacity-50",
+        "disabled:hover:data-[state=checked]:bg-primary/70 disabled:hover:data-[state=unchecked]:bg-accent/50 disabled:hover:border-accent/30",
         className
       )}
       {...props}
