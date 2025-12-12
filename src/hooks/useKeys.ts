@@ -16,6 +16,11 @@ interface CreateKeyDto {
   description?: string;
 }
 
+interface UpdateKeyDto {
+  name?: string;
+  description?: string | null;
+}
+
 // 번역 키 목록 조회
 export function useKeys(projectId: string) {
   return useQuery({
@@ -109,6 +114,55 @@ export function useCreateKey(projectId: string) {
         queryKey: QUERY_KEYS.KEYS(projectId),
       });
       // 번역 매트릭스 쿼리 무효화 (서버 데이터로 최종 동기화)
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
+      });
+    },
+  });
+}
+
+// 번역 키 수정
+export function useUpdateKey(projectId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ keyId, dto }: { keyId: string; dto: UpdateKeyDto }) => {
+      const { data } = await api.patch<Key>(
+        `/projects/${projectId}/keys/${keyId}`,
+        dto
+      );
+      return data;
+    },
+    onSuccess: () => {
+      // 키 목록 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.KEYS(projectId),
+      });
+      // 번역 매트릭스 쿼리도 무효화 (키 이름 변경 시 반영)
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
+      });
+    },
+  });
+}
+
+// 번역 키 삭제
+export function useDeleteKey(projectId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (keyId: string) => {
+      const { data } = await api.delete(
+        `/projects/${projectId}/keys/${keyId}`
+      );
+      return data;
+    },
+    onSuccess: () => {
+      // 키 목록 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.KEYS(projectId),
+      });
+      // 번역 매트릭스 쿼리도 무효화 (삭제 시 테이블에서 제거)
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
       });

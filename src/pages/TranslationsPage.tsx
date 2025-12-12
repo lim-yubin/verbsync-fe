@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { Save, Plus } from "lucide-react";
+import { Save, Plus, Edit2, Trash2, Check, X } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -18,8 +18,18 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useTranslationMatrix, useUpdateTranslations } from "@/hooks/useTranslations";
-import { useCreateKey, useKeys } from "@/hooks/useKeys";
+import { useCreateKey, useKeys, useUpdateKey, useDeleteKey } from "@/hooks/useKeys";
 import { EditableCell } from "@/components/translation/EditableCell";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function TranslationsPage() {
   const { id: projectId } = useParams<{ id: string }>();
@@ -27,6 +37,8 @@ export function TranslationsPage() {
   const { data: keys } = useKeys(projectId!); // 키 목록 (createdAt 포함)
   const { mutate: updateTranslations, isPending: isSaving } = useUpdateTranslations(projectId!);
   const { mutate: createKey, isPending: isCreatingKey } = useCreateKey(projectId!);
+  const { mutate: updateKey, isPending: isUpdatingKey } = useUpdateKey(projectId!);
+  const { mutate: deleteKey, isPending: isDeletingKey } = useDeleteKey(projectId!);
 
   // 변경사항 추적: "key|locale" -> "value"
   const [changes, setChanges] = useState<Record<string, string>>({});
@@ -35,6 +47,16 @@ export function TranslationsPage() {
   const [keyName, setKeyName] = useState("");
   const [keyDescription, setKeyDescription] = useState("");
   const [isAddingKey, setIsAddingKey] = useState(false);
+
+  // 키 수정 상태
+  const [editingKey, setEditingKey] = useState<{
+    key: string;
+    name: string;
+    description: string | null;
+  } | null>(null);
+
+  // 키 삭제 확인 다이얼로그
+  const [deleteDialogKey, setDeleteDialogKey] = useState<string | null>(null);
 
   // 키를 생성일 순으로 정렬된 매트릭스
   const sortedMatrix = useMemo(() => {
@@ -116,6 +138,86 @@ export function TranslationsPage() {
     setKeyName("");
     setKeyDescription("");
     setIsAddingKey(false);
+  };
+
+  const handleStartEditKey = (key: string) => {
+    const keyData = keys?.find((k) => k.name === key);
+    if (keyData) {
+      setEditingKey({
+        key: keyData.name,
+        name: keyData.name,
+        description: keyData.description,
+      });
+    }
+  };
+
+  const handleSaveEditKey = () => {
+    if (!editingKey) return;
+
+    const keyData = keys?.find((k) => k.name === editingKey.key);
+    if (!keyData) return;
+
+    // 변경사항이 없으면 취소
+    if (
+      editingKey.name === keyData.name &&
+      editingKey.description === keyData.description
+    ) {
+      setEditingKey(null);
+      return;
+    }
+
+    updateKey(
+      {
+        keyId: keyData.id,
+        dto: {
+          name: editingKey.name !== keyData.name ? editingKey.name : undefined,
+          description:
+            editingKey.description !== keyData.description
+              ? editingKey.description
+              : undefined,
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.success("번역 키가 수정되었습니다");
+          setEditingKey(null);
+        },
+        onError: (error: Error) => {
+          const axiosError = error as {
+            response?: { data?: { message?: string } };
+          };
+          toast.error(
+            axiosError.response?.data?.message || "키 수정에 실패했습니다"
+          );
+        },
+      }
+    );
+  };
+
+  const handleCancelEditKey = () => {
+    setEditingKey(null);
+  };
+
+  const handleDeleteKey = () => {
+    if (!deleteDialogKey) return;
+
+    const keyData = keys?.find((k) => k.name === deleteDialogKey);
+    if (!keyData) return;
+
+    deleteKey(keyData.id, {
+      onSuccess: () => {
+        toast.success("번역 키가 삭제되었습니다");
+        setDeleteDialogKey(null);
+      },
+      onError: (error: Error) => {
+        const axiosError = error as {
+          response?: { data?: { message?: string } };
+        };
+        toast.error(
+          axiosError.response?.data?.message || "키 삭제에 실패했습니다"
+        );
+      },
+    });
   };
 
   const hasChanges = Object.keys(changes).length > 0;
@@ -264,18 +366,92 @@ export function TranslationsPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                displayMatrix.rows.map((row) => (
-                  <TableRow key={row.key}>
-                    <TableCell className="sticky left-0 bg-background z-10 border-r">
-                      <div className="font-mono text-sm font-semibold">
-                        {row.key}
-                      </div>
-                      {row.description && (
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {row.description}
-                        </div>
-                      )}
-                    </TableCell>
+                displayMatrix.rows.map((row) => {
+                  const keyData = keys?.find((k) => k.name === row.key);
+                  const isEditing = editingKey?.key === row.key;
+
+                  return (
+                    <TableRow key={row.key}>
+                      <TableCell className="sticky left-0 bg-background z-10 border-r min-w-[250px]">
+                        {isEditing && keyData ? (
+                          <div className="space-y-2">
+                            <Input
+                              value={editingKey.name}
+                              onChange={(e) =>
+                                setEditingKey({
+                                  ...editingKey,
+                                  name: e.target.value,
+                                })
+                              }
+                              className="font-mono text-sm h-8"
+                              placeholder="키 이름"
+                            />
+                            <Textarea
+                              value={editingKey.description || ""}
+                              onChange={(e) =>
+                                setEditingKey({
+                                  ...editingKey,
+                                  description: e.target.value || null,
+                                })
+                              }
+                              placeholder="설명 (선택)"
+                              rows={2}
+                              className="text-xs resize-none"
+                            />
+                            <div className="flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={handleSaveEditKey}
+                                disabled={isUpdatingKey}
+                                className="h-7 px-2"
+                              >
+                                <Check className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={handleCancelEditKey}
+                                disabled={isUpdatingKey}
+                                className="h-7 px-2"
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="group relative">
+                            <div className="font-mono text-sm font-semibold">
+                              {row.key}
+                            </div>
+                            {row.description && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                {row.description}
+                              </div>
+                            )}
+                            <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleStartEditKey(row.key)}
+                                disabled={isDeletingKey}
+                                className="h-7 w-7 p-0"
+                              >
+                                <Edit2 className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setDeleteDialogKey(row.key)}
+                                disabled={isDeletingKey}
+                                className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </TableCell>
                     {displayMatrix.locales.map((locale) => {
                       const changeKey = `${row.key}|${locale.code}`;
                       const currentValue =
@@ -296,8 +472,9 @@ export function TranslationsPage() {
                         </TableCell>
                       );
                     })}
-                  </TableRow>
-                ))
+                    </TableRow>
+                  );
+                })
               )}
               
               {/* 새 키 추가 행 */}
@@ -392,6 +569,35 @@ export function TranslationsPage() {
           </div>
         )}
 
+        {/* 키 삭제 확인 다이얼로그 */}
+        <AlertDialog
+          open={deleteDialogKey !== null}
+          onOpenChange={(open) => !open && setDeleteDialogKey(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>번역 키 삭제 확인</AlertDialogTitle>
+              <AlertDialogDescription>
+                <span className="font-mono font-semibold">{deleteDialogKey}</span>{" "}
+                키를 삭제하시겠습니까?
+                <br />
+                <br />
+                이 작업은 되돌릴 수 없으며, 해당 키의 모든 번역 데이터가
+                영구적으로 삭제됩니다.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeletingKey}>취소</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteKey}
+                disabled={isDeletingKey}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeletingKey ? "삭제 중..." : "삭제"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AppLayout>
   );
