@@ -124,7 +124,9 @@ export function TranslationsPage() {
           const axiosError = error as {
             response?: { data?: { message?: string } };
           };
-          toast.error(axiosError.response?.data?.message || "저장에 실패했습니다");
+          toast.error(
+            axiosError.response?.data?.message || "저장에 실패했습니다"
+          );
         },
       }
     );
