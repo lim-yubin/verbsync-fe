@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Save, Plus, Edit2, Trash2, Check, X, Info } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -74,6 +75,11 @@ export function TranslationsPage() {
 
   // 키 삭제 확인 다이얼로그
   const [deleteDialogKey, setDeleteDialogKey] = useState<string | null>(null);
+
+  // 행 선택 상태
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [deleteSelectedDialogOpen, setDeleteSelectedDialogOpen] =
+    useState(false);
 
   // 키를 생성일 순으로 정렬된 매트릭스
   const sortedMatrix = useMemo(() => {
@@ -171,11 +177,7 @@ export function TranslationsPage() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Cmd+Shift+Enter (Mac) 또는 Ctrl+Shift+Enter (Windows/Linux)
-      if (
-        (e.metaKey || e.ctrlKey) &&
-        e.shiftKey &&
-        e.key === "Enter"
-      ) {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "Enter") {
         // 입력 필드에 포커스가 있으면 기본 동작 허용
         const target = e.target as HTMLElement;
         if (
@@ -276,6 +278,78 @@ export function TranslationsPage() {
           axiosError.response?.data?.message || "키 삭제에 실패했습니다"
         );
       },
+    });
+  };
+
+  // 행 선택 관련 함수들
+  const toggleKeySelection = (key: string) => {
+    setSelectedKeys((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) {
+        newSet.delete(key);
+      } else {
+        newSet.add(key);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (!displayMatrix?.rows) return;
+
+    if (selectedKeys.size === displayMatrix.rows.length) {
+      // 모두 선택되어 있으면 모두 해제
+      setSelectedKeys(new Set());
+    } else {
+      // 모두 선택
+      setSelectedKeys(new Set(displayMatrix.rows.map((row) => row.key)));
+    }
+  };
+
+  const handleDeleteSelectedKeys = () => {
+    if (selectedKeys.size === 0) return;
+
+    const keysToDelete = Array.from(selectedKeys)
+      .map((keyName) => keys?.find((k) => k.name === keyName))
+      .filter((k): k is NonNullable<typeof k> => k !== undefined);
+
+    if (keysToDelete.length === 0) return;
+
+    // 순차적으로 삭제
+    let completed = 0;
+    let failed = 0;
+
+    keysToDelete.forEach((keyData) => {
+      deleteKey(keyData.id, {
+        onSuccess: () => {
+          completed++;
+          if (completed + failed === keysToDelete.length) {
+            if (failed === 0) {
+              toast.success(`${completed}개의 번역 키가 삭제되었습니다`);
+            } else {
+              toast.warning(
+                `${completed}개 삭제 완료, ${failed}개 실패했습니다`
+              );
+            }
+            setSelectedKeys(new Set());
+            setDeleteSelectedDialogOpen(false);
+          }
+        },
+        onError: () => {
+          failed++;
+          if (completed + failed === keysToDelete.length) {
+            if (completed > 0) {
+              toast.warning(
+                `${completed}개 삭제 완료, ${failed}개 실패했습니다`
+              );
+            } else {
+              toast.error("키 삭제에 실패했습니다");
+            }
+            setSelectedKeys(new Set());
+            setDeleteSelectedDialogOpen(false);
+          }
+        },
+      });
     });
   };
 
@@ -388,14 +462,26 @@ export function TranslationsPage() {
           title="번역"
           description={`${displayMatrix.rows.length}개 키 × ${displayMatrix.locales.length}개 언어`}
           action={
-            <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
-              <Save className="mr-2 h-4 w-4" />
-              {isSaving
-                ? "저장 중..."
-                : hasChanges
-                ? `저장 (${Object.keys(changes).length})`
-                : "저장"}
-            </Button>
+            <div className="flex items-center gap-2">
+              {selectedKeys.size > 0 && (
+                <Button
+                  variant="destructive"
+                  onClick={() => setDeleteSelectedDialogOpen(true)}
+                  disabled={isDeletingKey}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  선택 삭제 ({selectedKeys.size})
+                </Button>
+              )}
+              <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
+                <Save className="mr-2 h-4 w-4" />
+                {isSaving
+                  ? "저장 중..."
+                  : hasChanges
+                  ? `저장 (${Object.keys(changes).length})`
+                  : "저장"}
+              </Button>
+            </div>
           }
         />
 
@@ -414,7 +500,17 @@ export function TranslationsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[200px] sticky left-0 bg-background z-10 border-r">
+                <TableHead className="w-[50px] sticky left-0 bg-background z-10 border-r">
+                  <Checkbox
+                    checked={
+                      displayMatrix.rows.length > 0 &&
+                      selectedKeys.size === displayMatrix.rows.length
+                    }
+                    onCheckedChange={toggleSelectAll}
+                    className="cursor-pointer"
+                  />
+                </TableHead>
+                <TableHead className="w-[200px] sticky left-[50px] bg-background z-10 border-r">
                   키
                 </TableHead>
                 {displayMatrix.locales.map((locale) => (
@@ -431,7 +527,7 @@ export function TranslationsPage() {
               {hasNoKeys && !isAddingKey ? (
                 <TableRow>
                   <TableCell
-                    colSpan={matrix.locales.length + 1}
+                    colSpan={matrix.locales.length + 2}
                     className="text-center py-8 text-muted-foreground"
                   >
                     <p className="text-sm">아직 번역 키가 없습니다</p>
@@ -446,8 +542,20 @@ export function TranslationsPage() {
                   const isEditing = editingKey?.key === row.key;
 
                   return (
-                    <TableRow key={row.key}>
-                      <TableCell className="sticky left-0 bg-background z-10 border-r min-w-[250px]">
+                    <TableRow
+                      key={row.key}
+                      className={cn(
+                        selectedKeys.has(row.key) && "bg-accent/50"
+                      )}
+                    >
+                      <TableCell className="sticky left-0 bg-background z-10 border-r w-[50px]">
+                        <Checkbox
+                          checked={selectedKeys.has(row.key)}
+                          onCheckedChange={() => toggleKeySelection(row.key)}
+                          className="cursor-pointer"
+                        />
+                      </TableCell>
+                      <TableCell className="sticky left-[50px] bg-background z-10 border-r min-w-[250px]">
                         {isEditing && keyData ? (
                           <div className="space-y-2">
                             <Input
@@ -558,7 +666,7 @@ export function TranslationsPage() {
               {/* 새 키 추가 행 */}
               {isAddingKey && (
                 <TableRow className="bg-muted/30 border-t-2 border-primary/20">
-                  <TableCell className="sticky left-0 bg-muted/30 z-10 border-r">
+                  <TableCell className="sticky left-0 bg-background z-10 border-r">
                     <div className="space-y-2">
                       <KeyAutocomplete
                         value={keyName}
@@ -674,6 +782,29 @@ export function TranslationsPage() {
             </Button>
           </div>
         )}
+
+        {/* 선택된 키 일괄 삭제 확인 다이얼로그 */}
+        <AlertDialog
+          open={deleteSelectedDialogOpen}
+          onOpenChange={setDeleteSelectedDialogOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>선택한 키 삭제</AlertDialogTitle>
+              <AlertDialogDescription>
+                선택한 {selectedKeys.size}개의 번역 키를 삭제하시겠습니까?
+                <br />
+                이 작업은 되돌릴 수 없습니다.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>취소</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteSelectedKeys}>
+                삭제
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* 키 삭제 확인 다이얼로그 */}
         <AlertDialog
