@@ -46,8 +46,13 @@ export function useCreateLocale(projectId: string) {
       return data;
     },
     onSuccess: () => {
+      // 언어 목록 쿼리 무효화
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.LOCALES(projectId),
+      });
+      // 번역 매트릭스 쿼리도 무효화 (번역 테이블에 즉시 반영)
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
       });
     },
   });
@@ -66,8 +71,13 @@ export function useUpdateLocaleStatus(projectId: string, localeId: string) {
       return data;
     },
     onSuccess: () => {
+      // 언어 목록 쿼리 무효화
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.LOCALES(projectId),
+      });
+      // 번역 매트릭스 쿼리도 무효화 (활성화 상태 변경 시 테이블에 반영)
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
       });
     },
   });

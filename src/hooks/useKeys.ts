@@ -37,9 +37,56 @@ export function useCreateKey(projectId: string) {
       const { data } = await api.post<Key>(`/projects/${projectId}/keys`, dto);
       return data;
     },
+    // Optimistic Update: 서버 응답 전에 UI 먼저 업데이트
+    onMutate: async (newKey) => {
+      // 진행 중인 쿼리 취소 (낙관적 업데이트가 덮어쓰지 않도록)
+      await queryClient.cancelQueries({
+        queryKey: QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
+      });
+
+      // 이전 데이터 백업 (롤백용)
+      const previousMatrix = queryClient.getQueryData(
+        QUERY_KEYS.TRANSLATIONS_MATRIX(projectId)
+      );
+
+      // 낙관적 업데이트: 새 키를 매트릭스에 추가
+      queryClient.setQueryData(
+        QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
+        (old: any) => {
+          if (!old) return old;
+          return {
+            ...old,
+            rows: [
+              ...old.rows,
+              {
+                key: newKey.name,
+                description: newKey.description || null,
+                translations: {},
+              },
+            ],
+          };
+        }
+      );
+
+      return { previousMatrix };
+    },
+    onError: (err, newKey, context) => {
+      // 에러 발생 시 이전 데이터로 롤백
+      if (context?.previousMatrix) {
+        queryClient.setQueryData(
+          QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
+          context.previousMatrix
+        );
+      }
+    },
     onSuccess: () => {
+      // 키 목록 쿼리 무효화
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.KEYS(projectId),
+      });
+      // 번역 매트릭스 쿼리 무효화 (서버 데이터로 최종 동기화)
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
       });
     },
   });
