@@ -522,10 +522,11 @@ export function TranslationsPage() {
                         existingKeys={keys?.map((k) => k.name) || []}
                         placeholder="새 키 이름 (예: login.title)"
                         onKeyDown={(e) => {
+                          // Cmd+Enter (Mac) 또는 Ctrl+Enter (Windows)로 추가
                           if (
                             e.key === "Enter" &&
-                            keyName.trim() &&
-                            !e.shiftKey
+                            (e.metaKey || e.ctrlKey) &&
+                            keyName.trim()
                           ) {
                             e.preventDefault();
                             handleAddKey();
