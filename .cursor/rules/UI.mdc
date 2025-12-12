@@ -61,6 +61,8 @@ Component usage:
 - Tables should feel spreadsheet-like: dense, precise, readable
 - Forms should feel calm and focused with clear labels and helper text
 - Dialogs and modals should feel fast and lightweight
+- All interactive elements (buttons, links, clickable cards, toggles) must have `cursor-pointer` class
+- This ensures consistent UX across all clickable elements
 
 Interaction & animation:
 
