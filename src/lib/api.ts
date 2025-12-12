@@ -42,11 +42,13 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // 401 에러 && 재시도 아님 && refresh 엔드포인트 아님
+    // 401 에러 && 재시도 아님 && 인증 엔드포인트 아님
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url?.includes('/auth/refresh')
+      !originalRequest.url?.includes('/auth/refresh') &&
+      !originalRequest.url?.includes('/auth/login') &&
+      !originalRequest.url?.includes('/auth/register')
     ) {
       if (isRefreshing) {
         // 다른 요청이 이미 토큰 갱신 중이면 대기

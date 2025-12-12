@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 
@@ -46,7 +46,9 @@ export function LoginForm() {
       onError: (error: Error) => {
         console.error(error);
         const axiosError = error as AxiosError<{ message?: string }>;
-        toast.error(axiosError.response?.data?.message || "로그인에 실패했습니다");
+        toast.error(
+          axiosError.response?.data?.message || "로그인에 실패했습니다"
+        );
       },
     });
   };
@@ -96,12 +98,12 @@ export function LoginForm() {
           <span className="text-gray-600 dark:text-gray-400">
             계정이 없으신가요?{" "}
           </span>
-          <a
-            href={ROUTES.REGISTER}
+          <Link
+            to={ROUTES.REGISTER}
             className="text-gray-900 dark:text-gray-100 font-medium hover:underline"
           >
             회원가입
-          </a>
+          </Link>
         </div>
       </CardContent>
     </Card>

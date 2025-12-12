@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 
@@ -126,12 +126,12 @@ export function RegisterForm() {
           <span className="text-gray-600 dark:text-gray-400">
             이미 계정이 있으신가요?{" "}
           </span>
-          <a
-            href={ROUTES.LOGIN}
+          <Link
+            to={ROUTES.LOGIN}
             className="text-gray-900 dark:text-gray-100 font-medium hover:underline"
           >
             로그인
-          </a>
+          </Link>
         </div>
       </CardContent>
     </Card>
