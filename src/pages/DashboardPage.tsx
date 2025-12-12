@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 export function DashboardPage() {
   return (
     <AppLayout>
-      <div className="space-y-6">
+      <div className="mx-auto max-w-7xl space-y-6">
         <PageHeader
           title="프로젝트"
           description="내가 관리하는 번역 프로젝트"

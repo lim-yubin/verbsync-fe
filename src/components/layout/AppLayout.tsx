@@ -8,12 +8,10 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="relative min-h-screen bg-background">
-      <Navbar />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1">
-          <div className="container max-w-7xl mx-auto p-6">{children}</div>
-        </main>
+      <Sidebar />
+      <div className="md:pl-60">
+        <Navbar />
+        <main className="p-6">{children}</main>
       </div>
     </div>
   );
