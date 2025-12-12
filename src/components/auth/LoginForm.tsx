@@ -3,6 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,9 +43,10 @@ export function LoginForm() {
         toast.success("로그인 성공!");
         navigate(ROUTES.DASHBOARD);
       },
-      onError: (error: any) => {
+      onError: (error: Error) => {
         console.error(error);
-        toast.error(error.response?.data?.message || "로그인에 실패했습니다");
+        const axiosError = error as AxiosError<{ message?: string }>;
+        toast.error(axiosError.response?.data?.message || "로그인에 실패했습니다");
       },
     });
   };

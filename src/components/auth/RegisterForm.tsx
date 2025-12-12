@@ -3,6 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,8 +44,9 @@ export function RegisterForm() {
         toast.success("회원가입 성공! 환영합니다 🎉");
         navigate(ROUTES.DASHBOARD);
       },
-      onError: (error: any) => {
-        toast.error(error.response?.data?.message || "회원가입에 실패했습니다");
+      onError: (error: Error) => {
+        const axiosError = error as AxiosError<{ message?: string }>;
+        toast.error(axiosError.response?.data?.message || "회원가입에 실패했습니다");
       },
     });
   };
