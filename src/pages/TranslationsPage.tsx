@@ -28,6 +28,7 @@ import {
   useDeleteKey,
 } from "@/hooks/useKeys";
 import { EditableCell } from "@/components/translation/EditableCell";
+import { KeyAutocomplete } from "@/components/translation/KeyAutocomplete";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -512,10 +513,11 @@ export function TranslationsPage() {
                 <TableRow className="bg-muted/30 border-t-2 border-primary/20">
                   <TableCell className="sticky left-0 bg-muted/30 z-10 border-r">
                     <div className="space-y-2">
-                      <Input
-                        placeholder="새 키 이름 (예: login.title)"
+                      <KeyAutocomplete
                         value={keyName}
-                        onChange={(e) => setKeyName(e.target.value)}
+                        onChange={setKeyName}
+                        existingKeys={keys?.map((k) => k.name) || []}
+                        placeholder="새 키 이름 (예: login.title)"
                         onKeyDown={(e) => {
                           if (
                             e.key === "Enter" &&
@@ -528,7 +530,6 @@ export function TranslationsPage() {
                             handleCancelAddKey();
                           }
                         }}
-                        className="font-mono text-sm h-9"
                         autoFocus
                       />
                       <Textarea
