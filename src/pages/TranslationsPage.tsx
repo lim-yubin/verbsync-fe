@@ -1,43 +1,14 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Save,
-  Plus,
-  Edit2,
-  Trash2,
-  Check,
-  X,
-  Info,
-  Search,
-  ChevronDown,
-  ChevronRight,
-} from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Save, Trash2, Info, Plus } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Table, TableBody } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import {
   useTranslationMatrix,
   useUpdateTranslations,
@@ -48,8 +19,6 @@ import {
   useUpdateKey,
   useDeleteKey,
 } from "@/hooks/useKeys";
-import { EditableCell } from "@/components/translation/EditableCell";
-import { KeyAutocomplete } from "@/components/translation/KeyAutocomplete";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -66,6 +35,14 @@ import {
   extractNamespaces,
   sortKeys,
 } from "@/lib/translation-utils";
+import {
+  TranslationFilters,
+  TranslationTableHeader,
+  TranslationGroupHeader,
+  TranslationKeyRow,
+  AddKeyRow,
+  TranslationEmptyState,
+} from "@/components/translation";
 
 export function TranslationsPage() {
   const { id: projectId } = useParams<{ id: string }>();
@@ -497,27 +474,10 @@ export function TranslationsPage() {
   // 데이터가 없거나 비어있는 경우
   if (!matrix) {
     return (
-      <AppLayout>
-        <div className="mx-auto max-w-7xl space-y-6">
-          <PageHeader
-            title="번역"
-            description="번역 테이블에서 모든 번역을 관리하세요"
-          />
-          <Card className="p-12">
-            <div className="text-center">
-              <p className="text-lg font-semibold mb-2">번역을 시작하려면</p>
-              <p className="text-sm text-muted-foreground mb-4">
-                먼저 언어와 번역 키를 추가해주세요
-              </p>
-              <div className="flex justify-center gap-2">
-                <Button variant="outline" onClick={() => window.history.back()}>
-                  언어 추가하기
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </AppLayout>
+      <TranslationEmptyState
+        type="no-keys"
+        onAddLocale={() => window.history.back()}
+      />
     );
   }
 
@@ -527,27 +487,10 @@ export function TranslationsPage() {
 
   if (hasNoLocales) {
     return (
-      <AppLayout>
-        <div className="mx-auto max-w-7xl space-y-6">
-          <PageHeader
-            title="번역"
-            description="번역 테이블에서 모든 번역을 관리하세요"
-          />
-          <Card className="p-12">
-            <div className="text-center">
-              <p className="text-lg font-semibold mb-2">번역을 시작하려면</p>
-              <p className="text-sm text-muted-foreground mb-4">
-                먼저 언어를 추가해주세요
-              </p>
-              <div className="flex justify-center gap-2">
-                <Button variant="outline" onClick={() => window.history.back()}>
-                  언어 추가하기
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </AppLayout>
+      <TranslationEmptyState
+        type="no-locales"
+        onAddLocale={() => window.history.back()}
+      />
     );
   }
 
@@ -585,130 +528,30 @@ export function TranslationsPage() {
         />
 
         {/* 필터 바 */}
-        <Card className="p-4">
-          <div className="flex flex-col gap-4">
-            {/* 검색 및 필터 */}
-            <div className="flex flex-wrap items-center gap-3">
-              {/* 검색 */}
-              <div className="relative flex-1 min-w-[200px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="키 이름, namespace, 설명으로 검색..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-
-              {/* Namespace 필터 */}
-              {availableNamespaces.length > 0 && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">
-                    Namespace:
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {availableNamespaces.map((namespace) => {
-                      const isSelected = selectedNamespaces.includes(namespace);
-                      return (
-                        <Badge
-                          key={namespace}
-                          variant={isSelected ? "default" : "outline"}
-                          className="cursor-pointer"
-                          onClick={() => {
-                            setSelectedNamespaces((prev) =>
-                              isSelected
-                                ? prev.filter((n) => n !== namespace)
-                                : [...prev, namespace]
-                            );
-                          }}
-                        >
-                          {namespace}
-                        </Badge>
-                      );
-                    })}
-                    {selectedNamespaces.length > 0 && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs"
-                        onClick={() => setSelectedNamespaces([])}
-                      >
-                        모두 해제
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* 빈 번역 필터 */}
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="showEmptyOnly"
-                  checked={showEmptyOnly}
-                  onCheckedChange={(checked) =>
-                    setShowEmptyOnly(checked === true)
-                  }
-                  className="cursor-pointer"
-                />
-                <label
-                  htmlFor="showEmptyOnly"
-                  className="text-sm cursor-pointer"
-                >
-                  빈 번역만
-                </label>
-              </div>
-            </div>
-
-            {/* 정렬 및 그룹화 옵션 */}
-            <div className="flex items-center gap-4 flex-wrap">
-              {/* 정렬 */}
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">정렬:</span>
-                <Select
-                  value={sortBy}
-                  onValueChange={(value: "created" | "name" | "namespace") =>
-                    setSortBy(value)
-                  }
-                >
-                  <SelectTrigger className="w-[140px] h-8">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="created">생성일순</SelectItem>
-                    <SelectItem value="name">이름순</SelectItem>
-                    <SelectItem value="namespace">Namespace순</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* 그룹화 토글 */}
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="groupByNamespace"
-                  checked={groupByNamespace}
-                  onCheckedChange={(checked) =>
-                    setGroupByNamespace(checked === true)
-                  }
-                  className="cursor-pointer"
-                />
-                <label
-                  htmlFor="groupByNamespace"
-                  className="text-sm cursor-pointer"
-                >
-                  Namespace별 그룹화
-                </label>
-              </div>
-
-              {/* 결과 개수 */}
-              <div className="text-sm text-muted-foreground ml-auto">
-                {displayMatrix.rows.length}개 키
-                {searchQuery || selectedNamespaces.length > 0 || showEmptyOnly
-                  ? ` (필터링됨)`
-                  : ""}
-              </div>
-            </div>
-          </div>
-        </Card>
+        <TranslationFilters
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          availableNamespaces={availableNamespaces}
+          selectedNamespaces={selectedNamespaces}
+          onNamespaceToggle={(namespace) => {
+            setSelectedNamespaces((prev) =>
+              prev.includes(namespace)
+                ? prev.filter((n) => n !== namespace)
+                : [...prev, namespace]
+            );
+          }}
+          onNamespaceClear={() => setSelectedNamespaces([])}
+          showEmptyOnly={showEmptyOnly}
+          onShowEmptyOnlyChange={setShowEmptyOnly}
+          sortBy={sortBy}
+          onSortByChange={setSortBy}
+          groupByNamespace={groupByNamespace}
+          onGroupByNamespaceChange={setGroupByNamespace}
+          filteredCount={displayMatrix.rows.length}
+          isFiltered={
+            !!searchQuery || selectedNamespaces.length > 0 || showEmptyOnly
+          }
+        />
 
         {/* 사용 안내 */}
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -723,31 +566,12 @@ export function TranslationsPage() {
           )}
         >
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px] sticky left-0 bg-background z-10 border-r">
-                  <Checkbox
-                    checked={
-                      displayMatrix.rows.length > 0 &&
-                      selectedKeys.size === displayMatrix.rows.length
-                    }
-                    onCheckedChange={toggleSelectAll}
-                    className="cursor-pointer"
-                  />
-                </TableHead>
-                <TableHead className="min-w-[300px] sticky left-0 bg-background z-10 border-r">
-                  키
-                </TableHead>
-                {displayMatrix.locales.map((locale) => (
-                  <TableHead key={locale.code} className="min-w-[300px]">
-                    <div className="font-semibold">{locale.name}</div>
-                    <div className="text-xs text-muted-foreground font-normal">
-                      {locale.code}
-                    </div>
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
+            <TranslationTableHeader
+              locales={displayMatrix.locales}
+              selectedCount={selectedKeys.size}
+              totalCount={displayMatrix.rows.length}
+              onSelectAll={toggleSelectAll}
+            />
             <TableBody>
               {groupByNamespace && groupedMatrix
                 ? // 그룹화된 렌더링
@@ -765,33 +589,13 @@ export function TranslationsPage() {
                       return (
                         <React.Fragment key={namespace}>
                           {/* 그룹 헤더 */}
-                          <TableRow className="bg-muted/30 hover:bg-muted/40">
-                            <TableCell
-                              colSpan={displayMatrix.locales.length + 2}
-                              className="p-2"
-                            >
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 w-6 p-0"
-                                  onClick={() => toggleGroup(namespace)}
-                                >
-                                  {isCollapsed ? (
-                                    <ChevronRight className="h-4 w-4" />
-                                  ) : (
-                                    <ChevronDown className="h-4 w-4" />
-                                  )}
-                                </Button>
-                                <span className="font-semibold text-sm">
-                                  {namespace || "(root)"}
-                                </span>
-                                <Badge variant="secondary" className="text-xs">
-                                  {groupKeyCount}개 키
-                                </Badge>
-                              </div>
-                            </TableCell>
-                          </TableRow>
+                          <TranslationGroupHeader
+                            namespace={namespace}
+                            keyCount={groupKeyCount}
+                            isCollapsed={isCollapsed}
+                            onToggle={() => toggleGroup(namespace)}
+                            colSpan={displayMatrix.locales.length + 2}
+                          />
 
                           {/* 그룹 내 키들 */}
                           {!isCollapsed &&
@@ -802,134 +606,47 @@ export function TranslationsPage() {
                               const isEditing = editingKey?.key === row.key;
 
                               return (
-                                <TableRow
+                                <TranslationKeyRow
                                   key={row.key}
-                                  className={cn(
-                                    selectedKeys.has(row.key) && "bg-accent/50"
-                                  )}
-                                >
-                                  <TableCell className="sticky left-0 bg-background z-10 border-r w-[50px]">
-                                    <Checkbox
-                                      checked={selectedKeys.has(row.key)}
-                                      onCheckedChange={() =>
-                                        toggleKeySelection(row.key)
-                                      }
-                                      className="cursor-pointer"
-                                    />
-                                  </TableCell>
-                                  <TableCell className="sticky left-0 bg-background z-10 border-r min-w-[300px]">
-                                    {isEditing && keyData ? (
-                                      <div className="space-y-2">
-                                        <Input
-                                          value={editingKey.name}
-                                          onChange={(e) =>
-                                            setEditingKey({
-                                              ...editingKey,
-                                              name: e.target.value,
-                                            })
-                                          }
-                                          className="font-mono text-sm h-8"
-                                          placeholder="키 이름"
-                                        />
-                                        <Textarea
-                                          value={editingKey.description || ""}
-                                          onChange={(e) =>
-                                            setEditingKey({
-                                              ...editingKey,
-                                              description:
-                                                e.target.value || null,
-                                            })
-                                          }
-                                          placeholder="설명 (선택)"
-                                          rows={2}
-                                          className="text-xs resize-none"
-                                        />
-                                        <div className="flex items-center gap-2">
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={handleSaveEditKey}
-                                            disabled={isUpdatingKey}
-                                            className="h-7 px-2"
-                                          >
-                                            <Check className="h-3 w-3" />
-                                          </Button>
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={handleCancelEditKey}
-                                            disabled={isUpdatingKey}
-                                            className="h-7 px-2"
-                                          >
-                                            <X className="h-3 w-3" />
-                                          </Button>
-                                        </div>
-                                      </div>
-                                    ) : (
-                                      <div className="group relative">
-                                        <div className="font-mono text-sm font-semibold">
-                                          {row.key}
-                                        </div>
-                                        {row.description && (
-                                          <div className="text-xs text-muted-foreground mt-1">
-                                            {row.description}
-                                          </div>
-                                        )}
-                                        <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() =>
-                                              handleStartEditKey(row.key)
-                                            }
-                                            disabled={isDeletingKey}
-                                            className="h-7 w-7 p-0"
-                                          >
-                                            <Edit2 className="h-3 w-3" />
-                                          </Button>
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() =>
-                                              setDeleteDialogKey(row.key)
-                                            }
-                                            disabled={isDeletingKey}
-                                            className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                          >
-                                            <Trash2 className="h-3 w-3" />
-                                          </Button>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </TableCell>
-                                  {displayMatrix.locales.map((locale) => {
-                                    const changeKey = `${row.key}|${locale.code}`;
-                                    const currentValue =
-                                      changeKey in changes
-                                        ? changes[changeKey]
-                                        : row.translations[locale.code] || "";
-                                    const isModified = changeKey in changes;
-
-                                    return (
-                                      <TableCell
-                                        key={locale.code}
-                                        className="p-2 max-w-[300px]"
-                                      >
-                                        <EditableCell
-                                          value={currentValue}
-                                          onChange={(value) =>
-                                            handleCellChange(
-                                              row.key,
-                                              locale.code,
-                                              value
-                                            )
-                                          }
-                                          isModified={isModified}
-                                        />
-                                      </TableCell>
-                                    );
-                                  })}
-                                </TableRow>
+                                  row={row}
+                                  locales={displayMatrix.locales}
+                                  keyData={keyData}
+                                  isSelected={selectedKeys.has(row.key)}
+                                  isEditing={isEditing}
+                                  editingName={editingKey?.name || ""}
+                                  editingDescription={
+                                    editingKey?.description || null
+                                  }
+                                  changes={changes}
+                                  onSelect={(checked) => {
+                                    if (checked) {
+                                      toggleKeySelection(row.key);
+                                    } else {
+                                      toggleKeySelection(row.key);
+                                    }
+                                  }}
+                                  onStartEdit={() =>
+                                    handleStartEditKey(row.key)
+                                  }
+                                  onEditNameChange={(name) =>
+                                    setEditingKey((prev) =>
+                                      prev ? { ...prev, name } : null
+                                    )
+                                  }
+                                  onEditDescriptionChange={(description) =>
+                                    setEditingKey((prev) =>
+                                      prev ? { ...prev, description } : null
+                                    )
+                                  }
+                                  onSaveEdit={handleSaveEditKey}
+                                  onCancelEdit={handleCancelEditKey}
+                                  onDelete={() => setDeleteDialogKey(row.key)}
+                                  onCellChange={(locale, value) =>
+                                    handleCellChange(row.key, locale, value)
+                                  }
+                                  isUpdatingKey={isUpdatingKey}
+                                  isDeletingKey={isDeletingKey}
+                                />
                               );
                             })}
                         </React.Fragment>
@@ -941,213 +658,78 @@ export function TranslationsPage() {
                     const isEditing = editingKey?.key === row.key;
 
                     return (
-                      <TableRow
+                      <TranslationKeyRow
                         key={row.key}
-                        className={cn(
-                          selectedKeys.has(row.key) && "bg-accent/50"
-                        )}
-                      >
-                        <TableCell className="sticky left-0 bg-background z-10 border-r w-[50px]">
-                          <Checkbox
-                            checked={selectedKeys.has(row.key)}
-                            onCheckedChange={() => toggleKeySelection(row.key)}
-                            className="cursor-pointer"
-                          />
-                        </TableCell>
-                        <TableCell className="sticky left-0 bg-background z-10 border-r min-w-[300px]">
-                          {isEditing && keyData ? (
-                            <div className="space-y-2">
-                              <Input
-                                value={editingKey.name}
-                                onChange={(e) =>
-                                  setEditingKey({
-                                    ...editingKey,
-                                    name: e.target.value,
-                                  })
-                                }
-                                className="font-mono text-sm h-8"
-                                placeholder="키 이름"
-                              />
-                              <Textarea
-                                value={editingKey.description || ""}
-                                onChange={(e) =>
-                                  setEditingKey({
-                                    ...editingKey,
-                                    description: e.target.value || null,
-                                  })
-                                }
-                                placeholder="설명 (선택)"
-                                rows={2}
-                                className="text-xs resize-none"
-                              />
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={handleSaveEditKey}
-                                  disabled={isUpdatingKey}
-                                  className="h-7 px-2"
-                                >
-                                  <Check className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={handleCancelEditKey}
-                                  disabled={isUpdatingKey}
-                                  className="h-7 px-2"
-                                >
-                                  <X className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="group relative">
-                              <div className="font-mono text-sm font-semibold">
-                                {row.key}
-                              </div>
-                              {row.description && (
-                                <div className="text-xs text-muted-foreground mt-1">
-                                  {row.description}
-                                </div>
-                              )}
-                              <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => handleStartEditKey(row.key)}
-                                  disabled={isDeletingKey}
-                                  className="h-7 w-7 p-0"
-                                >
-                                  <Edit2 className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => setDeleteDialogKey(row.key)}
-                                  disabled={isDeletingKey}
-                                  className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            </div>
-                          )}
-                        </TableCell>
-                        {displayMatrix.locales.map((locale) => {
-                          const changeKey = `${row.key}|${locale.code}`;
-                          const currentValue =
-                            changeKey in changes
-                              ? changes[changeKey]
-                              : row.translations[locale.code] || "";
-                          const isModified = changeKey in changes;
-
-                          return (
-                            <TableCell
-                              key={locale.code}
-                              className="p-2 max-w-[300px]"
-                            >
-                              <EditableCell
-                                value={currentValue}
-                                onChange={(value) =>
-                                  handleCellChange(row.key, locale.code, value)
-                                }
-                                isModified={isModified}
-                              />
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
+                        row={row}
+                        locales={displayMatrix.locales}
+                        keyData={keyData}
+                        isSelected={selectedKeys.has(row.key)}
+                        isEditing={isEditing}
+                        editingName={editingKey?.name || ""}
+                        editingDescription={editingKey?.description || null}
+                        changes={changes}
+                        onSelect={(checked) => {
+                          if (checked) {
+                            setSelectedKeys((prev) =>
+                              new Set(prev).add(row.key)
+                            );
+                          } else {
+                            setSelectedKeys((prev) => {
+                              const newSet = new Set(prev);
+                              newSet.delete(row.key);
+                              return newSet;
+                            });
+                          }
+                        }}
+                        onStartEdit={() => handleStartEditKey(row.key)}
+                        onEditNameChange={(name) =>
+                          setEditingKey((prev) =>
+                            prev ? { ...prev, name } : null
+                          )
+                        }
+                        onEditDescriptionChange={(description) =>
+                          setEditingKey((prev) =>
+                            prev ? { ...prev, description } : null
+                          )
+                        }
+                        onSaveEdit={handleSaveEditKey}
+                        onCancelEdit={handleCancelEditKey}
+                        onDelete={() => setDeleteDialogKey(row.key)}
+                        onCellChange={(locale, value) =>
+                          handleCellChange(row.key, locale, value)
+                        }
+                        isUpdatingKey={isUpdatingKey}
+                        isDeletingKey={isDeletingKey}
+                      />
                     );
                   })}
 
               {/* 새 키 추가 행 */}
               {isAddingKey && (
-                <TableRow className="bg-muted/30 border-t-2 border-primary/20">
-                  <TableCell className="sticky left-0 bg-muted/30 z-10 border-r w-[50px]">
-                    {/* 체크박스 셀은 비워둠 */}
-                  </TableCell>
-                  <TableCell className="sticky left-0 bg-background z-10 border-r">
-                    <div className="space-y-2">
-                      <KeyAutocomplete
-                        value={keyName}
-                        onChange={setKeyName}
-                        existingKeys={keys?.map((k) => k.name) || []}
-                        placeholder="새 키 이름 (예: login.title)"
-                        onKeyDown={(e) => {
-                          // Cmd+Enter (Mac) 또는 Ctrl+Enter (Windows)로 추가
-                          if (
-                            e.key === "Enter" &&
-                            (e.metaKey || e.ctrlKey) &&
-                            keyName.trim()
-                          ) {
-                            e.preventDefault();
-                            handleAddKey();
-                          } else if (e.key === "Escape") {
-                            handleCancelAddKey();
-                          }
-                        }}
-                        autoFocus
-                      />
-                      <Textarea
-                        placeholder="설명 (선택)"
-                        value={keyDescription}
-                        onChange={(e) => setKeyDescription(e.target.value)}
-                        onKeyDown={(e) => {
-                          // Cmd+Enter (Mac) 또는 Ctrl+Enter (Windows)로 추가
-                          if (
-                            e.key === "Enter" &&
-                            (e.metaKey || e.ctrlKey) &&
-                            keyName.trim()
-                          ) {
-                            e.preventDefault();
-                            handleAddKey();
-                          }
-                        }}
-                        rows={2}
-                        className="text-xs resize-none"
-                      />
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          onClick={handleAddKey}
-                          disabled={isCreatingKey || !keyName.trim()}
-                          className="h-7"
-                        >
-                          <Plus className="h-3 w-3 mr-1" />
-                          {isCreatingKey ? "추가 중..." : "추가"}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={handleCancelAddKey}
-                          disabled={isCreatingKey}
-                          className="h-7"
-                        >
-                          취소
-                        </Button>
-                        {keyName && (
-                          <span className="text-xs text-muted-foreground">
-                            {navigator.platform.includes("Mac") ||
-                            navigator.userAgent.includes("Mac")
-                              ? "Cmd+Enter"
-                              : "Ctrl+Enter"}
-                            : 추가, Esc: 취소
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </TableCell>
-                  {displayMatrix.locales.map((locale) => (
-                    <TableCell key={locale.code} className="p-2">
-                      <div className="min-h-[60px] p-3 rounded bg-muted/50 flex items-center justify-center border-2 border-dashed">
-                        <span className="text-xs text-muted-foreground italic">
-                          키 추가 후 번역 가능
-                        </span>
-                      </div>
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <AddKeyRow
+                  keyName={keyName}
+                  keyDescription={keyDescription}
+                  existingKeys={keys?.map((k) => k.name) || []}
+                  locales={displayMatrix.locales}
+                  isCreating={isCreatingKey}
+                  onKeyNameChange={setKeyName}
+                  onKeyDescriptionChange={setKeyDescription}
+                  onAdd={handleAddKey}
+                  onCancel={handleCancelAddKey}
+                  onKeyDown={(e) => {
+                    // Cmd+Enter (Mac) 또는 Ctrl+Enter (Windows)로 추가
+                    if (
+                      e.key === "Enter" &&
+                      (e.metaKey || e.ctrlKey) &&
+                      keyName.trim()
+                    ) {
+                      e.preventDefault();
+                      handleAddKey();
+                    } else if (e.key === "Escape") {
+                      handleCancelAddKey();
+                    }
+                  }}
+                />
               )}
             </TableBody>
           </Table>

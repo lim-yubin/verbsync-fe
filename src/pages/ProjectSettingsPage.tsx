@@ -63,7 +63,6 @@ export function ProjectSettingsPage() {
     formState: { errors },
     setValue,
     watch,
-    reset,
   } = useForm<ProjectSettingsFormData>({
     resolver: zodResolver(projectSettingsSchema),
     defaultValues: {
@@ -78,6 +77,7 @@ export function ProjectSettingsPage() {
       : undefined,
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const selectedLocale = watch("defaultLocale");
 
   // 활성화된 언어만 필터링
