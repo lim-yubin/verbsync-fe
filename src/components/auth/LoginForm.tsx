@@ -6,7 +6,13 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useLogin } from "@/hooks/useAuth";
 import { ROUTES } from "@/lib/constants";
 
@@ -36,6 +42,7 @@ export function LoginForm() {
         navigate(ROUTES.DASHBOARD);
       },
       onError: (error: any) => {
+        console.error(error);
         toast.error(error.response?.data?.message || "로그인에 실패했습니다");
       },
     });
@@ -45,9 +52,7 @@ export function LoginForm() {
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle>로그인</CardTitle>
-        <CardDescription>
-          Verbasync 계정으로 로그인하세요
-        </CardDescription>
+        <CardDescription>Verbasync 계정으로 로그인하세요</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -99,4 +104,3 @@ export function LoginForm() {
     </Card>
   );
 }
-
