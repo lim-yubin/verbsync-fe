@@ -49,3 +49,18 @@ export function useMe() {
   });
 }
 
+// 로그아웃
+export function useLogout() {
+  const logout = useAuthStore((state) => state.logout);
+
+  return useMutation({
+    mutationFn: async () => {
+      await api.post("/auth/logout");
+    },
+    onSettled: () => {
+      // 성공/실패 상관없이 로컬 상태 클리어
+      logout();
+    },
+  });
+}
+

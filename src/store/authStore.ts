@@ -4,9 +4,10 @@ import type { User } from "@/types/api";
 import { STORAGE_KEYS } from "@/lib/constants";
 
 interface AuthState {
-  token: string | null;
+  accessToken: string | null; // 메모리에만 저장 (15분 만료)
   user: User | null;
   isAuthenticated: boolean;
+  setAccessToken: (token: string) => void;
   login: (token: string, user: User) => void;
   logout: () => void;
 }
@@ -14,14 +15,20 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      token: null,
+      accessToken: null,
       user: null,
       isAuthenticated: false,
-      login: (token, user) => set({ token, user, isAuthenticated: true }),
-      logout: () => set({ token: null, user: null, isAuthenticated: false }),
+      setAccessToken: (token) => set({ accessToken: token }),
+      login: (token, user) => set({ accessToken: token, user, isAuthenticated: true }),
+      logout: () => set({ accessToken: null, user: null, isAuthenticated: false }),
     }),
     {
       name: STORAGE_KEYS.AUTH_TOKEN,
+      // accessToken은 persist에서 제외 (메모리에만 저장)
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+      }),
     }
   )
 );
