@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ROUTES } from "@/lib/constants";
-import { 
-  LandingPage, 
-  LoginPage, 
-  RegisterPage, 
+import {
+  LandingPage,
+  LoginPage,
+  RegisterPage,
   DashboardPage,
-  ProjectDetailPage 
+  ProjectDetailPage,
 } from "@/pages";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { PublicRoute } from "@/components/auth/PublicRoute";
