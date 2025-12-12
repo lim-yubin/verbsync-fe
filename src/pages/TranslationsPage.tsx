@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { Save } from "lucide-react";
+import { Save, Plus } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -14,17 +14,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useTranslationMatrix, useUpdateTranslations } from "@/hooks/useTranslations";
+import { useCreateKey } from "@/hooks/useKeys";
 import { EditableCell } from "@/components/translation/EditableCell";
 
 export function TranslationsPage() {
   const { id: projectId } = useParams<{ id: string }>();
   const { data: matrix, isLoading, error } = useTranslationMatrix(projectId!);
   const { mutate: updateTranslations, isPending: isSaving } = useUpdateTranslations(projectId!);
+  const { mutate: createKey, isPending: isCreatingKey } = useCreateKey(projectId!);
 
   // 변경사항 추적: "key|locale" -> "value"
   const [changes, setChanges] = useState<Record<string, string>>({});
+  
+  // 키 추가 Dialog
+  const [keyDialogOpen, setKeyDialogOpen] = useState(false);
+  const [keyName, setKeyName] = useState("");
+  const [keyDescription, setKeyDescription] = useState("");
 
   // 디버깅용 로그
   console.log("TranslationsPage Debug:", {
@@ -64,6 +81,28 @@ export function TranslationsPage() {
         },
         onError: (error: any) => {
           toast.error(error.response?.data?.message || "저장에 실패했습니다");
+        },
+      }
+    );
+  };
+
+  const handleAddKey = () => {
+    if (!keyName.trim()) {
+      toast.error("키 이름을 입력해주세요");
+      return;
+    }
+
+    createKey(
+      { name: keyName.trim(), description: keyDescription.trim() || undefined },
+      {
+        onSuccess: () => {
+          toast.success("번역 키가 추가되었습니다");
+          setKeyDialogOpen(false);
+          setKeyName("");
+          setKeyDescription("");
+        },
+        onError: (error: any) => {
+          toast.error(error.response?.data?.message || "키 추가에 실패했습니다");
         },
       }
     );
@@ -174,14 +213,23 @@ export function TranslationsPage() {
           title="번역"
           description={`${matrix.rows.length}개 키 × ${matrix.locales.length}개 언어`}
           action={
-            <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
-              <Save className="mr-2 h-4 w-4" />
-              {isSaving
-                ? "저장 중..."
-                : hasChanges
-                ? `저장 (${Object.keys(changes).length})`
-                : "저장"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setKeyDialogOpen(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                키 추가
+              </Button>
+              <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
+                <Save className="mr-2 h-4 w-4" />
+                {isSaving
+                  ? "저장 중..."
+                  : hasChanges
+                  ? `저장 (${Object.keys(changes).length})`
+                  : "저장"}
+              </Button>
+            </div>
           }
         />
 
@@ -249,6 +297,66 @@ export function TranslationsPage() {
             </Button>
           </div>
         )}
+
+        {/* 키 추가 다이얼로그 */}
+        <Dialog open={keyDialogOpen} onOpenChange={setKeyDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>새 번역 키 추가</DialogTitle>
+              <DialogDescription>
+                번역에 사용할 키를 추가하세요 (예: login.title, home.hero.subtitle)
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="key-name">
+                  키 이름 <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="key-name"
+                  placeholder="login.title"
+                  value={keyName}
+                  onChange={(e) => setKeyName(e.target.value)}
+                  className="font-mono"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleAddKey();
+                    }
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">
+                  점(.)으로 구분된 키 이름을 사용하세요
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="key-description">설명 (선택)</Label>
+                <Textarea
+                  id="key-description"
+                  placeholder="로그인 페이지의 제목"
+                  value={keyDescription}
+                  onChange={(e) => setKeyDescription(e.target.value)}
+                  rows={3}
+                />
+              </div>
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setKeyDialogOpen(false);
+                    setKeyName("");
+                    setKeyDescription("");
+                  }}
+                >
+                  취소
+                </Button>
+                <Button onClick={handleAddKey} disabled={isCreatingKey || !keyName.trim()}>
+                  {isCreatingKey ? "추가 중..." : "추가"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppLayout>
   );
