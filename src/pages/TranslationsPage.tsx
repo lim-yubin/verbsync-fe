@@ -4,6 +4,7 @@ import { Save, Plus, Edit2, Trash2, Check, X } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
 import {
@@ -366,7 +367,12 @@ export function TranslationsPage() {
           }
         />
 
-        <div className="rounded-lg border bg-background overflow-auto">
+        <div
+          className={cn(
+            "rounded-lg border bg-background",
+            isAddingKey ? "overflow-x-hidden overflow-y-auto" : "overflow-auto"
+          )}
+        >
           <Table>
             <TableHeader>
               <TableRow>
