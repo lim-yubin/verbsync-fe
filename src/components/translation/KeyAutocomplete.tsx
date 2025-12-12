@@ -100,9 +100,17 @@ export function KeyAutocomplete({
         e.preventDefault();
         setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
         return;
-      } else if (e.key === "Enter" && selectedIndex >= 0) {
+      } else if (e.key === "Enter") {
+        // Cmd/Ctrl+Enter는 키 추가용이므로 제외
+        if (e.metaKey || e.ctrlKey) {
+          // 부모의 onKeyDown 호출 (키 추가 처리)
+          onKeyDown?.(e);
+          return;
+        }
+        // 일반 Enter: 선택된 제안이 있으면 그것을, 없으면 첫 번째 제안을 선택
         e.preventDefault();
-        handleSelectSuggestion(suggestions[selectedIndex]);
+        const indexToSelect = selectedIndex >= 0 ? selectedIndex : 0;
+        handleSelectSuggestion(suggestions[indexToSelect]);
         return;
       } else if (e.key === "Tab" && selectedIndex >= 0) {
         e.preventDefault();
