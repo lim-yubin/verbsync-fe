@@ -128,7 +128,7 @@ export function RegisterForm() {
           </span>
           <Link
             to={ROUTES.LOGIN}
-            className="text-gray-900 dark:text-gray-100 font-medium hover:underline"
+            className="text-gray-900 dark:text-gray-100 font-medium hover:underline cursor-pointer"
           >
             로그인
           </Link>

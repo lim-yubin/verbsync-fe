@@ -14,7 +14,7 @@ export function Navbar() {
         {/* Logo & Brand */}
         <Link
           to={ROUTES.DASHBOARD}
-          className="flex items-center space-x-2"
+          className="flex items-center space-x-2 cursor-pointer"
         >
           <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background">
             <span className="text-sm font-bold">V</span>
