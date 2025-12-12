@@ -1,11 +1,17 @@
 import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useLocales, useCreateLocale, useUpdateLocaleStatus } from "@/hooks/useLocales";
+import {
+  useLocales,
+  useCreateLocale,
+  useUpdateLocaleStatus,
+  useDeleteLocale,
+  type Locale,
+} from "@/hooks/useLocales";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +19,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -35,7 +51,9 @@ export function LocalesPage() {
 
   const { data: project } = useProject(projectId!);
   const { data: locales, isLoading } = useLocales(projectId!);
-  const { mutate: createLocale, isPending: isCreating } = useCreateLocale(projectId!);
+  const { mutate: createLocale, isPending: isCreating } = useCreateLocale(
+    projectId!
+  );
 
   // 이미 추가된 언어 코드 목록
   const addedLocaleCodes = useMemo(
@@ -45,7 +63,8 @@ export function LocalesPage() {
 
   // 선택 가능한 언어 목록 (이미 추가된 언어 제외)
   const availableLocales = useMemo(
-    () => SUPPORTED_LOCALES.filter((locale) => !addedLocaleCodes.has(locale.code)),
+    () =>
+      SUPPORTED_LOCALES.filter((locale) => !addedLocaleCodes.has(locale.code)),
     [addedLocaleCodes]
   );
 
@@ -72,8 +91,11 @@ export function LocalesPage() {
           setDialogOpen(false);
           setSelectedLocaleCode("");
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.message || "언어 추가에 실패했습니다");
+        onError: (error: Error) => {
+          const axiosError = error as { response?: { data?: { message?: string } } };
+          toast.error(
+            axiosError.response?.data?.message || "언어 추가에 실패했습니다"
+          );
         },
       }
     );
@@ -169,7 +191,11 @@ export function LocalesPage() {
               </Button>
               <Button
                 onClick={handleCreate}
-                disabled={isCreating || !selectedLocaleCode || availableLocales.length === 0}
+                disabled={
+                  isCreating ||
+                  !selectedLocaleCode ||
+                  availableLocales.length === 0
+                }
               >
                 {isCreating ? "추가 중..." : "추가"}
               </Button>
@@ -182,15 +208,19 @@ export function LocalesPage() {
 }
 
 interface LocaleItemProps {
-  locale: any;
+  locale: Locale;
   projectId: string;
   isDefault: boolean;
 }
 
 function LocaleItem({ locale, projectId, isDefault }: LocaleItemProps) {
-  const { mutate: updateStatus, isPending } = useUpdateLocaleStatus(
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { mutate: updateStatus, isPending: isUpdating } = useUpdateLocaleStatus(
     projectId,
     locale.id
+  );
+  const { mutate: deleteLocale, isPending: isDeleting } = useDeleteLocale(
+    projectId
   );
 
   const handleToggle = (checked: boolean) => {
@@ -207,17 +237,35 @@ function LocaleItem({ locale, projectId, isDefault }: LocaleItemProps) {
             checked ? "언어가 활성화되었습니다" : "언어가 비활성화되었습니다"
           );
         },
-        onError: () => {
-          toast.error("상태 변경에 실패했습니다");
+        onError: (error: Error) => {
+          const axiosError = error as { response?: { data?: { message?: string } } };
+          toast.error(
+            axiosError.response?.data?.message || "상태 변경에 실패했습니다"
+          );
         },
       }
     );
   };
 
+  const handleDelete = () => {
+    deleteLocale(locale.id, {
+      onSuccess: () => {
+        toast.success("언어가 삭제되었습니다");
+        setDeleteDialogOpen(false);
+      },
+      onError: (error: Error) => {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        toast.error(
+          axiosError.response?.data?.message || "언어 삭제에 실패했습니다"
+        );
+      },
+    });
+  };
+
   return (
     <Card
       className={`p-6 transition-opacity ${
-        !locale.isActive ? "opacity-60" : ""
+        !locale.isActive ? "opacity-90" : ""
       }`}
     >
       <div className="flex items-center justify-between">
@@ -271,12 +319,49 @@ function LocaleItem({ locale, projectId, isDefault }: LocaleItemProps) {
               id={`switch-${locale.id}`}
               checked={locale.isActive}
               onCheckedChange={handleToggle}
-              disabled={isPending || (isDefault && locale.isActive)}
+              disabled={isUpdating || (isDefault && locale.isActive)}
             />
           </div>
+          {!isDefault && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => setDeleteDialogOpen(true)}
+              disabled={isDeleting || isUpdating}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
+
+      {/* 삭제 확인 다이얼로그 */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>언어 삭제 확인</AlertDialogTitle>
+            <AlertDialogDescription>
+              <span className="font-semibold">{locale.name}</span> (
+              {locale.code.toUpperCase()}) 언어를 삭제하시겠습니까?
+              <br />
+              <br />
+              이 작업은 되돌릴 수 없으며, 해당 언어의 모든 번역 데이터가
+              영구적으로 삭제됩니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>취소</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "삭제 중..." : "삭제"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }
-

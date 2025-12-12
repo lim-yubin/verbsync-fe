@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { QUERY_KEYS } from "@/lib/constants";
 
-interface Locale {
+export interface Locale {
   id: string;
   projectId: string;
   code: string;
@@ -78,6 +78,34 @@ export function useUpdateLocaleStatus(projectId: string, localeId: string) {
       // 번역 매트릭스 쿼리도 무효화 (활성화 상태 변경 시 테이블에 반영)
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
+      });
+    },
+  });
+}
+
+// 언어 삭제
+export function useDeleteLocale(projectId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (localeId: string) => {
+      const { data } = await api.delete(
+        `/projects/${projectId}/locales/${localeId}`
+      );
+      return data;
+    },
+    onSuccess: () => {
+      // 언어 목록 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.LOCALES(projectId),
+      });
+      // 번역 매트릭스 쿼리도 무효화 (삭제 시 테이블에서 제거)
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
+      });
+      // 키 목록도 무효화 (관련 번역이 삭제될 수 있음)
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.KEYS(projectId),
       });
     },
   });
