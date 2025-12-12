@@ -43,13 +43,34 @@ export function useCreateKey(projectId: string) {
       await queryClient.cancelQueries({
         queryKey: QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
       });
+      await queryClient.cancelQueries({
+        queryKey: QUERY_KEYS.KEYS(projectId),
+      });
 
       // 이전 데이터 백업 (롤백용)
       const previousMatrix = queryClient.getQueryData(
         QUERY_KEYS.TRANSLATIONS_MATRIX(projectId)
       );
+      const previousKeys = queryClient.getQueryData(QUERY_KEYS.KEYS(projectId));
 
-      // 낙관적 업데이트: 새 키를 매트릭스에 추가
+      // 낙관적 업데이트: 새 키를 키 목록에 추가 (정렬을 위해)
+      queryClient.setQueryData(QUERY_KEYS.KEYS(projectId), (old: any) => {
+        if (!old) return old;
+        const newKeyData = {
+          id: `temp-${Date.now()}`,
+          projectId,
+          name: newKey.name,
+          description: newKey.description || null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        return [...old, newKeyData].sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      });
+
+      // 낙관적 업데이트: 새 키를 매트릭스에 추가 (마지막에 추가, 정렬은 프론트에서 처리)
       queryClient.setQueryData(
         QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
         (old: any) => {
@@ -68,7 +89,7 @@ export function useCreateKey(projectId: string) {
         }
       );
 
-      return { previousMatrix };
+      return { previousMatrix, previousKeys };
     },
     onError: (err, newKey, context) => {
       // 에러 발생 시 이전 데이터로 롤백
@@ -77,6 +98,9 @@ export function useCreateKey(projectId: string) {
           QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
           context.previousMatrix
         );
+      }
+      if (context?.previousKeys) {
+        queryClient.setQueryData(QUERY_KEYS.KEYS(projectId), context.previousKeys);
       }
     },
     onSuccess: () => {

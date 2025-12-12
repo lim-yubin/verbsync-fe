@@ -18,12 +18,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useTranslationMatrix, useUpdateTranslations } from "@/hooks/useTranslations";
-import { useCreateKey } from "@/hooks/useKeys";
+import { useCreateKey, useKeys } from "@/hooks/useKeys";
 import { EditableCell } from "@/components/translation/EditableCell";
 
 export function TranslationsPage() {
   const { id: projectId } = useParams<{ id: string }>();
   const { data: matrix, isLoading, error } = useTranslationMatrix(projectId!);
+  const { data: keys } = useKeys(projectId!); // 키 목록 (createdAt 포함)
   const { mutate: updateTranslations, isPending: isSaving } = useUpdateTranslations(projectId!);
   const { mutate: createKey, isPending: isCreatingKey } = useCreateKey(projectId!);
 
@@ -35,15 +36,26 @@ export function TranslationsPage() {
   const [keyDescription, setKeyDescription] = useState("");
   const [isAddingKey, setIsAddingKey] = useState(false);
 
-  // 디버깅용 로그
-  console.log("TranslationsPage Debug:", {
-    projectId,
-    isLoading,
-    error,
-    matrix,
-    rowsCount: matrix?.rows?.length,
-    localesCount: matrix?.locales?.length,
-  });
+  // 키를 생성일 순으로 정렬된 매트릭스
+  const sortedMatrix = useMemo(() => {
+    if (!matrix || !keys) return matrix;
+
+    // 키를 생성일 순으로 정렬 (오래된 것부터)
+    const sortedKeys = [...keys].sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+
+    // 정렬된 키 순서대로 rows 재정렬
+    const sortedRows = sortedKeys
+      .map((key) => matrix.rows.find((row) => row.key === key.name))
+      .filter((row): row is NonNullable<typeof row> => row !== undefined);
+
+    return {
+      ...matrix,
+      rows: sortedRows,
+    };
+  }, [matrix, keys]);
 
   const handleCellChange = (key: string, locale: string, value: string) => {
     const changeKey = `${key}|${locale}`;
@@ -170,8 +182,11 @@ export function TranslationsPage() {
     );
   }
 
+  // 정렬된 매트릭스 사용
+  const displayMatrix = sortedMatrix || matrix;
+
   // 언어가 없는 경우
-  const hasNoLocales = !matrix.locales || matrix.locales.length === 0;
+  const hasNoLocales = !displayMatrix?.locales || displayMatrix.locales.length === 0;
 
   if (hasNoLocales) {
     return (
@@ -200,14 +215,14 @@ export function TranslationsPage() {
   }
 
   // 키가 없는 경우도 테이블 구조는 보여주기 (하단에 추가 행 포함)
-  const hasNoKeys = !matrix.rows || matrix.rows.length === 0;
+  const hasNoKeys = !displayMatrix?.rows || displayMatrix.rows.length === 0;
 
   return (
     <AppLayout>
       <div className="mx-auto max-w-full space-y-6">
         <PageHeader
           title="번역"
-          description={`${matrix.rows.length}개 키 × ${matrix.locales.length}개 언어`}
+          description={`${displayMatrix.rows.length}개 키 × ${displayMatrix.locales.length}개 언어`}
           action={
             <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
               <Save className="mr-2 h-4 w-4" />
@@ -227,7 +242,7 @@ export function TranslationsPage() {
                 <TableHead className="w-[200px] sticky left-0 bg-background z-10 border-r">
                   키
                 </TableHead>
-                {matrix.locales.map((locale) => (
+                {displayMatrix.locales.map((locale) => (
                   <TableHead key={locale.code} className="min-w-[250px]">
                     <div className="font-semibold">{locale.name}</div>
                     <div className="text-xs text-muted-foreground font-normal">
@@ -249,7 +264,7 @@ export function TranslationsPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                matrix.rows.map((row) => (
+                displayMatrix.rows.map((row) => (
                   <TableRow key={row.key}>
                     <TableCell className="sticky left-0 bg-background z-10 border-r">
                       <div className="font-mono text-sm font-semibold">
@@ -261,7 +276,7 @@ export function TranslationsPage() {
                         </div>
                       )}
                     </TableCell>
-                    {matrix.locales.map((locale) => {
+                    {displayMatrix.locales.map((locale) => {
                       const changeKey = `${row.key}|${locale.code}`;
                       const currentValue =
                         changeKey in changes
@@ -339,7 +354,7 @@ export function TranslationsPage() {
                       </div>
                     </div>
                   </TableCell>
-                  {matrix.locales.map((locale) => (
+                  {displayMatrix.locales.map((locale) => (
                     <TableCell key={locale.code} className="p-2">
                       <div className="min-h-[60px] p-3 rounded bg-muted/50 flex items-center justify-center border-2 border-dashed">
                         <span className="text-xs text-muted-foreground italic">
