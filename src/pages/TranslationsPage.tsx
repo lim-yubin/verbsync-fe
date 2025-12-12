@@ -20,11 +20,21 @@ import { EditableCell } from "@/components/translation/EditableCell";
 
 export function TranslationsPage() {
   const { id: projectId } = useParams<{ id: string }>();
-  const { data: matrix, isLoading } = useTranslationMatrix(projectId!);
+  const { data: matrix, isLoading, error } = useTranslationMatrix(projectId!);
   const { mutate: updateTranslations, isPending: isSaving } = useUpdateTranslations(projectId!);
 
   // 변경사항 추적: "key|locale" -> "value"
   const [changes, setChanges] = useState<Record<string, string>>({});
+
+  // 디버깅용 로그
+  console.log("TranslationsPage Debug:", {
+    projectId,
+    isLoading,
+    error,
+    matrix,
+    rowsCount: matrix?.rows?.length,
+    localesCount: matrix?.locales?.length,
+  });
 
   const handleCellChange = (key: string, locale: string, value: string) => {
     const changeKey = `${key}|${locale}`;
@@ -72,7 +82,32 @@ export function TranslationsPage() {
     );
   }
 
-  if (!matrix || matrix.rows.length === 0 || matrix.locales.length === 0) {
+  // 에러 처리
+  if (error) {
+    return (
+      <AppLayout>
+        <div className="mx-auto max-w-7xl space-y-6">
+          <PageHeader
+            title="번역"
+            description="번역 테이블에서 모든 번역을 관리하세요"
+          />
+          <Card className="p-12">
+            <div className="text-center">
+              <p className="text-lg font-semibold mb-2 text-destructive">
+                데이터를 불러올 수 없습니다
+              </p>
+              <p className="text-sm text-muted-foreground mb-4">
+                {error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다"}
+              </p>
+            </div>
+          </Card>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // 데이터가 없거나 비어있는 경우
+  if (!matrix) {
     return (
       <AppLayout>
         <div className="mx-auto max-w-7xl space-y-6">
@@ -89,6 +124,40 @@ export function TranslationsPage() {
               <div className="flex justify-center gap-2">
                 <Button variant="outline" onClick={() => window.history.back()}>
                   언어 추가하기
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // 언어나 키가 없는 경우
+  const hasNoLocales = !matrix.locales || matrix.locales.length === 0;
+  const hasNoKeys = !matrix.rows || matrix.rows.length === 0;
+
+  if (hasNoLocales || hasNoKeys) {
+    return (
+      <AppLayout>
+        <div className="mx-auto max-w-7xl space-y-6">
+          <PageHeader
+            title="번역"
+            description="번역 테이블에서 모든 번역을 관리하세요"
+          />
+          <Card className="p-12">
+            <div className="text-center">
+              <p className="text-lg font-semibold mb-2">번역을 시작하려면</p>
+              <p className="text-sm text-muted-foreground mb-4">
+                {hasNoLocales && hasNoKeys
+                  ? "먼저 언어와 번역 키를 추가해주세요"
+                  : hasNoLocales
+                  ? "먼저 언어를 추가해주세요"
+                  : "먼저 번역 키를 추가해주세요"}
+              </p>
+              <div className="flex justify-center gap-2">
+                <Button variant="outline" onClick={() => window.history.back()}>
+                  {hasNoLocales ? "언어 추가하기" : "번역 키 추가하기"}
                 </Button>
               </div>
             </div>
