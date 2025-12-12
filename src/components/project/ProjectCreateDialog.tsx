@@ -146,7 +146,11 @@ export function ProjectCreateDialog({
             >
               취소
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="bg-foreground text-background hover:bg-foreground/90"
+            >
               {isPending ? "생성 중..." : "프로젝트 생성"}
             </Button>
           </div>
