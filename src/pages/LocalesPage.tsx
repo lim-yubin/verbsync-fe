@@ -198,7 +198,6 @@ export function LocalesPage() {
                   !selectedLocaleCode ||
                   availableLocales.length === 0
                 }
-                className="bg-foreground text-background hover:bg-foreground/90"
               >
                 {isCreating ? "추가 중..." : "추가"}
               </Button>
