@@ -6,6 +6,8 @@ import {
   RegisterPage,
   DashboardPage,
   ProjectDetailPage,
+  LocalesPage,
+  KeysPage,
 } from "@/pages";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { PublicRoute } from "@/components/auth/PublicRoute";
@@ -54,6 +56,22 @@ function App() {
           element={
             <ProtectedRoute>
               <ProjectDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects/:id/locales"
+          element={
+            <ProtectedRoute>
+              <LocalesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects/:id/keys"
+          element={
+            <ProtectedRoute>
+              <KeysPage />
             </ProtectedRoute>
           }
         />

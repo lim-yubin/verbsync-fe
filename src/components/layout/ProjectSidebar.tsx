@@ -24,28 +24,26 @@ export function ProjectSidebar() {
       icon: Home,
     },
     {
+      title: "언어",
+      href: ROUTES.PROJECT_LOCALES(projectId),
+      icon: Globe,
+    },
+    {
       title: "번역 키",
       href: ROUTES.PROJECT_KEYS(projectId),
       icon: Key,
-      disabled: true,
     },
     {
       title: "번역",
       href: ROUTES.PROJECT_TRANSLATIONS(projectId),
       icon: Languages,
-      disabled: true,
-    },
-    {
-      title: "언어",
-      href: ROUTES.PROJECT_LOCALES(projectId),
-      icon: Globe,
-      disabled: true,
+      disabled: true, // 아직 구현 안 됨
     },
     {
       title: "설정",
       href: `/projects/${projectId}/settings`,
       icon: Settings,
-      disabled: true,
+      disabled: true, // 아직 구현 안 됨
     },
   ];
 
