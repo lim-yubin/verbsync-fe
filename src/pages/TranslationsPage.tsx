@@ -167,6 +167,38 @@ export function TranslationsPage() {
     setIsAddingKey(false);
   };
 
+  // 키보드 단축키: Cmd/Ctrl+Shift+Enter로 새 키 추가
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd+Shift+Enter (Mac) 또는 Ctrl+Shift+Enter (Windows/Linux)
+      if (
+        (e.metaKey || e.ctrlKey) &&
+        e.shiftKey &&
+        e.key === "Enter"
+      ) {
+        // 입력 필드에 포커스가 있으면 기본 동작 허용
+        const target = e.target as HTMLElement;
+        if (
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable
+        ) {
+          return;
+        }
+
+        e.preventDefault();
+        if (!isAddingKey) {
+          setIsAddingKey(true);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isAddingKey]);
+
   const handleStartEditKey = (key: string) => {
     const keyData = keys?.find((k) => k.name === key);
     if (keyData) {
