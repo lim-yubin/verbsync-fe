@@ -120,8 +120,11 @@ export function TranslationsPage() {
           toast.success(`${updates.length}개의 번역이 저장되었습니다`);
           setChanges({});
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.message || "저장에 실패했습니다");
+        onError: (error: Error) => {
+          const axiosError = error as {
+            response?: { data?: { message?: string } };
+          };
+          toast.error(axiosError.response?.data?.message || "저장에 실패했습니다");
         },
       }
     );
@@ -142,9 +145,12 @@ export function TranslationsPage() {
           setKeyDescription("");
           setIsAddingKey(false);
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
+          const axiosError = error as {
+            response?: { data?: { message?: string } };
+          };
           toast.error(
-            error.response?.data?.message || "키 추가에 실패했습니다"
+            axiosError.response?.data?.message || "키 추가에 실패했습니다"
           );
         },
       }

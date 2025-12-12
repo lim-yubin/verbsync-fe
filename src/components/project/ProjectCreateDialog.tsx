@@ -61,6 +61,7 @@ export function ProjectCreateDialog({
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const selectedLocale = watch("defaultLocale");
 
   const onSubmit = (data: ProjectFormData) => {

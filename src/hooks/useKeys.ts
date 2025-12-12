@@ -2,6 +2,19 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { QUERY_KEYS } from "@/lib/constants";
 
+// TranslationMatrix 타입은 useTranslations.ts에서 정의됨
+interface TranslationMatrix {
+  locales: Array<{
+    code: string;
+    name: string;
+  }>;
+  rows: Array<{
+    key: string;
+    description: string | null;
+    translations: Record<string, string>;
+  }>;
+}
+
 interface Key {
   id: string;
   projectId: string;
@@ -59,7 +72,7 @@ export function useCreateKey(projectId: string) {
       const previousKeys = queryClient.getQueryData(QUERY_KEYS.KEYS(projectId));
 
       // 낙관적 업데이트: 새 키를 키 목록에 추가 (정렬을 위해)
-      queryClient.setQueryData(QUERY_KEYS.KEYS(projectId), (old: any) => {
+      queryClient.setQueryData(QUERY_KEYS.KEYS(projectId), (old: Key[] | undefined) => {
         if (!old) return old;
         const newKeyData = {
           id: `temp-${Date.now()}`,
@@ -78,7 +91,7 @@ export function useCreateKey(projectId: string) {
       // 낙관적 업데이트: 새 키를 매트릭스에 추가 (마지막에 추가, 정렬은 프론트에서 처리)
       queryClient.setQueryData(
         QUERY_KEYS.TRANSLATIONS_MATRIX(projectId),
-        (old: any) => {
+        (old: TranslationMatrix | undefined) => {
           if (!old) return old;
           return {
             ...old,

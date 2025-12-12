@@ -29,6 +29,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
 
     initializeAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 빈 배열: 앱 시작 시 한 번만 실행
 
   // 초기화 중에는 로딩 화면 표시

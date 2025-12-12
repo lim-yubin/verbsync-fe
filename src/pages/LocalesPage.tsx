@@ -356,10 +356,7 @@ function LocaleItem({ locale, projectId, isDefault }: LocaleItemProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>취소</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
+            <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
               {isDeleting ? "삭제 중..." : "삭제"}
             </AlertDialogAction>
           </AlertDialogFooter>

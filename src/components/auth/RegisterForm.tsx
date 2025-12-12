@@ -37,6 +37,7 @@ export function RegisterForm() {
   });
 
   const onSubmit = (data: RegisterFormData) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordConfirm, ...registerData } = data;
     
     register(registerData, {
