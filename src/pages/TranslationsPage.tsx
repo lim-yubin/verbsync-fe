@@ -492,7 +492,10 @@ export function TranslationsPage() {
                         const isModified = changeKey in changes;
 
                         return (
-                          <TableCell key={locale.code} className="p-2">
+                          <TableCell
+                            key={locale.code}
+                            className="p-2 max-w-[250px]"
+                          >
                             <EditableCell
                               value={currentValue}
                               onChange={(value) =>
