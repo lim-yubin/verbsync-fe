@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { Save, Plus, Edit2, Trash2, Check, X } from "lucide-react";
+import { Save, Plus, Edit2, Trash2, Check, X, Info } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
