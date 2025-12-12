@@ -367,6 +367,12 @@ export function TranslationsPage() {
           }
         />
 
+        {/* 사용 안내 */}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Info className="h-3.5 w-3.5" />
+          <span>셀을 더블클릭하여 번역을 편집할 수 있습니다</span>
+        </div>
+
         <div
           className={cn(
             "rounded-lg border bg-background",
