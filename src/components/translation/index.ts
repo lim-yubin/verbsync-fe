@@ -7,4 +7,6 @@ export { TranslationKeyRow } from "./TranslationKeyRow";
 export { AddKeyRow } from "./AddKeyRow";
 export { TranslationEmptyState } from "./TranslationEmptyState";
 export { TranslationNamespaceTree } from "./TranslationNamespaceTree";
+export { ExportButton } from "./ExportButton";
+export { ImportDialog } from "./ImportDialog";
 

@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Save, Trash2, Info, Plus } from "lucide-react";
+import { Save, Trash2, Info, Plus, Upload } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,9 @@ import {
   useUpdateKey,
   useDeleteKey,
 } from "@/hooks/useKeys";
+import { useProject } from "@/hooks/useProjects";
+import { ExportButton } from "@/components/translation/ExportButton";
+import { ImportDialog } from "@/components/translation/ImportDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,6 +49,7 @@ import {
 
 export function TranslationsPage() {
   const { id: projectId } = useParams<{ id: string }>();
+  const { data: project } = useProject(projectId!);
   const { data: matrix, isLoading, error } = useTranslationMatrix(projectId!);
   const { data: keys } = useKeys(projectId!); // 키 목록 (createdAt 포함)
   const { mutate: updateTranslations, isPending: isSaving } =
@@ -59,6 +63,9 @@ export function TranslationsPage() {
   const { mutate: deleteKey, isPending: isDeletingKey } = useDeleteKey(
     projectId!
   );
+
+  // Import 다이얼로그 상태
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // 변경사항 추적: "key|locale" -> "value"
   const [changes, setChanges] = useState<Record<string, string>>({});
@@ -427,6 +434,86 @@ export function TranslationsPage() {
 
   const hasChanges = Object.keys(changes).length > 0;
 
+  // Import 핸들러
+  const handleImport = async (
+    data: {
+      keys: Array<{ name: string; description: string | null }>;
+      translations: Array<{ key: string; locale: string; value: string }>;
+    },
+    mode: "merge" | "overwrite"
+  ) => {
+    // 1. 키 생성 (존재하지 않는 키만)
+    const existingKeyNames = new Set(keys?.map((k) => k.name) || []);
+    const newKeys = data.keys.filter((k) => !existingKeyNames.has(k.name));
+
+    // 키 생성
+    if (newKeys.length > 0) {
+      await Promise.all(
+        newKeys.map(
+          (key) =>
+            new Promise<void>((resolve, reject) => {
+              createKey(
+                {
+                  name: key.name,
+                  description: key.description || undefined,
+                },
+                {
+                  onSuccess: () => resolve(),
+                  onError: (error) => reject(error),
+                }
+              );
+            })
+        )
+      );
+    }
+
+    // 2. 번역 업데이트
+    let translationsToUpdate = data.translations;
+
+    // 병합 모드인 경우: 기존 번역이 있는 경우 건너뛰기
+    if (mode === "merge" && matrix) {
+      const existingTranslations = new Set<string>();
+      for (const row of matrix.rows) {
+        for (const locale of matrix.locales) {
+          const value = row.translations[locale.code];
+          if (value && value.trim()) {
+            existingTranslations.add(`${row.key}|${locale.code}`);
+          }
+        }
+      }
+
+      translationsToUpdate = data.translations.filter((t) => {
+        const key = `${t.key}|${t.locale}`;
+        return !existingTranslations.has(key);
+      });
+    }
+
+    // 3. 번역 업데이트
+    if (translationsToUpdate.length === 0) {
+      toast.info("업데이트할 번역이 없습니다.");
+      return;
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      updateTranslations(
+        { updates: translationsToUpdate },
+        {
+          onSuccess: () => {
+            const keyMessage =
+              newKeys.length > 0 ? `${newKeys.length}개 키 추가, ` : "";
+            toast.success(
+              `${keyMessage}${translationsToUpdate.length}개 번역 업데이트 완료`
+            );
+            resolve();
+          },
+          onError: (error) => {
+            reject(error);
+          },
+        }
+      );
+    });
+  };
+
   // 표시할 매트릭스 결정
   const displayMatrix = filteredAndSortedMatrix || sortedMatrix || matrix;
 
@@ -506,12 +593,38 @@ export function TranslationsPage() {
                   variant="destructive"
                   onClick={() => setDeleteSelectedDialogOpen(true)}
                   disabled={isDeletingKey}
+                  className="cursor-pointer"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   선택 삭제 ({selectedKeys.size})
                 </Button>
               )}
-              <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
+              {displayMatrix && project && (
+                <>
+                  <ExportButton
+                    matrix={displayMatrix}
+                    projectName={project.name}
+                    isFiltered={
+                      !!searchQuery ||
+                      selectedNamespaces.length > 0 ||
+                      showEmptyOnly
+                    }
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => setImportDialogOpen(true)}
+                    className="cursor-pointer"
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    가져오기
+                  </Button>
+                </>
+              )}
+              <Button
+                onClick={handleSave}
+                disabled={!hasChanges || isSaving}
+                className="cursor-pointer"
+              >
                 <Save className="mr-2 h-4 w-4" />
                 {isSaving
                   ? "저장 중..."
@@ -794,6 +907,20 @@ export function TranslationsPage() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Import 다이얼로그 */}
+        {project && displayMatrix && (
+          <ImportDialog
+            open={importDialogOpen}
+            onOpenChange={setImportDialogOpen}
+            onImport={handleImport}
+            existingLocales={displayMatrix.locales.map((l) => ({
+              code: l.code,
+              name: l.name,
+            }))}
+            existingKeys={keys?.map((k) => k.name) || []}
+          />
+        )}
       </div>
     </AppLayout>
   );
