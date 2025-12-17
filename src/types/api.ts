@@ -43,6 +43,8 @@ export interface Project {
   ownerId: string;
   createdAt: string;
   updatedAt: string;
+  // 도메인 제한 설정
+  allowedDomains?: string[]; // 허용된 도메인 목록 (예: ["example.com", "app.example.com"])
 }
 
 export interface CreateProjectDto {
@@ -53,6 +55,7 @@ export interface CreateProjectDto {
 export interface UpdateProjectDto {
   name?: string;
   defaultLocale?: string;
+  allowedDomains?: string[]; // 도메인 제한 설정
 }
 
 // ========== Locale ==========

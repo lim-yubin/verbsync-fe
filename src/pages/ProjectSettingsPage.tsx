@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Trash2, Save } from "lucide-react";
+import { Trash2, Save, Plus, X, Lock } from "lucide-react";
 import type { AxiosError } from "axios";
 
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -43,6 +43,7 @@ const projectSettingsSchema = z.object({
     .min(1, "프로젝트 이름을 입력해주세요")
     .max(100, "프로젝트 이름은 100자 이내로 입력해주세요"),
   defaultLocale: z.string().min(1, "기본 언어를 선택해주세요"),
+  allowedDomains: z.array(z.string()).optional(),
 });
 
 type ProjectSettingsFormData = z.infer<typeof projectSettingsSchema>;
@@ -68,11 +69,13 @@ export function ProjectSettingsPage() {
     defaultValues: {
       name: project?.name || "",
       defaultLocale: project?.defaultLocale || "en",
+      allowedDomains: project?.allowedDomains || [],
     },
     values: project
       ? {
           name: project.name,
           defaultLocale: project.defaultLocale,
+          allowedDomains: project.allowedDomains || [],
         }
       : undefined,
   });
@@ -86,11 +89,67 @@ export function ProjectSettingsPage() {
     activeLocales.some((l) => l.code === locale.code)
   );
 
+  const [newDomain, setNewDomain] = useState("");
+  const allowedDomains = watch("allowedDomains") || [];
+
+  const handleAddDomain = () => {
+    const trimmed = newDomain.trim();
+    if (!trimmed) {
+      toast.error("도메인을 입력해주세요");
+      return;
+    }
+
+    // 와일드카드 패턴 또는 일반 도메인 형식 검증
+    const isWildcard = trimmed.startsWith("*.");
+    const domainToValidate = isWildcard ? trimmed.substring(2) : trimmed;
+    const normalizedDomain = domainToValidate.toLowerCase();
+
+    // localhost는 허용
+    if (normalizedDomain === "localhost") {
+      const finalDomain = isWildcard ? `*.${normalizedDomain}` : normalizedDomain;
+      if (allowedDomains.includes(finalDomain)) {
+        toast.error("이미 추가된 도메인입니다");
+        return;
+      }
+      setValue("allowedDomains", [...allowedDomains, finalDomain]);
+      setNewDomain("");
+      return;
+    }
+
+    // 도메인 형식 검증 (와일드카드 제외한 부분)
+    const domainRegex = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/;
+    if (!domainRegex.test(normalizedDomain)) {
+      toast.error("올바른 도메인 형식이 아닙니다 (예: example.com, *.example.com)");
+      return;
+    }
+
+    const finalDomain = isWildcard ? `*.${normalizedDomain}` : normalizedDomain;
+    if (allowedDomains.includes(finalDomain)) {
+      toast.error("이미 추가된 도메인입니다");
+      return;
+    }
+
+    setValue("allowedDomains", [...allowedDomains, finalDomain]);
+    setNewDomain("");
+  };
+
+  const handleRemoveDomain = (domain: string) => {
+    setValue(
+      "allowedDomains",
+      allowedDomains.filter((d) => d !== domain)
+    );
+  };
+
   const onSubmit = (data: ProjectSettingsFormData) => {
     updateProject(
       {
         name: data.name !== project?.name ? data.name : undefined,
         defaultLocale: data.defaultLocale !== project?.defaultLocale ? data.defaultLocale : undefined,
+        allowedDomains:
+          JSON.stringify(data.allowedDomains || []) !==
+          JSON.stringify(project?.allowedDomains || [])
+            ? data.allowedDomains
+            : undefined,
       },
       {
         onSuccess: () => {
@@ -205,7 +264,96 @@ export function ProjectSettingsPage() {
               </div>
 
               <div className="flex justify-end">
-                <Button type="submit" disabled={isUpdating}>
+                <Button type="submit" disabled={isUpdating} className="cursor-pointer">
+                  <Save className="mr-2 h-4 w-4" />
+                  {isUpdating ? "저장 중..." : "저장"}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* API 보안 설정 */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5" />
+              API 보안 설정
+            </CardTitle>
+            <CardDescription>
+              헤더 기반 API Key 사용 시 허용된 도메인을 설정할 수 있습니다. 설정하지 않으면 모든 도메인에서 사용 가능합니다.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <Label>허용된 도메인</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newDomain}
+                    onChange={(e) => setNewDomain(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddDomain();
+                      }
+                    }}
+                    placeholder="example.com"
+                    disabled={isUpdating}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleAddDomain}
+                    disabled={isUpdating}
+                    className="cursor-pointer"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  도메인만 입력하세요 (예: example.com, app.example.com, *.example.com). 프로토콜(http://)이나 경로(/)는 제외하세요.
+                  <br />
+                  <span className="font-semibold">와일드카드:</span> <code className="text-xs bg-muted px-1 rounded">*.example.com</code>을 입력하면 모든 서브도메인을 허용합니다.
+                </p>
+              </div>
+
+              {allowedDomains.length > 0 && (
+                <div className="space-y-2">
+                  <Label>추가된 도메인</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {allowedDomains.map((domain) => (
+                      <div
+                        key={domain}
+                        className="flex items-center gap-1 rounded-md border bg-muted px-2 py-1 text-sm"
+                      >
+                        <span className="font-mono">{domain}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 cursor-pointer"
+                          onClick={() => handleRemoveDomain(domain)}
+                          disabled={isUpdating}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {allowedDomains.length === 0 && (
+                <div className="rounded-md border border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800 p-3">
+                  <p className="text-xs text-amber-900 dark:text-amber-100">
+                    도메인을 설정하지 않으면 모든 도메인에서 API Key를 사용할 수 있습니다. 보안을 위해 허용된 도메인을 설정하는 것을 권장합니다.
+                  </p>
+                </div>
+              )}
+
+              <div className="flex justify-end">
+                <Button type="submit" disabled={isUpdating} className="cursor-pointer">
                   <Save className="mr-2 h-4 w-4" />
                   {isUpdating ? "저장 중..." : "저장"}
                 </Button>

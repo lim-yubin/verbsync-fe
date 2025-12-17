@@ -1,5 +1,6 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useMemo } from "react";
+import { Globe, Languages, Settings, ArrowRight, Plus } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,6 +11,13 @@ import { useLocales } from "@/hooks/useLocales";
 import { useKeys } from "@/hooks/useKeys";
 import { useTranslationMatrix } from "@/hooks/useTranslations";
 import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ROUTES } from "@/lib/constants";
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -62,7 +70,9 @@ export function ProjectDetailPage() {
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <p className="text-lg font-semibold">프로젝트를 찾을 수 없습니다</p>
+              <p className="text-lg font-semibold">
+                프로젝트를 찾을 수 없습니다
+              </p>
               <p className="text-sm text-muted-foreground mt-2">
                 삭제되었거나 접근 권한이 없습니다
               </p>
@@ -89,6 +99,77 @@ export function ProjectDetailPage() {
           }
         />
 
+        {/* Quick Actions */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Card className="cursor-pointer hover:border-primary/50 transition-colors">
+            <Link to={ROUTES.PROJECT_LOCALES(id!)}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-950">
+                    <Globe className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <CardTitle className="text-base mt-4">언어 관리</CardTitle>
+                <CardDescription className="text-xs">
+                  언어를 추가하고 활성화하세요
+                </CardDescription>
+              </CardHeader>
+            </Link>
+          </Card>
+
+          <Card className="cursor-pointer hover:border-primary/50 transition-colors">
+            <Link to={ROUTES.PROJECT_TRANSLATIONS(id!)}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-950">
+                    <Languages className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <CardTitle className="text-base mt-4">번역 관리</CardTitle>
+                <CardDescription className="text-xs">
+                  번역을 작성하고 편집하세요
+                </CardDescription>
+              </CardHeader>
+            </Link>
+          </Card>
+
+          <Card className="cursor-pointer hover:border-primary/50 transition-colors">
+            <Link to={ROUTES.PROJECT_SETTINGS(id!)}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-950">
+                    <Settings className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <CardTitle className="text-base mt-4">프로젝트 설정</CardTitle>
+                <CardDescription className="text-xs">
+                  프로젝트 정보와 보안 설정
+                </CardDescription>
+              </CardHeader>
+            </Link>
+          </Card>
+
+          <Card className="border-dashed cursor-pointer hover:border-primary/50 transition-colors">
+            <Link to={ROUTES.PROJECT_TRANSLATIONS(id!)}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                    <Plus className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <CardTitle className="text-base mt-4">번역 시작하기</CardTitle>
+                <CardDescription className="text-xs">
+                  번역 키를 추가하고 번역을 작성하세요
+                </CardDescription>
+              </CardHeader>
+            </Link>
+          </Card>
+        </div>
+
         {/* Stats */}
         <ProjectStats
           localesCount={stats.localesCount}
@@ -98,47 +179,7 @@ export function ProjectDetailPage() {
 
         {/* API Key */}
         <ApiKeyDisplay apiKey={project.apiKey} />
-
-        {/* Quick Actions */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-lg border p-6">
-            <h3 className="font-semibold mb-2">시작하기</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              번역 키를 추가하고 언어를 설정하세요
-            </p>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">1.</span>
-                <span>언어 추가</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">2.</span>
-                <span>번역 키 생성</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">3.</span>
-                <span>번역 작성</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-lg border p-6">
-            <h3 className="font-semibold mb-2">개발자 가이드</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              API를 통해 번역 데이터를 가져오세요
-            </p>
-            <div className="rounded-md bg-muted p-3 font-mono text-xs">
-              <p className="text-muted-foreground">
-                // React i18next 예시
-              </p>
-              <p className="mt-1">
-                fetch('https://api.verbasync.com/public/{"{apiKey}"}/locales/ko.json')
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </AppLayout>
   );
 }
-
