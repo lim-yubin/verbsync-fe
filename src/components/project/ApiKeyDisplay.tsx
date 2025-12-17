@@ -61,11 +61,13 @@ i18n
   .use(initReactI18next)
   .init({
     backend: {
-      loadPath: '${apiBaseUrl}/api/translations/{{lng}}.json',
+      loadPath: '${apiBaseUrl}/api/translations/{{ns}}/{{lng}}.json',
       customHeaders: {
         'x-api-key': '${isVisible ? apiKey : "YOUR_API_KEY"}'
       }
     },
+    defaultNS: 'common',
+    ns: ['common', 'login', 'home'],
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false
@@ -83,16 +85,18 @@ i18n
   .use(initReactI18next)
   .init({
     backend: {
-      loadPath: '/api/translations/{{lng}}.json'
+      loadPath: '/api/translations/{{ns}}/{{lng}}.json'
     },
+    defaultNS: 'common',
+    ns: ['common', 'login', 'home'],
     fallbackLng: 'en'
   });
 
-// pages/api/translations/[lng].json.ts
+// pages/api/translations/[ns]/[lng].json.ts
 export default async function handler(req, res) {
-  const { lng } = req.query;
+  const { ns, lng } = req.query;
   const response = await fetch(
-    \`${apiBaseUrl}/api/translations/\${lng}.json\`,
+    \`${apiBaseUrl}/api/translations/\${ns}/\${lng}.json\`,
     {
       headers: {
         'x-api-key': process.env.VERBASYNC_API_KEY
