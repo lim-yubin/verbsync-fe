@@ -59,31 +59,6 @@ export function ApiKeyDisplay({ projectId }: ApiKeyDisplayProps) {
   const apiBaseUrl =
     import.meta.env.VITE_API_BASE_URL || "https://api.verbasync.com";
 
-  const reactCode = `// i18n.ts
-import i18n from 'i18next';
-import Backend from 'i18next-http-backend';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import { initReactI18next } from 'react-i18next';
-
-i18n
-  .use(Backend)
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    backend: {
-      loadPath: '${apiBaseUrl}/api/translations/{{ns}}/{{lng}}.json',
-      customHeaders: {
-        'x-api-key': '${isVisible ? apiKey : "YOUR_API_KEY"}'
-      }
-    },
-    defaultNS: 'common',
-    ns: ['common', 'login', 'home'],
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false
-    }
-  });`;
-
   const i18nextStandardCode = `// i18n.ts
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
@@ -105,24 +80,6 @@ i18n
     defaultNS: 'common',
     // ... 기타 i18next 설정
   });`;
-
-  const i18nextProxyCode = `// 1. 프론트엔드 설정 (i18n.ts)
-i18n.use(Backend).init({
-  backend: {
-    // 내 서버의 API 경로로 설정 (API Key 노출 방지)
-    loadPath: '/api/translations/{{ns}}/{{lng}}.json'
-  }
-});
-
-// 2. 백엔드 프록시 예시 (Node.js/Next.js)
-export default async function handler(req, res) {
-  const { ns, lng } = req.query;
-  const response = await fetch(\`${apiBaseUrl}/api/translations/\${ns}/\${lng}.json\`, {
-    headers: { 'x-api-key': process.env.VERBASYNC_API_KEY }
-  });
-  const data = await response.json();
-  res.json(data);
-}`;
 
   const componentUsageCode = `import { useTranslation } from 'react-i18next';
 

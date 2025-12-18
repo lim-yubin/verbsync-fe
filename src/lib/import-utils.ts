@@ -96,7 +96,6 @@ export async function parseExcelFile(
         }
 
         // 언어 열 추출 (3번째 열부터)
-        const localeHeaders = headers.slice(2);
         const locales: string[] = [];
 
         // 데이터 행 처리
@@ -188,7 +187,6 @@ export async function parseCSVFile(
           }
 
           // 언어 열 추출
-          const localeHeaders = headers.slice(2);
           const locales: string[] = [];
 
           // 데이터 행 처리

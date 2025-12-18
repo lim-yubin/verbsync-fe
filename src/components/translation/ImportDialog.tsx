@@ -142,8 +142,6 @@ export function ImportDialog({
   const existingKeySet = new Set(existingKeys);
   const newKeys =
     parsedData?.keys.filter((key) => !existingKeySet.has(key.name)) || [];
-  const existingKeysInFile =
-    parsedData?.keys.filter((key) => existingKeySet.has(key.name)) || [];
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
