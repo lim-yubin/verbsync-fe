@@ -178,7 +178,7 @@ export function ProjectDetailPage() {
         />
 
         {/* API Key */}
-        <ApiKeyDisplay apiKey={project.apiKey} />
+        <ApiKeyDisplay projectId={project.id} />
       </div>
     </AppLayout>
   );

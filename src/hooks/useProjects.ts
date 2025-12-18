@@ -1,7 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { QUERY_KEYS } from "@/lib/constants";
-import type { Project, CreateProjectDto, UpdateProjectDto } from "@/types/api";
+import type {
+  Project,
+  CreateProjectDto,
+  UpdateProjectDto,
+  ProjectApiKey,
+} from "@/types/api";
 
 // 프로젝트 목록 조회
 export function useProjects() {
@@ -39,6 +44,21 @@ export function useProject(projectId: string) {
       return data;
     },
     enabled: !!projectId,
+  });
+}
+
+// 프로젝트 API Key 조회
+export function useProjectApiKey(projectId: string) {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.PROJECT(projectId), "api-key"],
+    queryFn: async () => {
+      const { data } = await api.get<ProjectApiKey>(
+        `/projects/${projectId}/api-key`
+      );
+      return data;
+    },
+    enabled: !!projectId,
+    staleTime: Infinity, // API Key는 자주 바뀌지 않으므로 무한대 설정
   });
 }
 

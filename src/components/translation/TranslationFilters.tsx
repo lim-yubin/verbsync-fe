@@ -20,8 +20,6 @@ interface TranslationFiltersProps {
   selectedNamespaces: string[];
   onNamespaceToggle: (namespace: string) => void;
   onNamespaceClear: () => void;
-  showEmptyOnly: boolean;
-  onShowEmptyOnlyChange: (checked: boolean) => void;
   sortBy: "created" | "name" | "namespace";
   onSortByChange: (value: "created" | "name" | "namespace") => void;
   groupByNamespace: boolean;
@@ -37,8 +35,6 @@ export function TranslationFilters({
   selectedNamespaces,
   onNamespaceToggle,
   onNamespaceClear,
-  showEmptyOnly,
-  onShowEmptyOnlyChange,
   sortBy,
   onSortByChange,
   groupByNamespace,
@@ -71,21 +67,6 @@ export function TranslationFilters({
               onChange={(e) => onSearchChange(e.target.value)}
               className="pl-9"
             />
-          </div>
-
-          {/* 빈 번역 필터 */}
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="showEmptyOnly"
-              checked={showEmptyOnly}
-              onCheckedChange={(checked) =>
-                onShowEmptyOnlyChange(checked === true)
-              }
-              className="cursor-pointer"
-            />
-            <label htmlFor="showEmptyOnly" className="text-sm cursor-pointer">
-              빈 번역만
-            </label>
           </div>
         </div>
 

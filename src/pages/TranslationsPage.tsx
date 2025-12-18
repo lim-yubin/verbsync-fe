@@ -100,7 +100,6 @@ export function TranslationsPage() {
   // 필터링 및 그룹화 상태
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedNamespaces, setSelectedNamespaces] = useState<string[]>([]);
-  const [showEmptyOnly, setShowEmptyOnly] = useState(false);
   const [groupByNamespace, setGroupByNamespace] = useState(true);
   const [sortBy, setSortBy] = useState<"created" | "name" | "namespace">(
     "created"
@@ -139,7 +138,6 @@ export function TranslationsPage() {
       searchQuery,
       selectedNamespaces:
         selectedNamespaces.length > 0 ? selectedNamespaces : undefined,
-      showEmptyOnly,
     });
 
     // 정렬
@@ -153,7 +151,6 @@ export function TranslationsPage() {
     sortedMatrix,
     searchQuery,
     selectedNamespaces,
-    showEmptyOnly,
     sortBy,
     keys,
   ]);
@@ -606,8 +603,7 @@ export function TranslationsPage() {
                     projectName={project.name}
                     isFiltered={
                       !!searchQuery ||
-                      selectedNamespaces.length > 0 ||
-                      showEmptyOnly
+                      selectedNamespaces.length > 0
                     }
                   />
                   <Button
@@ -650,16 +646,12 @@ export function TranslationsPage() {
             );
           }}
           onNamespaceClear={() => setSelectedNamespaces([])}
-          showEmptyOnly={showEmptyOnly}
-          onShowEmptyOnlyChange={setShowEmptyOnly}
           sortBy={sortBy}
           onSortByChange={setSortBy}
           groupByNamespace={groupByNamespace}
           onGroupByNamespaceChange={setGroupByNamespace}
           filteredCount={displayMatrix.rows.length}
-          isFiltered={
-            !!searchQuery || selectedNamespaces.length > 0 || showEmptyOnly
-          }
+          isFiltered={!!searchQuery || selectedNamespaces.length > 0}
         />
 
         {/* 사용 안내 */}

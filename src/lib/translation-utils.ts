@@ -9,7 +9,6 @@ export interface TranslationRow {
 export interface FilterOptions {
   searchQuery?: string;
   selectedNamespaces?: string[];
-  showEmptyOnly?: boolean;
 }
 
 /**
@@ -191,10 +190,9 @@ export function extractNamespaces(rows: TranslationMatrix["rows"]): string[] {
  */
 export function filterKeys(
   rows: TranslationMatrix["rows"],
-  options: FilterOptions,
-  locales?: { code: string }[]
+  options: FilterOptions
 ): TranslationMatrix["rows"] {
-  const { searchQuery, selectedNamespaces, showEmptyOnly } = options;
+  const { searchQuery, selectedNamespaces } = options;
 
   return rows.filter((row) => {
     const matchesSearch = searchQuery
@@ -218,15 +216,7 @@ export function filterKeys(
         })()
       : true;
 
-    const matchesEmpty = showEmptyOnly
-      ? locales?.some(
-          (locale) =>
-            !row.translations[locale.code] ||
-            row.translations[locale.code].trim() === ""
-        )
-      : true;
-
-    return matchesSearch && matchesNamespace && matchesEmpty;
+    return matchesSearch && matchesNamespace;
   });
 }
 

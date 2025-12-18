@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import type { FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -12,7 +13,13 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -32,10 +39,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { useProject, useUpdateProject, useDeleteProject } from "@/hooks/useProjects";
+import {
+  useProject,
+  useUpdateProject,
+  useDeleteProject,
+} from "@/hooks/useProjects";
 import { useLocales } from "@/hooks/useLocales";
 import { SUPPORTED_LOCALES } from "@/lib/locales";
 import { ROUTES } from "@/lib/constants";
+import type { UpdateProjectDto } from "@/types/api";
 
 const projectSettingsSchema = z.object({
   name: z
@@ -53,7 +65,9 @@ export function ProjectSettingsPage() {
   const navigate = useNavigate();
   const { data: project, isLoading: isProjectLoading } = useProject(projectId!);
   const { data: locales, isLoading: isLocalesLoading } = useLocales(projectId!);
-  const { mutate: updateProject, isPending: isUpdating } = useUpdateProject(projectId!);
+  const { mutate: updateProject, isPending: isUpdating } = useUpdateProject(
+    projectId!
+  );
   const { mutate: deleteProject, isPending: isDeleting } = useDeleteProject();
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -104,9 +118,11 @@ export function ProjectSettingsPage() {
     const domainToValidate = isWildcard ? trimmed.substring(2) : trimmed;
     const normalizedDomain = domainToValidate.toLowerCase();
 
-    // localhost는 허용
+    // localhost 허용
     if (normalizedDomain === "localhost") {
-      const finalDomain = isWildcard ? `*.${normalizedDomain}` : normalizedDomain;
+      const finalDomain = isWildcard
+        ? `*.${normalizedDomain}`
+        : normalizedDomain;
       if (allowedDomains.includes(finalDomain)) {
         toast.error("이미 추가된 도메인입니다");
         return;
@@ -118,8 +134,11 @@ export function ProjectSettingsPage() {
 
     // 도메인 형식 검증 (와일드카드 제외한 부분)
     const domainRegex = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/;
+
     if (!domainRegex.test(normalizedDomain)) {
-      toast.error("올바른 도메인 형식이 아닙니다 (예: example.com, *.example.com)");
+      toast.error(
+        "올바른 도메인 형식이 아닙니다 (예: example.com, *.example.com)"
+      );
       return;
     }
 
@@ -140,27 +159,45 @@ export function ProjectSettingsPage() {
     );
   };
 
+  const onInvalid = (errors: FieldErrors<ProjectSettingsFormData>) => {
+    console.error("Form Validation Errors:", errors);
+    const firstError = Object.values(errors)[0];
+    if (firstError?.message) {
+      toast.error(firstError.message as string);
+    }
+  };
+
   const onSubmit = (data: ProjectSettingsFormData) => {
-    updateProject(
-      {
-        name: data.name !== project?.name ? data.name : undefined,
-        defaultLocale: data.defaultLocale !== project?.defaultLocale ? data.defaultLocale : undefined,
-        allowedDomains:
-          JSON.stringify(data.allowedDomains || []) !==
-          JSON.stringify(project?.allowedDomains || [])
-            ? data.allowedDomains
-            : undefined,
+    const updates: UpdateProjectDto = {
+      name: data.name !== project?.name ? data.name : undefined,
+      defaultLocale:
+        data.defaultLocale !== project?.defaultLocale
+          ? data.defaultLocale
+          : undefined,
+      allowedDomains:
+        JSON.stringify(data.allowedDomains || []) !==
+        JSON.stringify(project?.allowedDomains || [])
+          ? data.allowedDomains
+          : undefined,
+    };
+
+    // 필드 중 하나라도 존재할 때만 API 호출
+    if (Object.values(updates).every((v) => v === undefined)) {
+      toast.info("변경사항이 없습니다");
+      return;
+    }
+
+    updateProject(updates, {
+      onSuccess: () => {
+        toast.success("프로젝트 설정이 저장되었습니다");
       },
-      {
-        onSuccess: () => {
-          toast.success("프로젝트 설정이 저장되었습니다");
-        },
-        onError: (error: Error) => {
-          const axiosError = error as AxiosError<{ message?: string }>;
-          toast.error(axiosError.response?.data?.message || "설정 저장에 실패했습니다");
-        },
-      }
-    );
+      onError: (error: Error) => {
+        const axiosError = error as AxiosError<{ message?: string }>;
+        toast.error(
+          axiosError.response?.data?.message || "설정 저장에 실패했습니다"
+        );
+      },
+    });
   };
 
   const handleDelete = () => {
@@ -173,7 +210,9 @@ export function ProjectSettingsPage() {
       },
       onError: (error: Error) => {
         const axiosError = error as AxiosError<{ message?: string }>;
-        toast.error(axiosError.response?.data?.message || "프로젝트 삭제에 실패했습니다");
+        toast.error(
+          axiosError.response?.data?.message || "프로젝트 삭제에 실패했습니다"
+        );
       },
     });
   };
@@ -195,7 +234,9 @@ export function ProjectSettingsPage() {
         <div className="mx-auto max-w-4xl">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <p className="text-lg font-semibold">프로젝트를 찾을 수 없습니다</p>
+              <p className="text-lg font-semibold">
+                프로젝트를 찾을 수 없습니다
+              </p>
               <p className="text-sm text-muted-foreground mt-2">
                 삭제되었거나 접근 권한이 없습니다
               </p>
@@ -214,14 +255,19 @@ export function ProjectSettingsPage() {
           description="프로젝트 정보를 수정하거나 삭제할 수 있습니다"
         />
 
-        {/* 프로젝트 정보 수정 */}
-        <Card>
-          <CardHeader>
-            <CardTitle>프로젝트 정보</CardTitle>
-            <CardDescription>프로젝트 이름과 기본 언어를 변경할 수 있습니다</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form
+          onSubmit={handleSubmit(onSubmit, onInvalid)}
+          className="space-y-6"
+        >
+          {/* 프로젝트 정보 수정 */}
+          <Card>
+            <CardHeader>
+              <CardTitle>프로젝트 정보</CardTitle>
+              <CardDescription>
+                프로젝트 이름과 기본 언어를 변경할 수 있습니다
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="name">프로젝트 이름</Label>
                 <Input
@@ -231,7 +277,9 @@ export function ProjectSettingsPage() {
                   disabled={isUpdating}
                 />
                 {errors.name && (
-                  <p className="text-sm text-destructive">{errors.name.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.name.message}
+                  </p>
                 )}
               </div>
 
@@ -254,7 +302,9 @@ export function ProjectSettingsPage() {
                   </SelectContent>
                 </Select>
                 {errors.defaultLocale && (
-                  <p className="text-sm text-destructive">{errors.defaultLocale.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.defaultLocale.message}
+                  </p>
                 )}
                 {availableLocales.length === 0 && (
                   <p className="text-sm text-muted-foreground">
@@ -264,28 +314,31 @@ export function ProjectSettingsPage() {
               </div>
 
               <div className="flex justify-end">
-                <Button type="submit" disabled={isUpdating} className="cursor-pointer">
+                <Button
+                  type="submit"
+                  disabled={isUpdating}
+                  className="cursor-pointer"
+                >
                   <Save className="mr-2 h-4 w-4" />
                   {isUpdating ? "저장 중..." : "저장"}
                 </Button>
               </div>
-            </form>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* API 보안 설정 */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5" />
-              API 보안 설정
-            </CardTitle>
-            <CardDescription>
-              헤더 기반 API Key 사용 시 허용된 도메인을 설정할 수 있습니다. 설정하지 않으면 모든 도메인에서 사용 가능합니다.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* API 보안 설정 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Lock className="h-5 w-5" />
+                API 보안 설정
+              </CardTitle>
+              <CardDescription>
+                헤더 기반 API Key 사용 시 허용된 도메인을 설정할 수 있습니다.
+                설정하지 않으면 모든 도메인에서 사용 가능합니다.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>허용된 도메인</Label>
                 <div className="flex gap-2">
@@ -312,9 +365,23 @@ export function ProjectSettingsPage() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  도메인만 입력하세요 (예: example.com, app.example.com, *.example.com). 프로토콜(http://)이나 경로(/)는 제외하세요.
+                  도메인만 입력하세요 (예: example.com, app.example.com,
+                  *.example.com). 프로토콜(http://)이나 경로(/)는 제외하세요.
                   <br />
-                  <span className="font-semibold">와일드카드:</span> <code className="text-xs bg-muted px-1 rounded">*.example.com</code>을 입력하면 모든 서브도메인을 허용합니다.
+                  <span className="font-semibold text-primary">
+                    💡 로컬 테스트:
+                  </span>{" "}
+                  로컬 개발 환경에서 테스트하려면{" "}
+                  <code className="text-xs bg-muted px-1 rounded">
+                    localhost
+                  </code>
+                  를 추가하세요.
+                  <br />
+                  <span className="font-semibold">와일드카드:</span>{" "}
+                  <code className="text-xs bg-muted px-1 rounded">
+                    *.example.com
+                  </code>
+                  을 입력하면 모든 서브도메인을 허용합니다.
                 </p>
               </div>
 
@@ -347,20 +414,26 @@ export function ProjectSettingsPage() {
               {allowedDomains.length === 0 && (
                 <div className="rounded-md border border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800 p-3">
                   <p className="text-xs text-amber-900 dark:text-amber-100">
-                    도메인을 설정하지 않으면 모든 도메인에서 API Key를 사용할 수 있습니다. 보안을 위해 허용된 도메인을 설정하는 것을 권장합니다.
+                    도메인을 설정하지 않으면 모든 도메인에서 API Key를 사용할 수
+                    있습니다. 보안을 위해 허용된 도메인을 설정하는 것을
+                    권장합니다.
                   </p>
                 </div>
               )}
 
               <div className="flex justify-end">
-                <Button type="submit" disabled={isUpdating} className="cursor-pointer">
+                <Button
+                  type="submit"
+                  disabled={isUpdating}
+                  className="cursor-pointer"
+                >
                   <Save className="mr-2 h-4 w-4" />
                   {isUpdating ? "저장 중..." : "저장"}
                 </Button>
               </div>
-            </form>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </form>
 
         <Separator />
 
@@ -369,7 +442,8 @@ export function ProjectSettingsPage() {
           <CardHeader>
             <CardTitle className="text-destructive">위험 구역</CardTitle>
             <CardDescription>
-              프로젝트를 삭제하면 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다
+              프로젝트를 삭제하면 모든 데이터가 영구적으로 삭제되며 복구할 수
+              없습니다
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -390,10 +464,11 @@ export function ProjectSettingsPage() {
             <AlertDialogHeader>
               <AlertDialogTitle>프로젝트 삭제 확인</AlertDialogTitle>
               <AlertDialogDescription>
-                <span className="font-semibold">{project.name}</span> 프로젝트를 삭제하시겠습니까?
+                <span className="font-semibold">{project.name}</span> 프로젝트를
+                삭제하시겠습니까?
                 <br />
-                <br />
-                이 작업은 되돌릴 수 없으며, 다음 데이터가 영구적으로 삭제됩니다:
+                <br />이 작업은 되돌릴 수 없으며, 다음 데이터가 영구적으로
+                삭제됩니다:
                 <ul className="list-disc list-inside mt-2 space-y-1">
                   <li>모든 언어 설정</li>
                   <li>모든 번역 키</li>
@@ -418,4 +493,3 @@ export function ProjectSettingsPage() {
     </AppLayout>
   );
 }
-

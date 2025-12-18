@@ -39,12 +39,15 @@ export interface Project {
   id: string;
   name: string;
   defaultLocale: string;
-  apiKey: string;
   ownerId: string;
   createdAt: string;
   updatedAt: string;
   // 도메인 제한 설정
   allowedDomains?: string[]; // 허용된 도메인 목록 (예: ["example.com", "app.example.com"])
+}
+
+export interface ProjectApiKey {
+  apiKey: string;
 }
 
 export interface CreateProjectDto {

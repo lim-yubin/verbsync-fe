@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Copy, Check, Eye, EyeOff, Lock } from "lucide-react";
+import { Copy, Check, Eye, EyeOff, Lock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,17 +13,22 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { useProjectApiKey } from "@/hooks/useProjects";
 
 interface ApiKeyDisplayProps {
-  apiKey: string;
+  projectId: string;
 }
 
-export function ApiKeyDisplay({ apiKey }: ApiKeyDisplayProps) {
+export function ApiKeyDisplay({ projectId }: ApiKeyDisplayProps) {
+  const { data, isLoading, isError } = useProjectApiKey(projectId);
   const [isVisible, setIsVisible] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
+  const apiKey = data?.apiKey || "";
+
   const handleCopy = async () => {
+    if (!apiKey) return;
     try {
       await navigator.clipboard.writeText(apiKey);
       setCopied(true);
@@ -45,7 +50,12 @@ export function ApiKeyDisplay({ apiKey }: ApiKeyDisplayProps) {
     }
   };
 
-  const displayValue = isVisible ? apiKey : "•".repeat(apiKey.length);
+  const displayValue = isLoading
+    ? "Loading..."
+    : isVisible
+    ? apiKey
+    : "•".repeat(32);
+
   const apiBaseUrl =
     import.meta.env.VITE_API_BASE_URL || "https://api.verbasync.com";
 
@@ -107,6 +117,10 @@ export default async function handler(req, res) {
   res.json(data);
 }`;
 
+  if (isError) {
+    return null;
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -142,8 +156,11 @@ export default async function handler(req, res) {
                 size="icon"
                 className="h-7 w-7 cursor-pointer"
                 onClick={() => setIsVisible(!isVisible)}
+                disabled={isLoading}
               >
-                {isVisible ? (
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : isVisible ? (
                   <EyeOff className="h-4 w-4" />
                 ) : (
                   <Eye className="h-4 w-4" />
@@ -154,6 +171,7 @@ export default async function handler(req, res) {
                 size="icon"
                 className="h-7 w-7 cursor-pointer"
                 onClick={handleCopy}
+                disabled={isLoading || !apiKey}
               >
                 {copied ? (
                   <Check className="h-4 w-4 text-green-500" />
@@ -173,24 +191,18 @@ export default async function handler(req, res) {
               </p>
               <Button
                 variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs cursor-pointer"
-                onClick={() => handleCopyCode(reactCode, "React")}
+                size="icon"
+                className="h-7 w-7 cursor-pointer"
+                onClick={() => handleCopyCode(reactCode, "React i18next")}
               >
-                {copiedCode === "React" ? (
-                  <>
-                    <Check className="mr-1 h-3 w-3" />
-                    복사됨
-                  </>
+                {copiedCode === "React i18next" ? (
+                  <Check className="h-4 w-4 text-green-500" />
                 ) : (
-                  <>
-                    <Copy className="mr-1 h-3 w-3" />
-                    복사
-                  </>
+                  <Copy className="h-4 w-4" />
                 )}
               </Button>
             </div>
-            <pre className="font-mono text-xs bg-background p-3 rounded border overflow-x-auto whitespace-pre relative">
+            <pre className="font-mono text-xs bg-background p-3 rounded border overflow-x-auto whitespace-pre">
               <code>{reactCode}</code>
             </pre>
           </div>
@@ -204,24 +216,18 @@ export default async function handler(req, res) {
               </p>
               <Button
                 variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs cursor-pointer"
-                onClick={() => handleCopyCode(nextjsCode, "Next.js")}
+                size="icon"
+                className="h-7 w-7 cursor-pointer"
+                onClick={() => handleCopyCode(nextjsCode, "Next.js i18next")}
               >
-                {copiedCode === "Next.js" ? (
-                  <>
-                    <Check className="mr-1 h-3 w-3" />
-                    복사됨
-                  </>
+                {copiedCode === "Next.js i18next" ? (
+                  <Check className="h-4 w-4 text-green-500" />
                 ) : (
-                  <>
-                    <Copy className="mr-1 h-3 w-3" />
-                    복사
-                  </>
+                  <Copy className="h-4 w-4" />
                 )}
               </Button>
             </div>
-            <pre className="font-mono text-xs bg-background p-3 rounded border overflow-x-auto whitespace-pre relative">
+            <pre className="font-mono text-xs bg-background p-3 rounded border overflow-x-auto whitespace-pre">
               <code>{nextjsCode}</code>
             </pre>
           </div>
