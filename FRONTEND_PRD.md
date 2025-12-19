@@ -1,4 +1,4 @@
-# 🎨 Verbasync Frontend PRD (Product Requirements Document)
+# 🎨 Verbsync Frontend PRD (Product Requirements Document)
 
 **Version**: 1.0 (MVP)  
 **Last Updated**: 2025-12-11  
@@ -28,7 +28,7 @@
 
 ## 0. Overview
 
-**Verbasync Frontend**는 개발자를 위한 다국어(i18n) 관리 플랫폼의 웹 인터페이스입니다.
+**Verbsync Frontend**는 개발자를 위한 다국어(i18n) 관리 플랫폼의 웹 인터페이스입니다.
 
 ### 핵심 기능
 
@@ -86,6 +86,11 @@
 - [x] 인라인 편집 (테이블 셀 직접 수정)
 - [x] 일괄 저장 (Batch Update)
 - [x] 실시간 번역 상태 표시
+- [ ] **엑셀 다운로드** (필터 적용된 데이터)
+- [ ] **CSV 다운로드** (필터 적용된 데이터)
+- [ ] **JSON 다운로드** (필터 적용된 데이터, i18next 형식)
+- [ ] **엑셀/CSV 업로드** (파일 파싱 후 일괄 업데이트)
+- [ ] **JSON 업로드** (i18next 형식 파일 업로드)
 
 **UI/UX**
 
@@ -188,7 +193,7 @@
 └─────────────────────────────────────────────────────────────┘
                               ↓ HTTP/HTTPS
 ┌─────────────────────────────────────────────────────────────┐
-│              Verbasync Backend (NestJS API)                  │
+│              Verbsync Backend (NestJS API)                  │
 │                 http://localhost:3000                         │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -687,7 +692,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => set({ token: null, user: null, isAuthenticated: false }),
     }),
     {
-      name: "verbasync-auth",
+      name: "verbsync-auth",
     }
   )
 );
@@ -921,6 +926,85 @@ Saved:    bg-green-50 → bg-white (저장 완료 애니메이션)
 Ctrl/Cmd + S: 저장
 Ctrl/Cmd + F: 검색
 ```
+
+#### 6. 내보내기 (Export)
+
+- [ ] **엑셀 다운로드** (Excel)
+
+  - 현재 적용된 필터(검색, 네임스페이스, 빈 번역 필터)가 적용된 데이터만 다운로드
+  - 첫 번째 열: Key 이름
+  - 두 번째 열: Key 설명
+  - 이후 열: 각 언어별 번역 값
+  - 파일명: `{프로젝트명}_translations_{날짜}.xlsx`
+  - 빈 셀은 빈 문자열로 처리
+  - 라이브러리: `xlsx` 또는 `exceljs` 사용
+
+- [ ] **CSV 다운로드**
+
+  - 현재 적용된 필터가 적용된 데이터만 다운로드
+  - 첫 번째 열: Key 이름
+  - 두 번째 열: Key 설명
+  - 이후 열: 각 언어별 번역 값
+  - 파일명: `{프로젝트명}_translations_{날짜}.csv`
+  - 인코딩: UTF-8 with BOM (Excel 호환성)
+  - 구분자: 쉼표(`,`)
+  - 빈 셀은 빈 문자열로 처리
+  - 라이브러리: `papaparse` 또는 직접 구현
+
+- [ ] **JSON 다운로드** (i18next 형식)
+
+  - 현재 적용된 필터가 적용된 데이터만 다운로드
+  - 언어별로 분리된 JSON 파일 다운로드
+  - 형식: `{ "login.title": "로그인", "home.hero.title": "환영합니다" }`
+  - 파일명: `{언어코드}.json` (예: `ko.json`, `en.json`)
+  - ZIP 파일로 묶어서 다운로드 또는 개별 파일 다운로드 옵션 제공
+
+- [ ] **내보내기 UI**
+  - PageHeader의 action 영역에 "내보내기" 드롭다운 버튼 추가
+  - 옵션: "Excel 다운로드", "CSV 다운로드", "JSON 다운로드 (ZIP)", "JSON 다운로드 (개별)"
+  - 다운로드 전 필터 적용 여부 안내 메시지 표시
+
+#### 7. 가져오기 (Import)
+
+- [ ] **엑셀/CSV 업로드**
+
+  - 파일 선택 버튼 (`.xlsx`, `.xls`, `.csv` 지원)
+  - 파일 파싱: 첫 번째 열(Key), 두 번째 열(설명), 이후 열(언어별 번역)
+  - 업로드 전 미리보기: 파싱된 데이터를 테이블 형태로 표시
+  - 업로드 옵션:
+    - **덮어쓰기 모드**: 기존 번역을 새 데이터로 완전히 교체
+    - **병합 모드**: 기존 번역은 유지하고, 빈 번역만 채우기
+  - 키 자동 생성: 파일에 존재하지만 프로젝트에 없는 키는 자동으로 생성
+  - 언어 자동 생성: 파일에 존재하지만 프로젝트에 없는 언어는 경고 표시 (자동 생성 옵션 제공)
+  - 업로드 후 기존 PATCH API (`/projects/{projectId}/translations`)를 사용하여 일괄 업데이트
+
+- [ ] **JSON 업로드** (i18next 형식)
+
+  - 파일 선택 버튼 (`.json` 지원)
+  - 단일 파일 또는 ZIP 파일 지원
+  - 단일 파일: `{ "login.title": "로그인", ... }` 형식
+  - ZIP 파일: `ko.json`, `en.json` 등 언어별 파일 포함
+  - 파일명에서 언어 코드 추출 (예: `ko.json` → `ko`)
+  - 업로드 전 미리보기: 파싱된 키와 언어 정보 표시
+  - 업로드 옵션: 덮어쓰기/병합 모드 선택
+  - 키 자동 생성 지원
+
+- [ ] **가져오기 UI**
+
+  - PageHeader의 action 영역에 "가져오기" 버튼 추가
+  - 클릭 시 파일 선택 다이얼로그 열기
+  - 파일 선택 후 업로드 옵션 선택 다이얼로그 표시
+  - 업로드 진행 상태 표시 (로딩, 성공/실패)
+  - 업로드 결과 요약: 추가된 키 수, 업데이트된 번역 수, 오류 수
+
+- [ ] **구현 방식**
+  - 백엔드 API 변경 불필요: 프론트엔드에서 파일 파싱 후 기존 PATCH API 사용
+  - 라이브러리:
+    - Excel: `xlsx` 또는 `exceljs`
+    - CSV: `papaparse`
+    - ZIP: `jszip`
+  - 파일 크기 제한: 10MB (브라우저 메모리 고려)
+  - 에러 처리: 잘못된 형식, 누락된 필수 열, 중복 키 등 검증 및 사용자 피드백
 
 ---
 
@@ -1258,9 +1342,10 @@ function App() {
 
 **Import/Export**
 
-- [ ] CSV/Excel Import
-- [ ] CSV/Excel Export
-- [ ] JSON Export (i18next 형식)
+- [x] CSV/Excel Import (MVP에 포함됨)
+- [x] CSV/Excel Export (MVP에 포함됨)
+- [x] JSON Import (MVP에 포함됨)
+- [x] JSON Export (i18next 형식, MVP에 포함됨)
 
 **검색 & 필터**
 
@@ -1300,8 +1385,8 @@ function App() {
 
 ```bash
 # 프론트엔드 프로젝트 생성
-npm create vite@latest verbasync-fe -- --template react-swc-ts
-cd verbasync-fe
+npm create vite@latest verbsync-fe -- --template react-swc-ts
+cd verbsync-fe
 
 # 의존성 설치
 npm install react-router-dom

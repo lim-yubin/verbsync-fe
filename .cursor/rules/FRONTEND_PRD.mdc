@@ -1,4 +1,8 @@
-# 🎨 Verbasync Frontend PRD (Product Requirements Document)
+---
+alwaysApply: true
+---
+
+# 🎨 Verbsync Frontend PRD (Product Requirements Document)
 
 **Version**: 1.0 (MVP)  
 **Last Updated**: 2025-12-11  
@@ -28,7 +32,7 @@
 
 ## 0. Overview
 
-**Verbasync Frontend**는 개발자를 위한 다국어(i18n) 관리 플랫폼의 웹 인터페이스입니다.
+**Verbsync Frontend**는 개발자를 위한 다국어(i18n) 관리 플랫폼의 웹 인터페이스입니다.
 
 ### 핵심 기능
 
@@ -188,7 +192,7 @@
 └─────────────────────────────────────────────────────────────┘
                               ↓ HTTP/HTTPS
 ┌─────────────────────────────────────────────────────────────┐
-│              Verbasync Backend (NestJS API)                  │
+│              Verbsync Backend (NestJS API)                  │
 │                 http://localhost:3000                         │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -687,7 +691,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => set({ token: null, user: null, isAuthenticated: false }),
     }),
     {
-      name: "verbasync-auth",
+      name: "verbsync-auth",
     }
   )
 );
@@ -1292,6 +1296,53 @@ function App() {
 - [ ] VSCode Extension
 - [ ] GitHub Actions (번역 자동 푸시)
 
+**구독 플랜 시스템** ⚠️ **사용자 반응 확인 후 결정**
+
+> **참고**: 구독 플랜은 MVP에 포함되지 않으며, 서비스 출시 후 사용자 반응을 확인한 후 개발 여부를 결정할 예정입니다.
+
+- [ ] **플랜 구조 설계**
+
+  - Free (무료) - 개인 개발자, 소규모 프로젝트
+  - Starter ($19/월) - 프리랜서, 소규모 팀
+  - Pro ($79/월) - 중소기업, 성장하는 팀
+  - Enterprise (맞춤형) - 대기업, 대규모 조직
+
+- [ ] **사용량 제한 시스템**
+
+  - 프로젝트 수 제한 (Free: 1개, Starter: 5개, Pro: 무제한)
+  - 번역 키 수 제한 (Free: 100개, Starter: 1,000개, Pro: 10,000개)
+  - 언어 수 제한 (Free: 3개, Starter: 10개, Pro: 무제한)
+  - 팀 멤버 수 제한 (Free: 1명, Starter: 3명, Pro: 무제한)
+  - Rate Limiting (DDoS 방지 목적, 정상 사용에는 제약 없음)
+    - Free: 100 req/min
+    - Starter: 500 req/min
+    - Pro: 2,000 req/min
+    - Enterprise: 10,000 req/min (SLA 보장)
+
+  **참고**: 번역 데이터는 정적 데이터이므로 캐싱을 통해 효율적으로 사용할 수 있습니다. API 요청 수 제한은 없으며, Rate limiting은 DDoS 방지 목적입니다.
+
+- [ ] **플랜별 기능 차별화**
+
+  - Import/Export 기능 (Starter 이상)
+  - 팀 협업 기능 (Starter 이상)
+  - 실시간 협업 (Pro 이상)
+  - 번역 워크플로우 (Pro 이상)
+  - AI 자동 번역 (Pro 이상)
+  - SSO/SAML (Enterprise만)
+
+- [ ] **플랜 체크 미들웨어**
+
+  - 백엔드에서 플랜별 제한 검증
+  - 프론트엔드에서 제한 도달 시 안내
+  - 업그레이드 유도 UI
+
+- [ ] **결제 시스템 통합**
+  - 결제 게이트웨이 연동 (Stripe 등)
+  - 구독 관리 (월간/연간)
+  - 플랜 변경 및 업그레이드
+
+자세한 내용은 `SUBSCRIPTION_PLANS.md` 파일을 참고하세요.
+
 ---
 
 ## 15. Development Checklist
@@ -1300,8 +1351,8 @@ function App() {
 
 ```bash
 # 프론트엔드 프로젝트 생성
-npm create vite@latest verbasync-fe -- --template react-swc-ts
-cd verbasync-fe
+npm create vite@latest verbsync-fe -- --template react-swc-ts
+cd verbsync-fe
 
 # 의존성 설치
 npm install react-router-dom
