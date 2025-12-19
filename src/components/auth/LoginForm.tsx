@@ -11,9 +11,6 @@ import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { useLogin } from "@/hooks/useAuth";
 import { ROUTES } from "@/lib/constants";
@@ -54,12 +51,8 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>로그인</CardTitle>
-        <CardDescription>Verbasync 계정으로 로그인하세요</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <Card className="w-full border shadow-sm">
+      <CardContent className="pt-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">이메일</Label>
@@ -71,7 +64,7 @@ export function LoginForm() {
               disabled={isPending}
             />
             {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
+              <p className="text-sm text-destructive">{errors.email.message}</p>
             )}
           </div>
 
@@ -85,7 +78,7 @@ export function LoginForm() {
               disabled={isPending}
             />
             {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
+              <p className="text-sm text-destructive">{errors.password.message}</p>
             )}
           </div>
 
@@ -95,12 +88,12 @@ export function LoginForm() {
         </form>
 
         <div className="mt-4 text-center text-sm">
-          <span className="text-gray-600 dark:text-gray-400">
+          <span className="text-muted-foreground">
             계정이 없으신가요?{" "}
           </span>
           <Link
             to={ROUTES.REGISTER}
-            className="text-gray-900 dark:text-gray-100 font-medium hover:underline cursor-pointer"
+            className="text-foreground font-medium hover:underline cursor-pointer"
           >
             회원가입
           </Link>

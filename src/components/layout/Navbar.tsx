@@ -3,6 +3,7 @@ import { ROUTES } from "@/lib/constants";
 import { ThemeToggle } from "./ThemeToggle";
 import { UserMenu } from "./UserMenu";
 import { MobileNav } from "./MobileNav";
+import { Logo } from "@/components/ui/Logo";
 
 export function Navbar() {
   return (
@@ -16,9 +17,7 @@ export function Navbar() {
           to={ROUTES.DASHBOARD}
           className="flex items-center space-x-2 cursor-pointer"
         >
-          <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background">
-            <span className="text-sm font-bold">V</span>
-          </div>
+          <Logo width={24} height={24} className="shrink-0" />
           <span className="hidden font-semibold sm:inline-block">
             Verbasync
           </span>

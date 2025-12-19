@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ROUTES } from "@/lib/constants";
 import {
-  LandingPage,
   LoginPage,
   RegisterPage,
   DashboardPage,
@@ -23,7 +22,7 @@ function App() {
           path={ROUTES.HOME}
           element={
             <PublicRoute>
-              <LandingPage />
+              <LoginPage />
             </PublicRoute>
           }
         />

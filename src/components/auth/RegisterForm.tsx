@@ -8,7 +8,7 @@ import type { AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useRegister } from "@/hooks/useAuth";
 import { ROUTES } from "@/lib/constants";
 
@@ -53,14 +53,8 @@ export function RegisterForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>회원가입</CardTitle>
-        <CardDescription>
-          새로운 계정을 만들어 시작하세요
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <Card className="w-full border shadow-sm">
+      <CardContent className="pt-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">이름</Label>
@@ -72,7 +66,7 @@ export function RegisterForm() {
               disabled={isPending}
             />
             {errors.name && (
-              <p className="text-sm text-red-500">{errors.name.message}</p>
+              <p className="text-sm text-destructive">{errors.name.message}</p>
             )}
           </div>
 
@@ -86,7 +80,7 @@ export function RegisterForm() {
               disabled={isPending}
             />
             {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
+              <p className="text-sm text-destructive">{errors.email.message}</p>
             )}
           </div>
 
@@ -100,7 +94,7 @@ export function RegisterForm() {
               disabled={isPending}
             />
             {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
+              <p className="text-sm text-destructive">{errors.password.message}</p>
             )}
           </div>
 
@@ -114,7 +108,7 @@ export function RegisterForm() {
               disabled={isPending}
             />
             {errors.passwordConfirm && (
-              <p className="text-sm text-red-500">{errors.passwordConfirm.message}</p>
+              <p className="text-sm text-destructive">{errors.passwordConfirm.message}</p>
             )}
           </div>
 
@@ -124,12 +118,12 @@ export function RegisterForm() {
         </form>
 
         <div className="mt-4 text-center text-sm">
-          <span className="text-gray-600 dark:text-gray-400">
+          <span className="text-muted-foreground">
             이미 계정이 있으신가요?{" "}
           </span>
           <Link
             to={ROUTES.LOGIN}
-            className="text-gray-900 dark:text-gray-100 font-medium hover:underline cursor-pointer"
+            className="text-foreground font-medium hover:underline cursor-pointer"
           >
             로그인
           </Link>
