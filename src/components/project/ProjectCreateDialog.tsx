@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -21,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCreateProject } from "@/hooks/useProjects";
+import { useCreateLocale } from "@/hooks/useLocales";
 import { ROUTES } from "@/lib/constants";
 import { SUPPORTED_LOCALES } from "@/lib/locales";
 
@@ -44,7 +46,7 @@ export function ProjectCreateDialog({
   onOpenChange,
 }: ProjectCreateDialogProps) {
   const navigate = useNavigate();
-  const { mutate: createProject, isPending } = useCreateProject();
+  const { mutate: createProject, isPending: isCreatingProject } = useCreateProject();
 
   const {
     register,
@@ -64,13 +66,68 @@ export function ProjectCreateDialog({
   // eslint-disable-next-line react-hooks/incompatible-library
   const selectedLocale = watch("defaultLocale");
 
+  // 기본 언어 추가를 위한 상태
+  const [pendingLocaleCreation, setPendingLocaleCreation] = useState<{
+    projectId: string;
+    code: string;
+    name: string;
+  } | null>(null);
+
+  // 프로젝트 생성 후 기본 언어 추가
+  const { mutate: createLocale, isPending: isCreatingLocale } = useCreateLocale(
+    pendingLocaleCreation?.projectId || ""
+  );
+
+  const isPending = isCreatingProject || isCreatingLocale;
+
+  // pendingLocaleCreation이 설정되면 기본 언어 추가
+  useEffect(() => {
+    if (pendingLocaleCreation) {
+      createLocale(
+        {
+          code: pendingLocaleCreation.code,
+          name: pendingLocaleCreation.name,
+        },
+        {
+          onSuccess: () => {
+            toast.success("프로젝트가 생성되었습니다!");
+            reset();
+            onOpenChange(false);
+            navigate(ROUTES.PROJECT_DETAIL(pendingLocaleCreation.projectId));
+            setPendingLocaleCreation(null);
+          },
+          onError: (error) => {
+            console.error(error);
+            toast.error("기본 언어 추가에 실패했습니다");
+            // 프로젝트는 생성되었으므로 상세 페이지로 이동
+            navigate(ROUTES.PROJECT_DETAIL(pendingLocaleCreation.projectId));
+            setPendingLocaleCreation(null);
+          },
+        }
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingLocaleCreation]);
+
   const onSubmit = (data: ProjectFormData) => {
     createProject(data, {
       onSuccess: (project) => {
-        toast.success("프로젝트가 생성되었습니다!");
-        reset();
-        onOpenChange(false);
-        navigate(ROUTES.PROJECT_DETAIL(project.id));
+        // 선택된 기본 언어 정보 찾기
+        const selectedLocaleInfo = SUPPORTED_LOCALES.find(
+          (locale) => locale.code === data.defaultLocale
+        );
+
+        if (!selectedLocaleInfo) {
+          toast.error("선택한 언어 정보를 찾을 수 없습니다");
+          return;
+        }
+
+        // 기본 언어 추가를 위한 상태 설정
+        setPendingLocaleCreation({
+          projectId: project.id,
+          code: data.defaultLocale,
+          name: selectedLocaleInfo.name,
+        });
       },
       onError: (error) => {
         console.error(error);
