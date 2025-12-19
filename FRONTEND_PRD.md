@@ -1,4 +1,4 @@
-# 🎨 Verbasync Frontend PRD (Product Requirements Document)
+# 🎨 Verbsync Frontend PRD (Product Requirements Document)
 
 **Version**: 1.0 (MVP)  
 **Last Updated**: 2025-12-11  
@@ -28,7 +28,7 @@
 
 ## 0. Overview
 
-**Verbasync Frontend**는 개발자를 위한 다국어(i18n) 관리 플랫폼의 웹 인터페이스입니다.
+**Verbsync Frontend**는 개발자를 위한 다국어(i18n) 관리 플랫폼의 웹 인터페이스입니다.
 
 ### 핵심 기능
 
@@ -193,7 +193,7 @@
 └─────────────────────────────────────────────────────────────┘
                               ↓ HTTP/HTTPS
 ┌─────────────────────────────────────────────────────────────┐
-│              Verbasync Backend (NestJS API)                  │
+│              Verbsync Backend (NestJS API)                  │
 │                 http://localhost:3000                         │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -692,7 +692,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => set({ token: null, user: null, isAuthenticated: false }),
     }),
     {
-      name: "verbasync-auth",
+      name: "verbsync-auth",
     }
   )
 );
@@ -930,6 +930,7 @@ Ctrl/Cmd + F: 검색
 #### 6. 내보내기 (Export)
 
 - [ ] **엑셀 다운로드** (Excel)
+
   - 현재 적용된 필터(검색, 네임스페이스, 빈 번역 필터)가 적용된 데이터만 다운로드
   - 첫 번째 열: Key 이름
   - 두 번째 열: Key 설명
@@ -939,6 +940,7 @@ Ctrl/Cmd + F: 검색
   - 라이브러리: `xlsx` 또는 `exceljs` 사용
 
 - [ ] **CSV 다운로드**
+
   - 현재 적용된 필터가 적용된 데이터만 다운로드
   - 첫 번째 열: Key 이름
   - 두 번째 열: Key 설명
@@ -950,6 +952,7 @@ Ctrl/Cmd + F: 검색
   - 라이브러리: `papaparse` 또는 직접 구현
 
 - [ ] **JSON 다운로드** (i18next 형식)
+
   - 현재 적용된 필터가 적용된 데이터만 다운로드
   - 언어별로 분리된 JSON 파일 다운로드
   - 형식: `{ "login.title": "로그인", "home.hero.title": "환영합니다" }`
@@ -964,6 +967,7 @@ Ctrl/Cmd + F: 검색
 #### 7. 가져오기 (Import)
 
 - [ ] **엑셀/CSV 업로드**
+
   - 파일 선택 버튼 (`.xlsx`, `.xls`, `.csv` 지원)
   - 파일 파싱: 첫 번째 열(Key), 두 번째 열(설명), 이후 열(언어별 번역)
   - 업로드 전 미리보기: 파싱된 데이터를 테이블 형태로 표시
@@ -975,6 +979,7 @@ Ctrl/Cmd + F: 검색
   - 업로드 후 기존 PATCH API (`/projects/{projectId}/translations`)를 사용하여 일괄 업데이트
 
 - [ ] **JSON 업로드** (i18next 형식)
+
   - 파일 선택 버튼 (`.json` 지원)
   - 단일 파일 또는 ZIP 파일 지원
   - 단일 파일: `{ "login.title": "로그인", ... }` 형식
@@ -985,6 +990,7 @@ Ctrl/Cmd + F: 검색
   - 키 자동 생성 지원
 
 - [ ] **가져오기 UI**
+
   - PageHeader의 action 영역에 "가져오기" 버튼 추가
   - 클릭 시 파일 선택 다이얼로그 열기
   - 파일 선택 후 업로드 옵션 선택 다이얼로그 표시
@@ -1379,8 +1385,8 @@ function App() {
 
 ```bash
 # 프론트엔드 프로젝트 생성
-npm create vite@latest verbasync-fe -- --template react-swc-ts
-cd verbasync-fe
+npm create vite@latest verbsync-fe -- --template react-swc-ts
+cd verbsync-fe
 
 # 의존성 설치
 npm install react-router-dom

@@ -18,9 +18,7 @@ export function Navbar() {
           className="flex items-center space-x-2 cursor-pointer"
         >
           <Logo width={24} height={24} className="shrink-0" />
-          <span className="hidden font-semibold sm:inline-block">
-            Verbasync
-          </span>
+          <span className="hidden font-semibold sm:inline-block">Verbsync</span>
         </Link>
 
         {/* Spacer */}
@@ -35,4 +33,3 @@ export function Navbar() {
     </header>
   );
 }
-

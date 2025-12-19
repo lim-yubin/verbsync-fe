@@ -1,11 +1,12 @@
-export const APP_NAME = "Verbasync";
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+export const APP_NAME = "Verbsync";
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 // LocalStorage Keys
 export const STORAGE_KEYS = {
-  AUTH_TOKEN: "verbasync-auth-token",
-  AUTH_USER: "verbasync-auth-user",
-  THEME: "verbasync-theme",
+  AUTH_TOKEN: "verbsync-auth-token",
+  AUTH_USER: "verbsync-auth-user",
+  THEME: "verbsync-theme",
 } as const;
 
 // Query Keys
@@ -32,4 +33,3 @@ export const ROUTES = {
   PROJECT_TRANSLATIONS: (id: string) => `/projects/${id}/translations`,
   PROJECT_SETTINGS: (id: string) => `/projects/${id}/settings`,
 } as const;
-

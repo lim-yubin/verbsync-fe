@@ -16,29 +16,31 @@ export function RegisterPage() {
         <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
           <ThemeToggle />
         </div>
-        
+
         <div className="w-full max-w-md space-y-8">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center">
-            <a href="/" className="inline-flex items-center gap-2 justify-center">
+            <a
+              href="/"
+              className="inline-flex items-center gap-2 justify-center"
+            >
               <Logo width={32} height={32} />
-              <h1 className="text-2xl font-bold text-foreground">
-                Verbasync
-              </h1>
+              <h1 className="text-2xl font-bold text-foreground">Verbsync</h1>
             </a>
           </div>
-          
+
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">회원가입</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-2">
+              회원가입
+            </h2>
             <p className="text-muted-foreground">
               새로운 계정을 만들어 시작하세요
             </p>
           </div>
-          
+
           <RegisterForm />
         </div>
       </div>
     </div>
   );
 }
-

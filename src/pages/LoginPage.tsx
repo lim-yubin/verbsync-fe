@@ -25,14 +25,14 @@ export function LoginPage() {
               className="inline-flex items-center gap-2 justify-center"
             >
               <Logo width={32} height={32} />
-              <h1 className="text-2xl font-bold text-foreground">Verbasync</h1>
+              <h1 className="text-2xl font-bold text-foreground">Verbsync</h1>
             </a>
           </div>
 
           <div>
             <h2 className="text-2xl font-bold text-foreground mb-2">로그인</h2>
             <p className="text-muted-foreground">
-              Verbasync 계정으로 로그인하세요
+              Verbsync 계정으로 로그인하세요
             </p>
           </div>
 

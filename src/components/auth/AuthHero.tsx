@@ -105,7 +105,7 @@ export function AuthHero() {
           >
             <Logo width={48} height={48} className="shrink-0" />
           </motion.div>
-          <span className="text-2xl font-bold tracking-tight">Verbasync</span>
+          <span className="text-2xl font-bold tracking-tight">Verbsync</span>
         </motion.div>
 
         {/* Main Content */}
@@ -143,7 +143,7 @@ export function AuthHero() {
             <p className="text-base text-muted-foreground leading-relaxed">
               JSON 파일을 직접 수정하고 커밋하던 시대는 끝났습니다.
               <br />
-              Verbasync로 코드 수정 없이 실시간으로 다국어를 관리하세요.
+              Verbsync로 코드 수정 없이 실시간으로 다국어를 관리하세요.
             </p>
           </div>
 

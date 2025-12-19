@@ -57,7 +57,7 @@ export function ApiKeyDisplay({ projectId }: ApiKeyDisplayProps) {
     : "•".repeat(32);
 
   const apiBaseUrl =
-    import.meta.env.VITE_API_BASE_URL || "https://api.verbasync.com";
+    import.meta.env.VITE_API_BASE_URL || "https://api.verbsync.com";
 
   const i18nextStandardCode = `// i18n.ts
 import i18n from 'i18next';
@@ -69,7 +69,7 @@ i18n
   .use(initReactI18next)
   .init({
     backend: {
-      // Verbasync API 경로 설정
+      // Verbsync API 경로 설정
       loadPath: '${apiBaseUrl}/api/translations/{{ns}}/{{lng}}.json',
       // 헤더에 API Key 포함
       customHeaders: {
@@ -110,7 +110,7 @@ function WelcomeComponent() {
           i18next 연동 및 사용 가이드
         </CardTitle>
         <CardDescription>
-          Verbasync는 i18next와 완벽하게 호환됩니다. 아래 가이드를 따라 실시간
+          Verbsync는 i18next와 완벽하게 호환됩니다. 아래 가이드를 따라 실시간
           번역 동기화를 시작하세요.
         </CardDescription>
       </CardHeader>

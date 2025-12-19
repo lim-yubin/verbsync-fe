@@ -2,7 +2,7 @@
 alwaysApply: true
 ---
 
-# 🎨 Verbasync Frontend PRD (Product Requirements Document)
+# 🎨 Verbsync Frontend PRD (Product Requirements Document)
 
 **Version**: 1.0 (MVP)  
 **Last Updated**: 2025-12-11  
@@ -32,7 +32,7 @@ alwaysApply: true
 
 ## 0. Overview
 
-**Verbasync Frontend**는 개발자를 위한 다국어(i18n) 관리 플랫폼의 웹 인터페이스입니다.
+**Verbsync Frontend**는 개발자를 위한 다국어(i18n) 관리 플랫폼의 웹 인터페이스입니다.
 
 ### 핵심 기능
 
@@ -192,7 +192,7 @@ alwaysApply: true
 └─────────────────────────────────────────────────────────────┘
                               ↓ HTTP/HTTPS
 ┌─────────────────────────────────────────────────────────────┐
-│              Verbasync Backend (NestJS API)                  │
+│              Verbsync Backend (NestJS API)                  │
 │                 http://localhost:3000                         │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -691,7 +691,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => set({ token: null, user: null, isAuthenticated: false }),
     }),
     {
-      name: "verbasync-auth",
+      name: "verbsync-auth",
     }
   )
 );
@@ -1351,8 +1351,8 @@ function App() {
 
 ```bash
 # 프론트엔드 프로젝트 생성
-npm create vite@latest verbasync-fe -- --template react-swc-ts
-cd verbasync-fe
+npm create vite@latest verbsync-fe -- --template react-swc-ts
+cd verbsync-fe
 
 # 의존성 설치
 npm install react-router-dom
