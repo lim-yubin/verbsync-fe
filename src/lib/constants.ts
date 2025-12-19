@@ -17,6 +17,8 @@ export const QUERY_KEYS = {
   LOCALES: (projectId: string) => ["projects", projectId, "locales"],
   KEYS: (projectId: string) => ["projects", projectId, "keys"],
   TRANSLATIONS_MATRIX: (projectId: string) => ["projects", projectId, "matrix"],
+  MEMBERS: ["members"],
+  MEMBER_PERMISSIONS: ["members", "me"],
 } as const;
 
 // Routes
@@ -32,4 +34,5 @@ export const ROUTES = {
   PROJECT_KEYS: (id: string) => `/projects/${id}/keys`,
   PROJECT_TRANSLATIONS: (id: string) => `/projects/${id}/translations`,
   PROJECT_SETTINGS: (id: string) => `/projects/${id}/settings`,
+  MEMBERS: "/members",
 } as const;

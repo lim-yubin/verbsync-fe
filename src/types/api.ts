@@ -135,3 +135,48 @@ export interface TranslationMatrix {
     };
   }>;
 }
+
+// ========== Member ==========
+export type MemberRole = "OWNER" | "EDITOR" | "VIEWER";
+
+export type MemberStatus = "ACTIVE" | "PENDING";
+
+export interface ProjectMember {
+  id: string;
+  userId: string | null; // PENDING 상태면 null
+  projectId: string;
+  role: MemberRole;
+  status: MemberStatus;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  } | null; // PENDING 상태면 null
+  invitedAt: string;
+  joinedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InviteMemberDto {
+  email: string;
+  role: "EDITOR" | "VIEWER"; // Owner는 초대 불가
+}
+
+export interface UpdateMemberRoleDto {
+  role: "EDITOR" | "VIEWER"; // Owner는 변경 불가
+}
+
+export interface MemberPermissions {
+  role: MemberRole;
+  permissions: {
+    canEdit: boolean;
+    canManageSettings: boolean;
+    canManageMembers: boolean;
+    canDeleteProject: boolean;
+  };
+}
+
+export interface MembersResponse {
+  members: ProjectMember[];
+}

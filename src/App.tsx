@@ -8,6 +8,7 @@ import {
   LocalesPage,
   TranslationsPage,
   ProjectSettingsPage,
+  MembersPage,
   SettingsPage,
 } from "@/pages";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -89,6 +90,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ProjectSettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.MEMBERS}
+          element={
+            <ProtectedRoute>
+              <MembersPage />
             </ProtectedRoute>
           }
         />

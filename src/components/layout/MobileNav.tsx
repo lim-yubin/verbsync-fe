@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, Home, Settings } from "lucide-react";
+import { Menu, Home, Settings, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,11 @@ const navItems: NavItem[] = [
     title: "대시보드",
     href: ROUTES.DASHBOARD,
     icon: Home,
+  },
+  {
+    title: "멤버",
+    href: ROUTES.MEMBERS,
+    icon: Users,
   },
   {
     title: "설정",
