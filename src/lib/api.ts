@@ -25,7 +25,7 @@ let failedQueue: Array<{
   reject: (error: AxiosError) => void;
 }> = [];
 
-const processQueue = (error: AxiosError | null, token: string | null = null) => {
+const processQueue = (error: AxiosError<unknown> | null, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -81,7 +81,8 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         // Refresh Token도 만료됨 → 로그아웃
-        processQueue(refreshError, null);
+        const axiosError = refreshError as AxiosError<unknown>;
+        processQueue(axiosError, null);
         useAuthStore.getState().logout();
         window.location.href = "/login";
         return Promise.reject(refreshError);

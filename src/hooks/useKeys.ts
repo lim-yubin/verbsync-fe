@@ -109,7 +109,7 @@ export function useCreateKey(projectId: string) {
 
       return { previousMatrix, previousKeys };
     },
-    onError: (err, newKey, context) => {
+    onError: (_err, _newKey, context) => {
       // 에러 발생 시 이전 데이터로 롤백
       if (context?.previousMatrix) {
         queryClient.setQueryData(

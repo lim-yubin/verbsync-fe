@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { usePermission } from "./usePermission";
 import type { MemberPermissions } from "@/types/api";
 import { Skeleton } from "@/components/ui/skeleton";

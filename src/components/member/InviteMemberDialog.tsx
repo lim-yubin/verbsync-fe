@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,9 +27,7 @@ const inviteMemberSchema = z.object({
     .string()
     .min(1, "이메일을 입력해주세요")
     .email("올바른 이메일 형식이 아닙니다"),
-  role: z.enum(["EDITOR", "VIEWER"], {
-    required_error: "역할을 선택해주세요",
-  }),
+  role: z.enum(["EDITOR", "VIEWER"] as const),
 });
 
 type InviteMemberFormData = z.infer<typeof inviteMemberSchema>;

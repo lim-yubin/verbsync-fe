@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MemberItem } from "./MemberItem";
 import { InviteMemberDialog } from "./InviteMemberDialog";
-import { useMembers, useMemberPermissions } from "@/hooks/useMembers";
+import { useMembers } from "@/hooks/useMembers";
 import type { ProjectMember } from "@/types/api";
 
 interface MemberListProps {

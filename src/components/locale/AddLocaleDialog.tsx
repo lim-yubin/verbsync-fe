@@ -9,7 +9,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useCreateLocale } from "@/hooks/useLocales";
 import { SUPPORTED_LOCALES } from "@/lib/locales";
 import { toast } from "sonner";
 import type { Locale } from "@/hooks/useLocales";
