@@ -14,14 +14,13 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { useProjectApiKey } from "@/hooks/useProjects";
-import type { AxiosError } from "axios";
 
 interface ApiKeyDisplayProps {
   projectId: string;
 }
 
 export function ApiKeyDisplay({ projectId }: ApiKeyDisplayProps) {
-  const { data, isLoading, isError, error } = useProjectApiKey(projectId);
+  const { data, isLoading, isError } = useProjectApiKey(projectId);
   const [isVisible, setIsVisible] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
