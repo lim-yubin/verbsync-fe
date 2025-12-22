@@ -1,9 +1,10 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
+import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,15 +27,31 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { mutate: register, isPending } = useRegister();
+
+  // URL 파라미터에서 이메일과 초대 토큰 가져오기
+  const emailParam = searchParams.get("email");
+  const inviteToken = searchParams.get("inviteToken");
 
   const {
     register: registerField,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      email: emailParam || "",
+    },
   });
+
+  // 이메일 파라미터가 있으면 폼에 설정
+  useEffect(() => {
+    if (emailParam) {
+      setValue("email", emailParam);
+    }
+  }, [emailParam, setValue]);
 
   const onSubmit = (data: RegisterFormData) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -43,7 +60,12 @@ export function RegisterForm() {
     register(registerData, {
       onSuccess: () => {
         toast.success("회원가입 성공! 환영합니다 🎉");
-        navigate(ROUTES.DASHBOARD);
+        // 초대 토큰이 있으면 초대 수락 페이지로 이동
+        if (inviteToken) {
+          navigate(`${ROUTES.ACCEPT_INVITE}?token=${inviteToken}`);
+        } else {
+          navigate(ROUTES.DASHBOARD);
+        }
       },
       onError: (error: Error) => {
         const axiosError = error as AxiosError<{ message?: string }>;
