@@ -26,9 +26,10 @@ interface LocaleItemProps {
   locale: Locale;
   projectId: string;
   isDefault: boolean;
+  canEdit?: boolean; // 편집 권한 여부 (OWNER 또는 EDITOR만 가능)
 }
 
-export function LocaleItem({ locale, projectId, isDefault }: LocaleItemProps) {
+export function LocaleItem({ locale, projectId, isDefault, canEdit = true }: LocaleItemProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { mutate: updateStatus, isPending: isUpdating } = useUpdateLocaleStatus(
     projectId,
@@ -116,30 +117,32 @@ export function LocaleItem({ locale, projectId, isDefault }: LocaleItemProps) {
                 </p>
               )}
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={locale.isActive}
-                  onCheckedChange={handleToggle}
-                  disabled={isDefault || isUpdating}
-                  className="cursor-pointer"
-                />
-                <span className="text-sm text-muted-foreground">
-                  {locale.isActive ? "활성화" : "비활성화"}
-                </span>
+            {canEdit && (
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={locale.isActive}
+                    onCheckedChange={handleToggle}
+                    disabled={isDefault || isUpdating}
+                    className="cursor-pointer"
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {locale.isActive ? "활성화" : "비활성화"}
+                  </span>
+                </div>
+                {!isDefault && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDeleteDialogOpen(true)}
+                    disabled={isDeleting}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
-              {!isDefault && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDeleteDialogOpen(true)}
-                  disabled={isDeleting}
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </Card>

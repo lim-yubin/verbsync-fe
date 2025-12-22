@@ -57,6 +57,7 @@ export function LocalesPage() {
                 locale={locale}
                 projectId={projectId!}
                 isDefault={locale.code === project?.defaultLocale}
+                canEdit={canEdit}
               />
             ))}
           </div>
