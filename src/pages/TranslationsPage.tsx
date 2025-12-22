@@ -50,6 +50,9 @@ import {
 export function TranslationsPage() {
   const { id: projectId } = useParams<{ id: string }>();
   const { data: project } = useProject(projectId!);
+  
+  // 편집 권한 확인 (OWNER 또는 EDITOR만 편집 가능, VIEWER는 조회만)
+  const canEdit = project?.isOwner || project?.role === "EDITOR";
   const { data: matrix, isLoading, error } = useTranslationMatrix(projectId!);
   const { data: keys } = useKeys(projectId!); // 키 목록 (createdAt 포함)
   const { mutate: updateTranslations, isPending: isSaving } =
@@ -585,7 +588,7 @@ export function TranslationsPage() {
           description={`${displayMatrix.rows.length}개 키 × ${displayMatrix.locales.length}개 언어`}
           action={
             <div className="flex items-center gap-2">
-              {selectedKeys.size > 0 && (
+              {canEdit && selectedKeys.size > 0 && (
                 <Button
                   variant="destructive"
                   onClick={() => setDeleteSelectedDialogOpen(true)}
@@ -606,28 +609,32 @@ export function TranslationsPage() {
                       selectedNamespaces.length > 0
                     }
                   />
-                  <Button
-                    variant="outline"
-                    onClick={() => setImportDialogOpen(true)}
-                    className="cursor-pointer"
-                  >
-                    <Upload className="mr-2 h-4 w-4" />
-                    가져오기
-                  </Button>
+                  {canEdit && (
+                    <Button
+                      variant="outline"
+                      onClick={() => setImportDialogOpen(true)}
+                      className="cursor-pointer"
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      가져오기
+                    </Button>
+                  )}
                 </>
               )}
-              <Button
-                onClick={handleSave}
-                disabled={!hasChanges || isSaving}
-                className="cursor-pointer"
-              >
-                <Save className="mr-2 h-4 w-4" />
-                {isSaving
-                  ? "저장 중..."
-                  : hasChanges
-                  ? `저장 (${Object.keys(changes).length})`
-                  : "저장"}
-              </Button>
+              {canEdit && (
+                <Button
+                  onClick={handleSave}
+                  disabled={!hasChanges || isSaving}
+                  className="cursor-pointer"
+                >
+                  <Save className="mr-2 h-4 w-4" />
+                  {isSaving
+                    ? "저장 중..."
+                    : hasChanges
+                    ? `저장 (${Object.keys(changes).length})`
+                    : "저장"}
+                </Button>
+              )}
             </div>
           }
         />
@@ -655,10 +662,17 @@ export function TranslationsPage() {
         />
 
         {/* 사용 안내 */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Info className="h-3.5 w-3.5" />
-          <span>셀을 더블클릭하여 번역을 편집할 수 있습니다</span>
-        </div>
+        {canEdit ? (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Info className="h-3.5 w-3.5" />
+            <span>셀을 더블클릭하여 번역을 편집할 수 있습니다</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400">
+            <Info className="h-3.5 w-3.5" />
+            <span>조회자 권한으로는 번역을 수정할 수 없습니다</span>
+          </div>
+        )}
 
         <div
           className={cn(
@@ -723,6 +737,7 @@ export function TranslationsPage() {
                         isUpdatingKey={isUpdatingKey}
                         isDeletingKey={isDeletingKey}
                         colSpan={displayMatrix.locales.length + 2}
+                        canEdit={canEdit}
                       />
                     ))
                 : // 일반 렌더링 (그룹화 없음)
@@ -773,6 +788,7 @@ export function TranslationsPage() {
                         }
                         isUpdatingKey={isUpdatingKey}
                         isDeletingKey={isDeletingKey}
+                        canEdit={canEdit}
                       />
                     );
                   })}
@@ -816,7 +832,7 @@ export function TranslationsPage() {
         </div>
 
         {/* 새 키 추가 버튼 */}
-        {!isAddingKey && !hasNoKeys && (
+        {!isAddingKey && !hasNoKeys && canEdit && (
           <div className="flex flex-col items-center gap-2 pt-4 border-t">
             <Button
               variant="outline"
@@ -835,7 +851,7 @@ export function TranslationsPage() {
           </div>
         )}
 
-        {hasChanges && (
+        {hasChanges && canEdit && (
           <div className="fixed bottom-6 right-6">
             <Button size="lg" onClick={handleSave} disabled={isSaving}>
               <Save className="mr-2 h-5 w-5" />

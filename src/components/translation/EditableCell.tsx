@@ -6,12 +6,14 @@ interface EditableCellProps {
   value: string;
   onChange: (value: string) => void;
   isModified: boolean;
+  disabled?: boolean; // 편집 불가 여부 (VIEWER 권한)
 }
 
 export function EditableCell({
   value,
   onChange,
   isModified,
+  disabled = false,
 }: EditableCellProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [localValue, setLocalValue] = useState(value);
@@ -31,6 +33,7 @@ export function EditableCell({
   }, [isEditing]);
 
   const handleDoubleClick = () => {
+    if (disabled) return;
     setIsEditing(true);
   };
 
@@ -69,14 +72,17 @@ export function EditableCell({
     <div
       onDoubleClick={handleDoubleClick}
       className={cn(
-        "min-h-[60px] max-h-[120px] p-3 rounded cursor-pointer transition-colors",
+        "min-h-[60px] max-h-[120px] p-3 rounded transition-colors",
         "overflow-y-auto overflow-x-hidden",
         "break-words whitespace-pre-wrap",
-        "hover:bg-accent/50",
+        disabled
+          ? "cursor-not-allowed opacity-60"
+          : "cursor-pointer hover:bg-accent/50",
         isEmpty && "bg-muted text-muted-foreground italic",
         isModified && "bg-yellow-100 dark:bg-yellow-950/30",
         !isEmpty && !isModified && "bg-background"
       )}
+      title={disabled ? "조회자 권한으로는 번역을 수정할 수 없습니다" : undefined}
     >
       {isEmpty ? "(비어있음)" : value}
     </div>

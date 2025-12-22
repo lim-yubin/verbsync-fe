@@ -29,6 +29,7 @@ interface TranslationNamespaceTreeProps {
   isUpdatingKey: boolean;
   isDeletingKey: boolean;
   colSpan: number;
+  canEdit?: boolean; // 편집 권한 여부 (VIEWER는 false)
 }
 
 function TranslationNamespaceTreeComponent({
@@ -51,6 +52,7 @@ function TranslationNamespaceTreeComponent({
   isUpdatingKey,
   isDeletingKey,
   colSpan,
+  canEdit = true,
 }: TranslationNamespaceTreeProps) {
   const isCollapsed = collapsedGroups.has(node.fullPath);
   const hasChildren = node.children.size > 0 || node.keys.length > 0;
@@ -123,6 +125,7 @@ function TranslationNamespaceTreeComponent({
                 }
                 isUpdatingKey={isUpdatingKey}
                 isDeletingKey={isDeletingKey}
+                canEdit={canEdit}
               />
             );
           })}
@@ -152,6 +155,7 @@ function TranslationNamespaceTreeComponent({
                 isUpdatingKey={isUpdatingKey}
                 isDeletingKey={isDeletingKey}
                 colSpan={colSpan}
+                canEdit={canEdit}
               />
             ))}
         </>

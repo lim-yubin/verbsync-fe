@@ -204,7 +204,8 @@ function WelcomeComponent() {
           )}
         </div>
 
-        {!isError && !isForbidden && (
+        {/* i18next 연동 가이드는 모든 권한이 볼 수 있음 */}
+        {!isError && (
           <>
             <Separator />
 

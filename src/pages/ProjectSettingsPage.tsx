@@ -247,6 +247,9 @@ export function ProjectSettingsPage() {
     );
   }
 
+  // 소유자만 프로젝트 설정 수정 가능
+  const isOwner = project.isOwner;
+
   return (
     <AppLayout>
       <div className="mx-auto max-w-4xl space-y-6">
@@ -274,8 +277,14 @@ export function ProjectSettingsPage() {
                   id="name"
                   {...register("name")}
                   placeholder="프로젝트 이름"
-                  disabled={isUpdating}
+                  disabled={isUpdating || !isOwner}
+                  readOnly={!isOwner}
                 />
+                {!isOwner && (
+                  <p className="text-xs text-muted-foreground">
+                    프로젝트 소유자만 이름을 변경할 수 있습니다
+                  </p>
+                )}
                 {errors.name && (
                   <p className="text-sm text-destructive">
                     {errors.name.message}
@@ -313,16 +322,18 @@ export function ProjectSettingsPage() {
                 )}
               </div>
 
-              <div className="flex justify-end">
-                <Button
-                  type="submit"
-                  disabled={isUpdating}
-                  className="cursor-pointer"
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  {isUpdating ? "저장 중..." : "저장"}
-                </Button>
-              </div>
+              {isOwner && (
+                <div className="flex justify-end">
+                  <Button
+                    type="submit"
+                    disabled={isUpdating}
+                    className="cursor-pointer"
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    {isUpdating ? "저장 중..." : "저장"}
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -421,42 +432,48 @@ export function ProjectSettingsPage() {
                 </div>
               )}
 
-              <div className="flex justify-end">
-                <Button
-                  type="submit"
-                  disabled={isUpdating}
-                  className="cursor-pointer"
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  {isUpdating ? "저장 중..." : "저장"}
-                </Button>
-              </div>
+              {isOwner && (
+                <div className="flex justify-end">
+                  <Button
+                    type="submit"
+                    disabled={isUpdating}
+                    className="cursor-pointer"
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    {isUpdating ? "저장 중..." : "저장"}
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </form>
 
-        <Separator />
+        {isOwner && (
+          <>
+            <Separator />
 
-        {/* 위험 구역 */}
-        <Card className="border-destructive">
-          <CardHeader>
-            <CardTitle className="text-destructive">위험 구역</CardTitle>
-            <CardDescription>
-              프로젝트를 삭제하면 모든 데이터가 영구적으로 삭제되며 복구할 수
-              없습니다
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              variant="destructive"
-              onClick={() => setDeleteDialogOpen(true)}
-              disabled={isDeleting}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              {isDeleting ? "삭제 중..." : "프로젝트 삭제"}
-            </Button>
-          </CardContent>
-        </Card>
+            {/* 위험 구역 */}
+            <Card className="border-destructive">
+              <CardHeader>
+                <CardTitle className="text-destructive">위험 구역</CardTitle>
+                <CardDescription>
+                  프로젝트를 삭제하면 모든 데이터가 영구적으로 삭제되며 복구할 수
+                  없습니다
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  variant="destructive"
+                  onClick={() => setDeleteDialogOpen(true)}
+                  disabled={isDeleting}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {isDeleting ? "삭제 중..." : "프로젝트 삭제"}
+                </Button>
+              </CardContent>
+            </Card>
+          </>
+        )}
 
         {/* 삭제 확인 다이얼로그 */}
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
