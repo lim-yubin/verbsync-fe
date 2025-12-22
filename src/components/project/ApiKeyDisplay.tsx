@@ -322,6 +322,7 @@ function WelcomeComponent() {
               </div>
             </div>
           </div>
+        </div>
           </>
         )}
       </CardContent>

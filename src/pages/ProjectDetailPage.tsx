@@ -15,6 +15,7 @@ import { useMemberPermissions } from "@/hooks/useMembers";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -204,7 +205,7 @@ export function ProjectDetailPage() {
             ) : projectMembers && projectMembers.length > 0 ? (
               <MemberList 
                 members={projectMembers} 
-                canManage={canManageMembers && project.isOwner} 
+                canManage={!!(canManageMembers && project.isOwner)} 
               />
             ) : (
               <div className="text-center py-8 text-muted-foreground">
