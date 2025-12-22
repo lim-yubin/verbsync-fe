@@ -7,4 +7,5 @@ export { TranslationsPage } from "./TranslationsPage";
 export { ProjectSettingsPage } from "./ProjectSettingsPage";
 export { MembersPage } from "./MembersPage";
 export { SettingsPage } from "./SettingsPage";
+export { AcceptInvitePage } from "./AcceptInvitePage";
 

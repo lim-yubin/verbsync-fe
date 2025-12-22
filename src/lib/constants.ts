@@ -35,4 +35,5 @@ export const ROUTES = {
   PROJECT_TRANSLATIONS: (id: string) => `/projects/${id}/translations`,
   PROJECT_SETTINGS: (id: string) => `/projects/${id}/settings`,
   MEMBERS: "/members",
+  ACCEPT_INVITE: "/accept-invite",
 } as const;

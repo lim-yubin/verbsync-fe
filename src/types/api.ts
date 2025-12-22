@@ -180,3 +180,33 @@ export interface MemberPermissions {
 export interface MembersResponse {
   members: ProjectMember[];
 }
+
+// ========== Invite ==========
+export interface InviteInfo {
+  inviteToken: string;
+  email: string;
+  role: MemberRole;
+  accountOwner: {
+    name: string;
+    email: string;
+  };
+  isUserRegistered: boolean;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  } | null;
+}
+
+export interface AcceptInviteResponse {
+  id: string;
+  email: string;
+  role: MemberRole;
+  status: MemberStatus;
+  joinedAt: string;
+  account: {
+    id: string;
+    email: string;
+    name: string;
+  };
+}
