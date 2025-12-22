@@ -6,6 +6,7 @@ import type {
   CreateProjectDto,
   UpdateProjectDto,
   ProjectApiKey,
+  MembersResponse,
 } from "@/types/api";
 
 // 프로젝트 목록 조회
@@ -59,6 +60,7 @@ export function useProjectApiKey(projectId: string) {
     },
     enabled: !!projectId,
     staleTime: Infinity, // API Key는 자주 바뀌지 않으므로 무한대 설정
+    retry: false, // 에러 시 재시도하지 않음 (권한 없음 에러는 재시도 불필요)
   });
 }
 
@@ -92,6 +94,18 @@ export function useDeleteProject() {
       // 프로젝트 목록 갱신
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROJECTS });
     },
+  });
+}
+
+// 프로젝트 멤버 목록 조회
+export function useProjectMembers(projectId: string) {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.PROJECT(projectId), "members"],
+    queryFn: async () => {
+      const { data } = await api.get<MembersResponse>(`/projects/${projectId}/members`);
+      return data.members;
+    },
+    enabled: !!projectId,
   });
 }
 

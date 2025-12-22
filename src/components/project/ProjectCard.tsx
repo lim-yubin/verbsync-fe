@@ -11,6 +11,7 @@ interface ProjectCardProps {
   name: string;
   defaultLocale: string;
   createdAt: string;
+  role?: "OWNER" | "EDITOR" | "VIEWER";
 }
 
 export function ProjectCard({
@@ -18,6 +19,7 @@ export function ProjectCard({
   name,
   defaultLocale,
   createdAt,
+  role,
 }: ProjectCardProps) {
   const navigate = useNavigate();
 
@@ -53,6 +55,11 @@ export function ProjectCard({
           <Badge variant="secondary" className="text-xs">
             기본 언어
           </Badge>
+          {role && role !== "OWNER" && (
+            <Badge variant="outline" className="text-xs">
+              {role === "EDITOR" ? "편집자" : "조회자"}
+            </Badge>
+          )}
         </div>
 
         {/* Footer */}

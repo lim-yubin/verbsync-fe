@@ -44,6 +44,9 @@ export interface Project {
   updatedAt: string;
   // 도메인 제한 설정
   allowedDomains?: string[]; // 허용된 도메인 목록 (예: ["example.com", "app.example.com"])
+  // 멤버 정보 (프로젝트 목록 조회 시 포함)
+  isOwner?: boolean; // 자신이 소유자인지 여부
+  role?: "OWNER" | "EDITOR" | "VIEWER"; // 자신의 역할
 }
 
 export interface ProjectApiKey {

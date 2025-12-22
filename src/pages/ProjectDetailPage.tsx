@@ -1,15 +1,17 @@
 import { useParams, Link } from "react-router-dom";
 import { useMemo } from "react";
-import { Globe, Languages, Settings, ArrowRight, Plus } from "lucide-react";
+import { Globe, Languages, Settings, ArrowRight, Plus, Users } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiKeyDisplay } from "@/components/project/ApiKeyDisplay";
 import { ProjectStats } from "@/components/project/ProjectStats";
-import { useProject } from "@/hooks/useProjects";
+import { useProject, useProjectMembers } from "@/hooks/useProjects";
 import { useLocales } from "@/hooks/useLocales";
 import { useKeys } from "@/hooks/useKeys";
 import { useTranslationMatrix } from "@/hooks/useTranslations";
+import { MemberList } from "@/components/member";
+import { useMemberPermissions } from "@/hooks/useMembers";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -26,6 +28,10 @@ export function ProjectDetailPage() {
   const { data: keys, isLoading: isKeysLoading } = useKeys(id!);
   const { data: translationMatrix, isLoading: isMatrixLoading } =
     useTranslationMatrix(id!);
+  const { data: projectMembers, isLoading: isMembersLoading } = useProjectMembers(id!);
+  const { data: permissions } = useMemberPermissions();
+  
+  const canManageMembers = permissions?.permissions.canManageMembers ?? false;
 
   // 통계 계산
   const stats = useMemo(() => {
@@ -176,6 +182,38 @@ export function ProjectDetailPage() {
           keysCount={stats.keysCount}
           translationsCount={stats.translationsCount}
         />
+
+        {/* Members */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              팀 멤버
+            </CardTitle>
+            <CardDescription>
+              이 프로젝트에 접근할 수 있는 팀 멤버 목록입니다
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isMembersLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-24 w-full" />
+                ))}
+              </div>
+            ) : projectMembers && projectMembers.length > 0 ? (
+              <MemberList 
+                members={projectMembers} 
+                canManage={canManageMembers && project.isOwner} 
+              />
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>멤버가 없습니다</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* API Key */}
         <ApiKeyDisplay projectId={project.id} />
