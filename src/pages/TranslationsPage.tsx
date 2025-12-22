@@ -667,12 +667,12 @@ export function TranslationsPage() {
             <Info className="h-3.5 w-3.5" />
             <span>셀을 더블클릭하여 번역을 편집할 수 있습니다</span>
           </div>
-        ) : (
+        ) : project?.role === "VIEWER" ? (
           <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400">
             <Info className="h-3.5 w-3.5" />
             <span>조회자 권한으로는 번역을 수정할 수 없습니다</span>
           </div>
-        )}
+        ) : null}
 
         <div
           className={cn(

@@ -16,6 +16,9 @@ export function LocalesPage() {
   const { data: project } = useProject(projectId!);
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  // 편집 권한 확인 (OWNER 또는 EDITOR만 편집 가능, VIEWER는 조회만)
+  const canEdit = project?.isOwner || project?.role === "EDITOR";
+
   return (
     <AppLayout>
       <div className="mx-auto max-w-7xl space-y-6">
@@ -23,10 +26,12 @@ export function LocalesPage() {
           title="언어 관리"
           description="프로젝트에서 지원하는 언어를 관리하세요"
           action={
-            <Button onClick={() => setDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              언어 추가
-            </Button>
+            canEdit && (
+              <Button onClick={() => setDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                언어 추가
+              </Button>
+            )
           }
         />
 
