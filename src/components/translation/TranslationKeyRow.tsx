@@ -29,6 +29,7 @@ interface TranslationKeyRowProps {
   onCellChange: (locale: string, value: string) => void;
   isUpdatingKey: boolean;
   isDeletingKey: boolean;
+  canEdit?: boolean; // 편집 권한 여부 (VIEWER는 false)
 }
 
 function TranslationKeyRowComponent({
@@ -50,6 +51,7 @@ function TranslationKeyRowComponent({
   onCellChange,
   isUpdatingKey,
   isDeletingKey,
+  canEdit = true,
 }: TranslationKeyRowProps) {
   return (
     <TableRow
@@ -109,26 +111,28 @@ function TranslationKeyRowComponent({
                 {row.description}
               </div>
             )}
-            <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={onStartEdit}
-                disabled={isDeletingKey}
-                className="h-7 w-7 p-0"
-              >
-                <Edit2 className="h-3 w-3" />
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={onDelete}
-                disabled={isDeletingKey}
-                className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
-            </div>
+            {canEdit && (
+              <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={onStartEdit}
+                  disabled={isDeletingKey}
+                  className="h-7 w-7 p-0"
+                >
+                  <Edit2 className="h-3 w-3" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={onDelete}
+                  disabled={isDeletingKey}
+                  className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </TableCell>
@@ -146,6 +150,7 @@ function TranslationKeyRowComponent({
               value={currentValue}
               onChange={(value) => onCellChange(locale.code, value)}
               isModified={isModified}
+              disabled={!canEdit}
             />
           </TableCell>
         );
