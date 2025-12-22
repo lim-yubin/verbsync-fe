@@ -14,18 +14,25 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { useProjectApiKey } from "@/hooks/useProjects";
+import type { AxiosError } from "axios";
 
 interface ApiKeyDisplayProps {
   projectId: string;
 }
 
 export function ApiKeyDisplay({ projectId }: ApiKeyDisplayProps) {
-  const { data, isLoading, isError } = useProjectApiKey(projectId);
+  const { data, isLoading, isError, error } = useProjectApiKey(projectId);
   const [isVisible, setIsVisible] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const apiKey = data?.apiKey || "";
+  
+  // 403 에러인 경우 (권한 없음) - 멤버는 API Key를 볼 수 없음
+  const isForbidden = 
+    isError && 
+    error && 
+    (error as AxiosError).response?.status === 403;
 
   const handleCopy = async () => {
     if (!apiKey) return;
@@ -59,7 +66,8 @@ export function ApiKeyDisplay({ projectId }: ApiKeyDisplayProps) {
   const apiBaseUrl =
     import.meta.env.VITE_API_BASE_URL || "https://api.verbsync.com";
 
-  const i18nextStandardCode = `// i18n.ts
+  const i18nextStandardCode = apiKey
+    ? `// i18n.ts
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import Backend from 'i18next-http-backend';
@@ -74,6 +82,27 @@ i18n
       // 헤더에 API Key 포함
       customHeaders: {
         'x-api-key': '${isVisible ? apiKey : "YOUR_API_KEY"}'
+      }
+    },
+    fallbackLng: 'en',
+    defaultNS: 'common',
+    // ... 기타 i18next 설정
+  });`
+    : `// i18n.ts
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import Backend from 'i18next-http-backend';
+
+i18n
+  .use(Backend)
+  .use(initReactI18next)
+  .init({
+    backend: {
+      // Verbsync API 경로 설정
+      loadPath: '${apiBaseUrl}/api/translations/{{ns}}/{{lng}}.json',
+      // 헤더에 API Key 포함
+      customHeaders: {
+        'x-api-key': 'YOUR_API_KEY'
       }
     },
     fallbackLng: 'en',
@@ -98,10 +127,7 @@ function WelcomeComponent() {
   );
 }`;
 
-  if (isError) {
-    return null;
-  }
-
+  // 로딩 중이거나 에러가 나도 카드 표시 (로딩 상태 표시)
   return (
     <Card>
       <CardHeader>
@@ -123,13 +149,26 @@ function WelcomeComponent() {
               Secret
             </Badge>
           </div>
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Input
-                value={displayValue}
-                readOnly
-                className="pr-24 font-mono text-sm bg-muted/30"
-              />
+          {isForbidden ? (
+            <div className="rounded-md border border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800 p-3">
+              <p className="text-sm text-amber-900 dark:text-amber-100">
+                프로젝트 소유자만 API Key를 조회할 수 있습니다.
+              </p>
+            </div>
+          ) : isError ? (
+            <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3">
+              <p className="text-sm text-destructive">
+                API Key를 불러올 수 없습니다.
+              </p>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  value={displayValue}
+                  readOnly
+                  className="pr-24 font-mono text-sm bg-muted/30"
+                />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
                 <Button
                   variant="ghost"
@@ -162,12 +201,15 @@ function WelcomeComponent() {
               </div>
             </div>
           </div>
+          )}
         </div>
 
-        <Separator />
+        {!isError && !isForbidden && (
+          <>
+            <Separator />
 
-        {/* 2. 대시보드 세팅 가이드 */}
-        <div className="space-y-4">
+            {/* 2. 대시보드 세팅 가이드 */}
+            <div className="space-y-4">
           <div className="space-y-1">
             <p className="text-sm font-semibold">1. 대시보드에 키 등록하기</p>
             <p className="text-xs text-muted-foreground leading-relaxed">
@@ -281,6 +323,8 @@ function WelcomeComponent() {
             </div>
           </div>
         </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );

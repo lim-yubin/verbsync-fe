@@ -9,6 +9,7 @@ import type { ProjectMember } from "@/types/api";
 
 interface MemberListProps {
   canManage: boolean; // 멤버 관리 권한 여부
+  members?: ProjectMember[]; // 멤버 목록 (선택적, 없으면 useMembers 사용)
 }
 
 // 멤버 정렬 함수: Owner → Editor → Viewer, 그 다음 가입일순
@@ -31,9 +32,13 @@ function sortMembers(members: ProjectMember[]): ProjectMember[] {
   });
 }
 
-export function MemberList({ canManage }: MemberListProps) {
+export function MemberList({ canManage, members: propMembers }: MemberListProps) {
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  const { data: members, isLoading } = useMembers();
+  const { data: fetchedMembers, isLoading } = useMembers();
+  
+  // prop으로 전달된 members가 있으면 사용, 없으면 fetchedMembers 사용
+  const members = propMembers ?? fetchedMembers;
+  const isLoadingMembers = !propMembers && isLoading;
 
   // 멤버 정렬
   const sortedMembers = useMemo(() => {
@@ -41,7 +46,7 @@ export function MemberList({ canManage }: MemberListProps) {
     return sortMembers(members);
   }, [members]);
 
-  if (isLoading) {
+  if (isLoadingMembers) {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (

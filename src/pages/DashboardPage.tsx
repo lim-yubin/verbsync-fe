@@ -13,12 +13,28 @@ export function DashboardPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const { data: projects, isLoading } = useProjects();
 
+  // 소유한 프로젝트와 팀 프로젝트 구분
+  const ownedProjects = projects?.filter((p) => p.isOwner) || [];
+  const teamProjects = projects?.filter((p) => !p.isOwner) || [];
+  const hasOwnedProjects = ownedProjects.length > 0;
+  const hasTeamProjects = teamProjects.length > 0;
+
+  // 설명 텍스트 결정
+  const description =
+    hasOwnedProjects && hasTeamProjects
+      ? "내가 관리하는 프로젝트와 팀이 관리하는 프로젝트"
+      : hasOwnedProjects
+      ? "내가 관리하는 번역 프로젝트"
+      : hasTeamProjects
+      ? "팀이 관리하는 번역 프로젝트"
+      : "번역 프로젝트";
+
   return (
     <AppLayout>
       <div className="mx-auto max-w-7xl space-y-4 sm:space-y-6">
         <PageHeader
           title="프로젝트"
-          description="내가 관리하는 번역 프로젝트"
+          description={description}
           action={
             <Button
               className="w-full sm:w-auto"
@@ -36,16 +52,54 @@ export function DashboardPage() {
         ) : !projects || projects.length === 0 ? (
           <EmptyState onCreateProject={() => setCreateDialogOpen(true)} />
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                id={project.id}
-                name={project.name}
-                defaultLocale={project.defaultLocale}
-                createdAt={project.createdAt}
-              />
-            ))}
+          <div className="space-y-6">
+            {/* 내가 소유한 프로젝트 */}
+            {hasOwnedProjects && (
+              <div className="space-y-4">
+                <div>
+                  <h2 className="text-lg font-semibold">내가 관리하는 프로젝트</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {ownedProjects.length}개의 프로젝트
+                  </p>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {ownedProjects.map((project) => (
+                    <ProjectCard
+                      key={project.id}
+                      id={project.id}
+                      name={project.name}
+                      defaultLocale={project.defaultLocale}
+                      createdAt={project.createdAt}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 팀 프로젝트 */}
+            {hasTeamProjects && (
+              <div className="space-y-4">
+                {hasOwnedProjects && <div className="border-t pt-6" />}
+                <div>
+                  <h2 className="text-lg font-semibold">팀이 관리하는 프로젝트</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {teamProjects.length}개의 프로젝트
+                  </p>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {teamProjects.map((project) => (
+                    <ProjectCard
+                      key={project.id}
+                      id={project.id}
+                      name={project.name}
+                      defaultLocale={project.defaultLocale}
+                      createdAt={project.createdAt}
+                      role={project.role}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
