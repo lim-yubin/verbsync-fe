@@ -27,12 +27,6 @@ export function ApiKeyDisplay({ projectId }: ApiKeyDisplayProps) {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const apiKey = data?.apiKey || "";
-  
-  // 403 에러인 경우 (권한 없음) - 멤버는 API Key를 볼 수 없음
-  const isForbidden = 
-    isError && 
-    error && 
-    (error as AxiosError).response?.status === 403;
 
   const handleCopy = async () => {
     if (!apiKey) return;
@@ -149,13 +143,7 @@ function WelcomeComponent() {
               Secret
             </Badge>
           </div>
-          {isForbidden ? (
-            <div className="rounded-md border border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800 p-3">
-              <p className="text-sm text-amber-900 dark:text-amber-100">
-                프로젝트 소유자만 API Key를 조회할 수 있습니다.
-              </p>
-            </div>
-          ) : isError ? (
+          {isError ? (
             <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3">
               <p className="text-sm text-destructive">
                 API Key를 불러올 수 없습니다.
@@ -205,7 +193,7 @@ function WelcomeComponent() {
         </div>
 
         {/* i18next 연동 가이드는 모든 권한이 볼 수 있음 */}
-        {(!isError || isForbidden) && (
+        {!isError && (
           <>
             <Separator />
 

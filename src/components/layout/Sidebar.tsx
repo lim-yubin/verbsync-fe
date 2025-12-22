@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Home, Settings, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
+import { useMemberPermissions } from "@/hooks/useMembers";
 
 interface NavItem {
   title: string;
@@ -10,7 +11,7 @@ interface NavItem {
   disabled?: boolean;
 }
 
-const navItems: NavItem[] = [
+const allNavItems: NavItem[] = [
   {
     title: "대시보드",
     href: ROUTES.DASHBOARD,
@@ -30,6 +31,13 @@ const navItems: NavItem[] = [
 
 export function Sidebar() {
   const location = useLocation();
+  const { data: permissions } = useMemberPermissions();
+  
+  // 소유자만 멤버 메뉴 표시
+  const isOwner = permissions?.role === "OWNER";
+  const navItems = allNavItems.filter(
+    (item) => item.title !== "멤버" || isOwner
+  );
 
   return (
     <aside className="hidden md:flex w-60 flex-col fixed left-0 top-0 h-screen border-r bg-muted/30">
