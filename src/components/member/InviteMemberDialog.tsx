@@ -58,6 +58,8 @@ export function InviteMemberDialog({
     },
   });
 
+  // React Hook Form의 watch() 사용 (React Compiler 경고 무시)
+  // eslint-disable-next-line react-hooks/incompatible-library
   const selectedRole = watch("role");
 
   const onSubmit = (data: InviteMemberFormData) => {

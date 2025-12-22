@@ -63,7 +63,6 @@ export function ProjectCreateDialog({
     },
   });
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const selectedLocale = watch("defaultLocale");
 
   // 기본 언어 추가를 위한 상태

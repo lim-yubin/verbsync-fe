@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import LogoDark from "@/assets/icons/logo-dark.svg?react";
 import LogoLight from "@/assets/icons/logo-light.svg?react";
 
@@ -13,11 +13,8 @@ interface LogoProps {
 
 export function Logo({ className = "", width = 32, height = 32 }: LogoProps) {
   const { theme, systemTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // SSR hydration 이슈 방지: 클라이언트에서만 true로 초기화
+  const [mounted] = useState(() => typeof window !== "undefined");
 
   // SSR hydration 이슈 방지
   if (!mounted) {
