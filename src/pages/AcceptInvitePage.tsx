@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { useGetInviteInfo, useAcceptInvite } from "@/hooks/useMembers";
 import { useAuthStore } from "@/store/authStore";
