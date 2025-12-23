@@ -76,7 +76,7 @@ export function PricingPage() {
             간단하고 투명한 가격
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            프로젝트 규모에 맞는 최적의 플랜을 선택하세요. 모든 플랜은 14일 무료 체험을 제공합니다.
+            프로젝트 규모에 맞는 최적의 플랜을 선택하세요.
           </p>
         </div>
 
