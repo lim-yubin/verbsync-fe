@@ -29,6 +29,7 @@ export const ROUTES = {
   REGISTER: "/register",
   DASHBOARD: "/dashboard",
   SETTINGS: "/settings",
+  PRICING: "/pricing",
   SUBSCRIPTION: "/subscription",
   PROJECT_NEW: "/projects/new",
   PROJECT_DETAIL: (id: string) => `/projects/${id}`,

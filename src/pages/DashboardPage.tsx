@@ -42,7 +42,7 @@ export function DashboardPage() {
             <AlertDescription>
               Starter 플랜으로 업그레이드하여 더 많은 프로젝트와 기능을
               사용하세요.{" "}
-              <a href={ROUTES.SUBSCRIPTION} className="font-semibold underline cursor-pointer">
+              <a href={ROUTES.PRICING} className="font-semibold underline cursor-pointer">
                 자세히 보기
               </a>
             </AlertDescription>

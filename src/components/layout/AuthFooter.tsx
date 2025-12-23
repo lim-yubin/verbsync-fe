@@ -26,7 +26,7 @@ export function AuthFooter() {
               환불정책
             </Link>
             <Link
-              to={ROUTES.SUBSCRIPTION}
+              to={ROUTES.PRICING}
               className="hover:text-foreground transition-colors cursor-pointer"
             >
               가격

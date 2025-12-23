@@ -7,6 +7,7 @@ export { TranslationsPage } from "./TranslationsPage";
 export { ProjectSettingsPage } from "./ProjectSettingsPage";
 export { MembersPage } from "./MembersPage";
 export { SettingsPage } from "./SettingsPage";
+export { PricingPage } from "./PricingPage";
 export { SubscriptionPage } from "./SubscriptionPage";
 export { AcceptInvitePage } from "./AcceptInvitePage";
 export { PrivacyPage } from "./PrivacyPage";

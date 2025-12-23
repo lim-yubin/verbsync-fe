@@ -49,7 +49,7 @@ const plans: PlanOption[] = [
       "Excel/CSV Import & Export",
       "팀 멤버 초대 (최대 3명)",
     ],
-    cta: "스타터 시작하기",
+    cta: "업그레이드",
     featured: true,
   },
   {
@@ -64,7 +64,7 @@ const plans: PlanOption[] = [
       "AI 자동 번역 (1,000회/월)",
       "번역 히스토리 및 롤백",
     ],
-    cta: "프로 시작하기",
+    cta: "업그레이드",
     featured: false,
     comingSoon: true,
   },
@@ -74,11 +74,20 @@ export function SubscriptionPage() {
   const { data: planInfo, isLoading } = usePlan();
   const currentPlan = planInfo?.plan || "FREE";
 
-  const handleUpgrade = (plan: Plan) => {
+  const handleUpgrade = async (plan: Plan) => {
     // TODO: Paddle 결제 연동
     if (plan === "STARTER") {
-      // Paddle Checkout 링크 생성 및 리다이렉트
-      console.log("Upgrade to Starter plan");
+      try {
+        // Paddle Checkout 링크 생성 API 호출
+        // const { data } = await api.post<{ url: string }>("/subscription/checkout", {
+        //   plan: "STARTER",
+        //   period: "month",
+        // });
+        // window.location.href = data.url;
+        console.log("Upgrade to Starter plan - Paddle 결제 연동 예정");
+      } catch (error) {
+        console.error("Failed to create checkout link:", error);
+      }
     } else if (plan === "PRO") {
       console.log("Upgrade to Pro plan (Coming Soon)");
     }
@@ -88,8 +97,8 @@ export function SubscriptionPage() {
     <AppLayout>
       <div className="mx-auto max-w-7xl space-y-6">
         <PageHeader
-          title="구독 플랜"
-          description="프로젝트 규모에 맞는 최적의 플랜을 선택하세요"
+          title="구독 관리"
+          description="현재 플랜을 확인하고 업그레이드할 수 있습니다"
         />
 
         {/* 현재 플랜 정보 (로그인한 경우에만 표시) */}
