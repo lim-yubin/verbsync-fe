@@ -28,110 +28,129 @@ export function RefundPage() {
           <section>
             <h2 className="text-2xl font-semibold mb-4">1. 총칙</h2>
             <p className="text-muted-foreground leading-relaxed">
-              본 환불 정책은 Verbsync(이하 "회사")가 제공하는 유료 서비스 플랜(Starter, Pro, Enterprise)의 환불 및 취소에
-              관한 사항을 규정합니다. 본 정책은 전자상거래법 및 소비자기본법 등 관련 법령을 준수합니다.
+              Verbsync 유료 플랜(Starter, Pro, Enterprise)의 모든 구매는{" "}
+              <strong className="text-foreground">Paddle.com</strong>을 통해
+              처리되며, Paddle은 모든 거래에 대한{" "}
+              <strong className="text-foreground">
+                Merchant of Record(판매자 대행)
+              </strong>
+              로 작동합니다.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-4">
+              환불은 Paddle의 Buyer Terms(구매자 약관)에 따라 처리됩니다.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">2. 환불 정책</h2>
+            <h2 className="text-2xl font-semibold mb-4">
+              2. 소비자 취소 권리
+            </h2>
             <div className="space-y-4 text-muted-foreground">
               <div className="bg-primary/10 border border-primary/20 p-6 rounded-lg">
-                <p className="text-lg font-semibold text-foreground mb-2">14일 이내 전액 환불 보장</p>
+                <p className="text-lg font-semibold text-foreground mb-2">
+                  14일 이내 전액 환불 보장
+                </p>
                 <p className="leading-relaxed">
-                  구독 시작일로부터 14일 이내에 취소를 요청하시면, 결제하신 전액을 환불해드립니다. 별도의 조건이나 예외 없이
-                  전액 환불이 보장됩니다.
+                  소비자인 경우, 구매 완료일로부터{" "}
+                  <strong className="text-foreground">14일 이내</strong>에
+                  구매를 취소하고{" "}
+                  <strong className="text-foreground">전액 환불</strong>을
+                  받을 수 있는 권리가 있습니다. 별도의 사유 없이도 환불이
+                  가능합니다.
                 </p>
               </div>
               <p className="leading-relaxed">
-                회원은 유료 플랜 구독 후 14일 이내에 언제든지 환불을 요청할 수 있으며, 회사는 해당 요청에 대해 즉시 전액
-                환불을 처리합니다.
+                이 14일 취소 기간은 구매가 완료된 다음 날부터 시작됩니다.
               </p>
             </div>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">3. 환불 절차</h2>
-            <div className="space-y-4 text-muted-foreground">
-              <div>
-                <h3 className="text-xl font-semibold mb-3 text-foreground">3.1 환불 신청</h3>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>
-                    환불을 원하시는 경우 고객 지원 이메일(
-                    <strong className="text-foreground">verbsync@gmail.com</strong>)로 환불 요청을 보내주시거나, 대시보드
-                    내 설정 메뉴에서 구독 취소를 진행하실 수 있습니다.
-                  </li>
-                  <li>
-                    환불 신청 시 다음 정보를 포함해주세요:
-                    <ul className="list-circle pl-6 mt-2 space-y-1">
-                      <li>계정 이메일 주소</li>
-                      <li>구독 중인 플랜명</li>
-                      <li>구독 시작일</li>
-                    </ul>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-semibold mb-3 text-foreground">3.2 환불 처리</h3>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>환불 신청 접수 후 영업일 기준 3일 이내에 환불 처리를 완료합니다.</li>
-                  <li>
-                    환불이 승인된 경우, 결제 수단에 따라 다음 기간 내에 환불이 완료됩니다:
-                    <ul className="list-circle pl-6 mt-2 space-y-1">
-                      <li>신용카드: 승인 취소 후 영업일 기준 3~5일</li>
-                      <li>계좌이체: 영업일 기준 1~3일</li>
-                      <li>기타 결제 수단: 해당 결제 대행사의 정책에 따름</li>
-                    </ul>
-                  </li>
-                  <li>
-                    환불 금액은 원 결제 수단으로 환불되며, 원 결제 수단이 불가능한 경우 회원이 지정한 계좌로 환불할 수 있습니다.
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">4. 구독 취소 및 자동 갱신</h2>
+            <h2 className="text-2xl font-semibold mb-4">3. 환불 처리</h2>
             <div className="space-y-3 text-muted-foreground">
-              <p>① 유료 플랜은 자동 갱신되며, 다음 결제일 전까지 취소하지 않으면 자동으로 결제됩니다.</p>
               <p>
-                ② 구독 취소를 원하시는 경우 다음 결제일 전까지 취소하시면 됩니다. 취소 후에도 현재 결제 기간이 종료될 때까지
-                서비스를 이용하실 수 있습니다.
+                모든 환불 요청은{" "}
+                <strong className="text-foreground">Paddle</strong>에서
+                처리합니다.
               </p>
               <p>
-                ③ 구독 취소 시 다음 결제일부터 무료 플랜으로 자동 전환되며, 무료 플랜의 제한을 초과하는 데이터는 보관되지 않을
-                수 있습니다.
-              </p>
-              <p>
-                ④ 구독 취소 후 재가입 시, 이전 데이터는 복구되지 않을 수 있으니 필요한 데이터는 미리 백업하시기 바랍니다.
+                14일 기간 내에 유효한 환불 요청이 제출되면, Paddle은 Paddle의
+                Buyer Terms에 따라
+                <strong className="text-foreground"> 14일 이내</strong>에 원래
+                결제 수단으로 환불을 처리합니다.
               </p>
             </div>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">5. 환불 관련 문의</h2>
+            <h2 className="text-2xl font-semibold mb-4">4. 환불 요청 방법</h2>
+            <div className="space-y-3 text-muted-foreground">
+              <p>
+                환불을 요청하시려면 구매 영수증 이메일에 포함된 환불 링크를
+                사용하거나, 다음 주소로 직접 Paddle에 문의해주세요:
+              </p>
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <p className="font-semibold text-foreground mb-2">
+                  Paddle 고객 지원
+                </p>
+                <p>
+                  웹사이트:{" "}
+                  <a
+                    href="https://paddle.net"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline cursor-pointer"
+                  >
+                    https://paddle.net
+                  </a>
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">
+              5. 14일 기간 경과 후
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              14일 취소 기간이 경과한 후 제출된 환불 요청은 보장되지 않으며,
+              Paddle의 재량에 따라 검토될 수 있습니다.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">6. 추가 정보</h2>
+            <div className="space-y-3 text-muted-foreground">
+              <p>더 자세한 정보는 Paddle의 Buyer Terms를 참조해주세요:</p>
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <a
+                  href="https://www.paddle.com/legal/invoiced-consumer-terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline break-all cursor-pointer"
+                >
+                  https://www.paddle.com/legal/invoiced-consumer-terms
+                </a>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">7. 문의</h2>
             <div className="bg-muted/50 p-6 rounded-lg space-y-3 text-muted-foreground">
               <p>환불 관련 문의사항이 있으시면 아래로 연락해주세요:</p>
               <div>
-                <p className="font-semibold text-foreground mb-2">고객 지원</p>
+                <p className="font-semibold text-foreground mb-2">
+                  Verbsync 고객 지원
+                </p>
                 <p>이메일: verbsync@gmail.com</p>
                 <p className="mt-2">응답 시간: 영업일 기준 24시간 이내</p>
               </div>
               <p className="text-sm mt-4">
-                환불 처리 과정에서 추가 정보가 필요한 경우, 회원에게 개별적으로 연락을 드립니다.
+                환불 처리는 Paddle에서 직접 처리되므로, 환불 요청은 위의
+                Paddle 링크를 통해 진행해주시기 바랍니다.
               </p>
             </div>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">6. 정책 변경</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              본 환불 정책은 법령의 변경, 서비스 정책의 변경 등에 따라 변경될 수 있으며, 변경 시 서비스 내 공지사항을 통해
-              사전에 안내해드립니다. 변경된 정책은 공지한 시점부터 적용되며, 변경 전에 체결된 계약에 대해서는 기존 정책이
-              적용됩니다.
-            </p>
           </section>
         </div>
 
