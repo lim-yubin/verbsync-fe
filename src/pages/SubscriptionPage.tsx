@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePlan } from "@/hooks/usePlan";
 import { PlanBadge } from "@/components/subscription";
-import { PLAN_LABELS, PLAN_DESCRIPTIONS } from "@/lib/plans";
+import { PLAN_LABELS } from "@/lib/plans";
 import type { Plan } from "@/types/api";
 import { cn } from "@/lib/utils";
 

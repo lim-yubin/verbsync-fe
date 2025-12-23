@@ -77,7 +77,7 @@ test.describe('멤버 관리 확장 (Members Extended)', () => {
       const response = await responsePromise;
       // 유효한 토큰이면 200, 유효하지 않으면 404/401
       expect([200, 401, 404]).toContain(response.status());
-    } catch (e) {
+    } catch {
       // 토큰이 없으면 응답이 없을 수 있음
     }
   });

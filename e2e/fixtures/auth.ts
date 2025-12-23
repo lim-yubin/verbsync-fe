@@ -1,14 +1,14 @@
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, type Page } from '@playwright/test';
 
 type AuthFixtures = {
-  authenticatedPage: any;
+  authenticatedPage: Page;
 };
 
 /**
  * 인증된 사용자로 테스트하기 위한 fixture
  */
 export const test = base.extend<AuthFixtures>({
-  authenticatedPage: async ({ page, baseURL }, use) => {
+  authenticatedPage: async ({ page }, use) => {
     // 테스트용 계정 정보 (환경변수 또는 기본값)
     const testEmail = process.env.TEST_EMAIL || `test-${Date.now()}@example.com`;
     const testPassword = process.env.TEST_PASSWORD || 'test123456';
@@ -73,6 +73,7 @@ export const test = base.extend<AuthFixtures>({
     }
 
     // 인증된 페이지 사용
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     await use(page);
   },
 });

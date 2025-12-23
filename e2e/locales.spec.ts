@@ -83,8 +83,6 @@ test.describe('언어 관리 (Locales)', () => {
       const toggle = page.locator('input[type="checkbox"]').first();
       
       if (await toggle.count() > 0) {
-        const isChecked = await toggle.isChecked();
-
         // API 호출 확인
         const responsePromise = page.waitForResponse(
           (response) =>
