@@ -4,14 +4,17 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ProjectCard } from "@/components/project/ProjectCard";
 import { EmptyState } from "@/components/project/EmptyState";
 import { ProjectCreateDialog } from "@/components/project/ProjectCreateDialog";
 import { useProjects } from "@/hooks/useProjects";
+import { usePlan } from "@/hooks/usePlan";
 
 export function DashboardPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const { data: projects, isLoading } = useProjects();
+  const { data: planInfo } = usePlan();
 
   // 소유한 프로젝트와 팀 프로젝트 구분
   const ownedProjects = projects?.filter((p) => p.isOwner) || [];
@@ -32,6 +35,19 @@ export function DashboardPage() {
   return (
     <AppLayout>
       <div className="mx-auto max-w-7xl space-y-4 sm:space-y-6">
+        {/* Free 플랜 업그레이드 배너 */}
+        {planInfo && planInfo.plan === "FREE" && (
+          <Alert className="mb-6">
+            <AlertDescription>
+              Starter 플랜으로 업그레이드하여 더 많은 프로젝트와 기능을
+              사용하세요.{" "}
+              <a href="/pricing" className="font-semibold underline">
+                자세히 보기
+              </a>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <PageHeader
           title="프로젝트"
           description={description}

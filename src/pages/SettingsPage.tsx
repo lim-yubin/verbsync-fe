@@ -12,7 +12,13 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,7 +32,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { useMe, useChangePassword, useDeleteAccount } from "@/hooks/useAuth";
+import { usePlan } from "@/hooks/usePlan";
 import { ROUTES } from "@/lib/constants";
+import { PlanBadge } from "@/components/subscription/PlanBadge";
 
 const passwordSchema = z
   .object({
@@ -44,8 +52,11 @@ type PasswordFormData = z.infer<typeof passwordSchema>;
 export function SettingsPage() {
   const navigate = useNavigate();
   const { data: user, isLoading } = useMe();
-  const { mutate: changePassword, isPending: isChangingPassword } = useChangePassword();
-  const { mutate: deleteAccount, isPending: isDeletingAccount } = useDeleteAccount();
+  const { data: planInfo, isLoading: isLoadingPlan } = usePlan();
+  const { mutate: changePassword, isPending: isChangingPassword } =
+    useChangePassword();
+  const { mutate: deleteAccount, isPending: isDeletingAccount } =
+    useDeleteAccount();
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -71,7 +82,9 @@ export function SettingsPage() {
         },
         onError: (error: Error) => {
           const axiosError = error as AxiosError<{ message?: string }>;
-          toast.error(axiosError.response?.data?.message || "비밀번호 변경에 실패했습니다");
+          toast.error(
+            axiosError.response?.data?.message || "비밀번호 변경에 실패했습니다"
+          );
         },
       }
     );
@@ -85,7 +98,9 @@ export function SettingsPage() {
       },
       onError: (error: Error) => {
         const axiosError = error as AxiosError<{ message?: string }>;
-        toast.error(axiosError.response?.data?.message || "계정 삭제에 실패했습니다");
+        toast.error(
+          axiosError.response?.data?.message || "계정 삭제에 실패했습니다"
+        );
       },
     });
   };
@@ -107,7 +122,9 @@ export function SettingsPage() {
         <div className="mx-auto max-w-4xl">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <p className="text-lg font-semibold">사용자 정보를 불러올 수 없습니다</p>
+              <p className="text-lg font-semibold">
+                사용자 정보를 불러올 수 없습니다
+              </p>
             </div>
           </div>
         </div>
@@ -144,6 +161,57 @@ export function SettingsPage() {
 
         <Separator />
 
+        {/* 구독 플랜 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>구독 플랜</CardTitle>
+            <CardDescription>
+              현재 플랜 정보를 확인하고 업그레이드할 수 있습니다
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {isLoadingPlan ? (
+              <Skeleton className="h-20" />
+            ) : planInfo ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <Label>현재 플랜:</Label>
+                  <PlanBadge plan={planInfo.plan} />
+                  {planInfo.plan === "FREE" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => (window.location.href = "/pricing")}
+                    >
+                      업그레이드
+                    </Button>
+                  )}
+                </div>
+                {planInfo.planStartedAt && (
+                  <div className="text-sm text-muted-foreground">
+                    플랜 시작일:{" "}
+                    {new Date(planInfo.planStartedAt).toLocaleDateString(
+                      "ko-KR"
+                    )}
+                  </div>
+                )}
+                {planInfo.planEndsAt && (
+                  <div className="text-sm text-muted-foreground">
+                    플랜 만료일:{" "}
+                    {new Date(planInfo.planEndsAt).toLocaleDateString("ko-KR")}
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                플랜 정보를 불러올 수 없습니다
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Separator />
+
         {/* 비밀번호 변경 */}
         <Card>
           <CardHeader>
@@ -151,7 +219,10 @@ export function SettingsPage() {
             <CardDescription>비밀번호를 변경할 수 있습니다</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-6">
+            <form
+              onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
+              className="space-y-6"
+            >
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">현재 비밀번호</Label>
                 <Input
@@ -217,7 +288,8 @@ export function SettingsPage() {
           <CardHeader>
             <CardTitle className="text-destructive">위험 구역</CardTitle>
             <CardDescription>
-              계정을 삭제하면 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다
+              계정을 삭제하면 모든 데이터가 영구적으로 삭제되며 복구할 수
+              없습니다
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -240,8 +312,8 @@ export function SettingsPage() {
               <AlertDialogDescription>
                 정말로 계정을 삭제하시겠습니까?
                 <br />
-                <br />
-                이 작업은 되돌릴 수 없으며, 다음 데이터가 영구적으로 삭제됩니다:
+                <br />이 작업은 되돌릴 수 없으며, 다음 데이터가 영구적으로
+                삭제됩니다:
                 <ul className="list-disc list-inside mt-2 space-y-1">
                   <li>모든 프로젝트</li>
                   <li>모든 번역 데이터</li>
@@ -250,7 +322,9 @@ export function SettingsPage() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isDeletingAccount}>취소</AlertDialogCancel>
+              <AlertDialogCancel disabled={isDeletingAccount}>
+                취소
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteAccount}
                 disabled={isDeletingAccount}
@@ -265,4 +339,3 @@ export function SettingsPage() {
     </AppLayout>
   );
 }
-

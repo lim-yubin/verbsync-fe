@@ -213,3 +213,19 @@ export interface AcceptInviteResponse {
     name: string;
   };
 }
+
+// ========== Subscription ==========
+export type Plan = "FREE" | "STARTER" | "PRO" | "ENTERPRISE";
+
+export interface PlanFeatures {
+  canExportExcel: boolean;
+  canImport: boolean;
+  canInviteMembers: boolean;
+}
+
+export interface PlanInfo {
+  plan: Plan;
+  features: PlanFeatures;
+  planStartedAt: string | null;
+  planEndsAt: string | null;
+}

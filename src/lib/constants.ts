@@ -19,6 +19,7 @@ export const QUERY_KEYS = {
   TRANSLATIONS_MATRIX: (projectId: string) => ["projects", projectId, "matrix"],
   MEMBERS: ["members"],
   MEMBER_PERMISSIONS: ["members", "me"],
+  PLAN: ["plan"],
 } as const;
 
 // Routes
