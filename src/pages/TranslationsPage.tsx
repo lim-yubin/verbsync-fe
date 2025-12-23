@@ -20,8 +20,14 @@ import {
   useDeleteKey,
 } from "@/hooks/useKeys";
 import { useProject } from "@/hooks/useProjects";
+import { usePlan } from "@/hooks/usePlan";
 import { ExportButton } from "@/components/translation/ExportButton";
 import { ImportDialog } from "@/components/translation/ImportDialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,9 +56,11 @@ import {
 export function TranslationsPage() {
   const { id: projectId } = useParams<{ id: string }>();
   const { data: project } = useProject(projectId!);
+  const { data: planInfo } = usePlan();
   
   // 편집 권한 확인 (OWNER 또는 EDITOR만 편집 가능, VIEWER는 조회만)
   const canEdit = project?.isOwner || project?.role === "EDITOR";
+  const canImport = planInfo?.features.canImport ?? false;
   const { data: matrix, isLoading, error } = useTranslationMatrix(projectId!);
   const { data: keys } = useKeys(projectId!); // 키 목록 (createdAt 포함)
   const { mutate: updateTranslations, isPending: isSaving } =
@@ -610,14 +618,35 @@ export function TranslationsPage() {
                     }
                   />
                   {canEdit && (
-                    <Button
-                      variant="outline"
-                      onClick={() => setImportDialogOpen(true)}
-                      className="cursor-pointer"
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      가져오기
-                    </Button>
+                    canImport ? (
+                      <Button
+                        variant="outline"
+                        onClick={() => setImportDialogOpen(true)}
+                        className="cursor-pointer"
+                      >
+                        <Upload className="mr-2 h-4 w-4" />
+                        가져오기
+                      </Button>
+                    ) : (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            disabled
+                            className="cursor-not-allowed opacity-50"
+                          >
+                            <Upload className="mr-2 h-4 w-4" />
+                            가져오기
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Starter 플랜 이상에서 사용 가능합니다.{" "}
+                          <a href="/pricing" className="underline">
+                            업그레이드하기
+                          </a>
+                        </TooltipContent>
+                      </Tooltip>
+                    )
                   )}
                 </>
               )}

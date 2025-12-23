@@ -17,6 +17,8 @@ export interface RegisterDto {
   email: string;
   password: string;
   name: string;
+  agreedToTerms: boolean;
+  agreedToPrivacy: boolean;
 }
 
 export interface AuthResponse {
@@ -212,4 +214,20 @@ export interface AcceptInviteResponse {
     email: string;
     name: string;
   };
+}
+
+// ========== Subscription ==========
+export type Plan = "FREE" | "STARTER" | "PRO" | "ENTERPRISE";
+
+export interface PlanFeatures {
+  canExportExcel: boolean;
+  canImport: boolean;
+  canInviteMembers: boolean;
+}
+
+export interface PlanInfo {
+  plan: Plan;
+  features: PlanFeatures;
+  planStartedAt: string | null;
+  planEndsAt: string | null;
 }

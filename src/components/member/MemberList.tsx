@@ -2,9 +2,15 @@ import { useState, useMemo } from "react";
 import { Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { MemberItem } from "./MemberItem";
 import { InviteMemberDialog } from "./InviteMemberDialog";
 import { useMembers } from "@/hooks/useMembers";
+import { usePlan } from "@/hooks/usePlan";
 import type { ProjectMember } from "@/types/api";
 
 interface MemberListProps {
@@ -35,6 +41,8 @@ function sortMembers(members: ProjectMember[]): ProjectMember[] {
 export function MemberList({ canManage, members: propMembers }: MemberListProps) {
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const { data: fetchedMembers, isLoading } = useMembers();
+  const { data: planInfo } = usePlan();
+  const canInviteMembers = planInfo?.features.canInviteMembers ?? false;
   
   // prop으로 전달된 members가 있으면 사용, 없으면 fetchedMembers 사용
   const members = propMembers ?? fetchedMembers;
@@ -67,13 +75,33 @@ export function MemberList({ canManage, members: propMembers }: MemberListProps)
           팀 멤버를 초대하여 함께 작업하세요
         </p>
         {canManage && (
-          <Button
-            onClick={() => setInviteDialogOpen(true)}
-            className="cursor-pointer"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            멤버 초대
-          </Button>
+          canInviteMembers ? (
+            <Button
+              onClick={() => setInviteDialogOpen(true)}
+              className="cursor-pointer"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              멤버 초대
+            </Button>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  disabled
+                  className="cursor-not-allowed opacity-50"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  멤버 초대
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                Starter 플랜 이상에서 사용 가능합니다.{" "}
+                <a href="/pricing" className="underline">
+                  업그레이드하기
+                </a>
+              </TooltipContent>
+            </Tooltip>
+          )
         )}
       </div>
     );
@@ -89,7 +117,8 @@ export function MemberList({ canManage, members: propMembers }: MemberListProps)
               총 {members.length}명
             </p>
           </div>
-          {canManage && (
+        {canManage && (
+          canInviteMembers ? (
             <Button
               onClick={() => setInviteDialogOpen(true)}
               className="cursor-pointer"
@@ -97,7 +126,26 @@ export function MemberList({ canManage, members: propMembers }: MemberListProps)
               <Plus className="mr-2 h-4 w-4" />
               멤버 초대
             </Button>
-          )}
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  disabled
+                  className="cursor-not-allowed opacity-50"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  멤버 초대
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                Starter 플랜 이상에서 사용 가능합니다.{" "}
+                <a href="/pricing" className="underline">
+                  업그레이드하기
+                </a>
+              </TooltipContent>
+            </Tooltip>
+          )
+        )}
         </div>
 
         <div className="space-y-3">

@@ -12,6 +12,7 @@ import { useKeys } from "@/hooks/useKeys";
 import { useTranslationMatrix } from "@/hooks/useTranslations";
 import { MemberList } from "@/components/member";
 import { useMemberPermissions } from "@/hooks/useMembers";
+import { usePlan } from "@/hooks/usePlan";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -31,8 +32,11 @@ export function ProjectDetailPage() {
     useTranslationMatrix(id!);
   const { data: projectMembers, isLoading: isMembersLoading } = useProjectMembers(id!);
   const { data: permissions } = useMemberPermissions();
+  const { data: planInfo } = usePlan();
   
   const canManageMembers = permissions?.permissions.canManageMembers ?? false;
+  // Free 플랜이 아닌 경우에만 멤버 섹션 표시
+  const canSeeMembers = planInfo?.plan !== "FREE";
 
   // 통계 계산
   const stats = useMemo(() => {
@@ -184,37 +188,39 @@ export function ProjectDetailPage() {
           translationsCount={stats.translationsCount}
         />
 
-        {/* Members */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              팀 멤버
-            </CardTitle>
-            <CardDescription>
-              이 프로젝트에 접근할 수 있는 팀 멤버 목록입니다
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isMembersLoading ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-24 w-full" />
-                ))}
-              </div>
-            ) : projectMembers && projectMembers.length > 0 ? (
-              <MemberList 
-                members={projectMembers} 
-                canManage={!!(canManageMembers && project.isOwner)} 
-              />
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>멤버가 없습니다</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {/* Members - Free 플랜이 아닌 경우에만 표시 */}
+        {canSeeMembers && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                팀 멤버
+              </CardTitle>
+              <CardDescription>
+                이 프로젝트에 접근할 수 있는 팀 멤버 목록입니다
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isMembersLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-24 w-full" />
+                  ))}
+                </div>
+              ) : projectMembers && projectMembers.length > 0 ? (
+                <MemberList 
+                  members={projectMembers} 
+                  canManage={!!(canManageMembers && project.isOwner)} 
+                />
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>멤버가 없습니다</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* API Key */}
         <ApiKeyDisplay projectId={project.id} />
