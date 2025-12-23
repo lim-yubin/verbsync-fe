@@ -92,7 +92,7 @@ export function SubscriptionPage() {
           description="프로젝트 규모에 맞는 최적의 플랜을 선택하세요"
         />
 
-        {/* 현재 플랜 정보 */}
+        {/* 현재 플랜 정보 (로그인한 경우에만 표시) */}
         {isLoading ? (
           <Card>
             <CardContent className="pt-6">

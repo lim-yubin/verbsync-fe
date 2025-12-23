@@ -64,6 +64,10 @@ function App() {
           path={ROUTES.REFUND}
           element={<RefundPage />}
         />
+        <Route
+          path={ROUTES.SUBSCRIPTION}
+          element={<SubscriptionPage />}
+        />
 
         {/* Protected Routes (비로그인 시 로그인 페이지로 리다이렉트) */}
         <Route
@@ -79,14 +83,6 @@ function App() {
           element={
             <ProtectedRoute>
               <SettingsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={ROUTES.SUBSCRIPTION}
-          element={
-            <ProtectedRoute>
-              <SubscriptionPage />
             </ProtectedRoute>
           }
         />
