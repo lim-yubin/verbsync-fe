@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, Home, Settings, Users } from "lucide-react";
+import { Menu, Home, Settings, Users, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useMemberPermissions } from "@/hooks/useMembers";
+import { usePlan } from "@/hooks/usePlan";
 
 interface NavItem {
   title: string;
@@ -32,10 +33,14 @@ const allNavItems: NavItem[] = [
     icon: Users,
   },
   {
+    title: "구독",
+    href: ROUTES.SUBSCRIPTION,
+    icon: CreditCard,
+  },
+  {
     title: "설정",
-    href: "/settings",
+    href: ROUTES.SETTINGS,
     icon: Settings,
-    disabled: true,
   },
 ];
 
@@ -43,11 +48,20 @@ export function MobileNav() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const { data: permissions } = useMemberPermissions();
+  const { data: planInfo } = usePlan();
   
   // 소유자만 멤버 메뉴 표시
   const isOwner = permissions?.role === "OWNER";
+  // Free 플랜이 아니고 소유자인 경우에만 멤버 메뉴 표시
+  const canSeeMembers = isOwner && planInfo?.plan !== "FREE";
+  
   const navItems = allNavItems.filter(
-    (item) => item.title !== "멤버" || isOwner
+    (item) => {
+      if (item.title === "멤버") {
+        return canSeeMembers;
+      }
+      return true;
+    }
   );
 
   return (

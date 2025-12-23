@@ -17,6 +17,8 @@ export interface RegisterDto {
   email: string;
   password: string;
   name: string;
+  agreedToTerms: boolean;
+  agreedToPrivacy: boolean;
 }
 
 export interface AuthResponse {

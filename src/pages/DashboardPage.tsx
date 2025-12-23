@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/project/EmptyState";
 import { ProjectCreateDialog } from "@/components/project/ProjectCreateDialog";
 import { useProjects } from "@/hooks/useProjects";
 import { usePlan } from "@/hooks/usePlan";
+import { ROUTES } from "@/lib/constants";
 
 export function DashboardPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -41,7 +42,7 @@ export function DashboardPage() {
             <AlertDescription>
               Starter 플랜으로 업그레이드하여 더 많은 프로젝트와 기능을
               사용하세요.{" "}
-              <a href="/pricing" className="font-semibold underline">
+              <a href={ROUTES.SUBSCRIPTION} className="font-semibold underline cursor-pointer">
                 자세히 보기
               </a>
             </AlertDescription>

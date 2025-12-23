@@ -29,6 +29,7 @@ export const ROUTES = {
   REGISTER: "/register",
   DASHBOARD: "/dashboard",
   SETTINGS: "/settings",
+  SUBSCRIPTION: "/subscription",
   PROJECT_NEW: "/projects/new",
   PROJECT_DETAIL: (id: string) => `/projects/${id}`,
   PROJECT_LOCALES: (id: string) => `/projects/${id}/locales`,
@@ -37,4 +38,7 @@ export const ROUTES = {
   PROJECT_SETTINGS: (id: string) => `/projects/${id}/settings`,
   MEMBERS: "/members",
   ACCEPT_INVITE: "/accept-invite",
+  TERMS: "/terms",
+  PRIVACY: "/privacy",
+  REFUND: "/refund",
 } as const;

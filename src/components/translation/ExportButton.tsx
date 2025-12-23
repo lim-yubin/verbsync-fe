@@ -8,11 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { exportToExcel, exportToCSV, exportToJSON } from "@/lib/export-utils";
 import type { TranslationMatrix } from "@/types/api";
 import { toast } from "sonner";
@@ -81,16 +76,13 @@ export function ExportButton({
   };
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="cursor-pointer">
-                <Download className="mr-2 h-4 w-4" />
-                내보내기
-              </Button>
-            </DropdownMenuTrigger>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="cursor-pointer">
+          <Download className="mr-2 h-4 w-4" />
+          내보내기
+        </Button>
+      </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>내보내기 형식</DropdownMenuLabel>
         {isFiltered && (
@@ -186,17 +178,5 @@ export function ExportButton({
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-        </div>
-      </TooltipTrigger>
-      {!canExportExcel && planInfo?.plan === "FREE" && (
-        <TooltipContent>
-          Starter 플랜 이상에서 Excel/CSV 내보내기가 가능합니다.{" "}
-          <a href="/pricing" className="underline">
-            업그레이드하기
-          </a>
-        </TooltipContent>
-      )}
-    </Tooltip>
   );
 }
-

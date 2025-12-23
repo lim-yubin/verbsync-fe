@@ -12,6 +12,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ROUTES } from "@/lib/constants";
 import {
   Card,
   CardContent,
@@ -33,7 +34,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { useMe, useChangePassword, useDeleteAccount } from "@/hooks/useAuth";
 import { usePlan } from "@/hooks/usePlan";
-import { ROUTES } from "@/lib/constants";
 import { PlanBadge } from "@/components/subscription/PlanBadge";
 
 const passwordSchema = z
@@ -177,15 +177,14 @@ export function SettingsPage() {
                 <div className="flex items-center gap-2">
                   <Label>현재 플랜:</Label>
                   <PlanBadge plan={planInfo.plan} />
-                  {planInfo.plan === "FREE" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => (window.location.href = "/pricing")}
-                    >
-                      업그레이드
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => (window.location.href = ROUTES.SUBSCRIPTION)}
+                    className="cursor-pointer"
+                  >
+                    플랜 관리
+                  </Button>
                 </div>
                 {planInfo.planStartedAt && (
                   <div className="text-sm text-muted-foreground">

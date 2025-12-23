@@ -10,7 +10,11 @@ import {
   ProjectSettingsPage,
   MembersPage,
   SettingsPage,
+  SubscriptionPage,
   AcceptInvitePage,
+  PrivacyPage,
+  TermsPage,
+  RefundPage,
 } from "@/pages";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { PublicRoute } from "@/components/auth/PublicRoute";
@@ -48,6 +52,18 @@ function App() {
           path={ROUTES.ACCEPT_INVITE}
           element={<AcceptInvitePage />}
         />
+        <Route
+          path={ROUTES.TERMS}
+          element={<TermsPage />}
+        />
+        <Route
+          path={ROUTES.PRIVACY}
+          element={<PrivacyPage />}
+        />
+        <Route
+          path={ROUTES.REFUND}
+          element={<RefundPage />}
+        />
 
         {/* Protected Routes (비로그인 시 로그인 페이지로 리다이렉트) */}
         <Route
@@ -63,6 +79,14 @@ function App() {
           element={
             <ProtectedRoute>
               <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.SUBSCRIPTION}
+          element={
+            <ProtectedRoute>
+              <SubscriptionPage />
             </ProtectedRoute>
           }
         />

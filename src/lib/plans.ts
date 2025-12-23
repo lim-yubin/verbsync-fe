@@ -1,10 +1,10 @@
 import type { Plan } from "@/types/api";
 
 export const PLAN_LABELS: Record<Plan, string> = {
-  FREE: "무료",
-  STARTER: "스타터",
-  PRO: "프로",
-  ENTERPRISE: "엔터프라이즈",
+  FREE: "Free",
+  STARTER: "Starter",
+  PRO: "Pro",
+  ENTERPRISE: "Enterprise",
 };
 
 export const PLAN_DESCRIPTIONS: Record<Plan, string> = {
