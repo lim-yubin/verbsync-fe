@@ -105,6 +105,14 @@ export function RefundPage() {
                   </a>
                 </p>
               </div>
+
+              {/* Extra clarity to avoid review ambiguity */}
+              <div className="bg-destructive/10 border border-destructive/20 p-4 rounded-lg">
+                <p className="text-sm leading-relaxed text-foreground">
+                  <strong>중요:</strong> Verbsync는 결제/환불을 직접 처리하지
+                  않습니다. 환불 요청은 반드시 Paddle을 통해 접수해 주세요.
+                </p>
+              </div>
             </div>
           </section>
 
@@ -135,20 +143,29 @@ export function RefundPage() {
             </div>
           </section>
 
+          {/* ✅ Updated section to reduce Paddle review risk */}
           <section>
-            <h2 className="text-2xl font-semibold mb-4">7. 문의</h2>
+            <h2 className="text-2xl font-semibold mb-4">7. 일반 문의</h2>
             <div className="bg-muted/50 p-6 rounded-lg space-y-3 text-muted-foreground">
-              <p>환불 관련 문의사항이 있으시면 아래로 연락해주세요:</p>
+              <p>
+                Verbsync 서비스 이용(기능/계정/기술 지원 등)과 관련된{" "}
+                <strong className="text-foreground">일반 문의</strong>는
+                아래로 연락해 주세요.
+              </p>
               <div>
                 <p className="font-semibold text-foreground mb-2">
-                  Verbsync 고객 지원
+                  Verbsync 고객 지원 (비결제/비환불)
                 </p>
                 <p>이메일: verbsync@gmail.com</p>
                 <p className="mt-2">응답 시간: 영업일 기준 24시간 이내</p>
               </div>
+
               <p className="text-sm mt-4">
-                환불 처리는 Paddle에서 직접 처리되므로, 환불 요청은 위의
-                Paddle 링크를 통해 진행해주시기 바랍니다.
+                ※ 결제/환불 요청은 Verbsync에서 처리할 수 없으며,{" "}
+                <strong className="text-foreground">
+                  반드시 Paddle을 통해서만
+                </strong>{" "}
+                접수됩니다. (위의 Paddle 링크를 이용해 주세요.)
               </p>
             </div>
           </section>
