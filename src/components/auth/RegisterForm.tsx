@@ -56,9 +56,7 @@ export function RegisterForm() {
     },
   });
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const agreedToTerms = watch("agreedToTerms");
-  // eslint-disable-next-line react-hooks/incompatible-library
   const agreedToPrivacy = watch("agreedToPrivacy");
 
   // 이메일 파라미터가 있으면 폼에 설정
