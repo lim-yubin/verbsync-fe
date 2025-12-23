@@ -249,6 +249,8 @@ export function ProjectSettingsPage() {
 
   // 소유자만 프로젝트 설정 수정 가능
   const isOwner = project.isOwner;
+  // 편집 권한 확인 (OWNER 또는 EDITOR만 편집 가능, VIEWER는 조회만)
+  const canEdit = project.isOwner || project.role === "EDITOR";
 
   return (
     <AppLayout>
@@ -363,18 +365,26 @@ export function ProjectSettingsPage() {
                       }
                     }}
                     placeholder="example.com"
-                    disabled={isUpdating}
+                    disabled={isUpdating || !canEdit}
+                    readOnly={!canEdit}
                   />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleAddDomain}
-                    disabled={isUpdating}
-                    className="cursor-pointer"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
+                  {canEdit && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleAddDomain}
+                      disabled={isUpdating}
+                      className="cursor-pointer"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
+                {!canEdit && (
+                  <p className="text-xs text-muted-foreground">
+                    조회자 권한으로는 API 보안 설정을 수정할 수 없습니다
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground">
                   도메인만 입력하세요 (예: example.com, app.example.com,
                   *.example.com). 프로토콜(http://)이나 경로(/)는 제외하세요.
@@ -406,16 +416,18 @@ export function ProjectSettingsPage() {
                         className="flex items-center gap-1 rounded-md border bg-muted px-2 py-1 text-sm"
                       >
                         <span className="font-mono">{domain}</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-5 w-5 cursor-pointer"
-                          onClick={() => handleRemoveDomain(domain)}
-                          disabled={isUpdating}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
+                        {canEdit && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-5 w-5 cursor-pointer"
+                            onClick={() => handleRemoveDomain(domain)}
+                            disabled={isUpdating}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -432,7 +444,7 @@ export function ProjectSettingsPage() {
                 </div>
               )}
 
-              {isOwner && (
+              {canEdit && (
                 <div className="flex justify-end">
                   <Button
                     type="submit"
