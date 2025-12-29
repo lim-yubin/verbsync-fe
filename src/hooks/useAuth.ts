@@ -5,10 +5,13 @@ import { QUERY_KEYS } from "@/lib/constants";
 import type {
   LoginDto,
   RegisterDto,
+  RegisterResponse,
   AuthResponse,
   User,
   UpdateProfileDto,
   ChangePasswordDto,
+  VerifyEmailDto,
+  ResendVerificationDto,
 } from "@/types/api";
 
 // 로그인
@@ -28,16 +31,30 @@ export function useLogin() {
 
 // 회원가입
 export function useRegister() {
-  const login = useAuthStore((state) => state.login);
-
   return useMutation({
     mutationFn: async (dto: RegisterDto) => {
-      const { data } = await api.post<AuthResponse>("/auth/register", dto);
+      const { data } = await api.post<RegisterResponse>("/auth/register", dto);
       return data;
     },
-    onSuccess: (data) => {
-      // 회원가입 성공 시 자동 로그인
-      login(data.accessToken, data.user);
+  });
+}
+
+// 이메일 인증
+export function useVerifyEmail() {
+  return useMutation({
+    mutationFn: async (dto: VerifyEmailDto) => {
+      const { data } = await api.post<{ message: string }>("/auth/verify-email", dto);
+      return data;
+    },
+  });
+}
+
+// 이메일 인증 재발송
+export function useResendVerificationEmail() {
+  return useMutation({
+    mutationFn: async (dto: ResendVerificationDto) => {
+      const { data } = await api.post<{ message: string }>("/auth/resend-verification", dto);
+      return data;
     },
   });
 }

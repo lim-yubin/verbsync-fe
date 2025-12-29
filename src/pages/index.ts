@@ -1,5 +1,8 @@
 export { LoginPage } from "./LoginPage";
 export { RegisterPage } from "./RegisterPage";
+export { VerifyEmailPage } from "./VerifyEmailPage";
+export { VerifyEmailSuccessPage } from "./VerifyEmailSuccessPage";
+export { EmailVerificationPendingPage } from "./EmailVerificationPendingPage";
 export { DashboardPage } from "./DashboardPage";
 export { ProjectDetailPage } from "./ProjectDetailPage";
 export { LocalesPage } from "./LocalesPage";

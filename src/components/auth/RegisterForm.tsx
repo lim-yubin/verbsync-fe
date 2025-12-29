@@ -77,13 +77,20 @@ export function RegisterForm() {
         agreedToPrivacy,
       },
       {
-        onSuccess: () => {
-          toast.success("회원가입 성공! 환영합니다 🎉");
-          // 초대 토큰이 있으면 초대 수락 페이지로 이동
-          if (inviteToken) {
-            navigate(`${ROUTES.ACCEPT_INVITE}?token=${inviteToken}`);
+        onSuccess: (response) => {
+          if (response.requiresEmailVerification) {
+            // 이메일 인증이 필요한 경우
+            toast.success("회원가입이 완료되었습니다. 이메일 인증을 완료해주세요.");
+            navigate(`/email-verification-pending?email=${encodeURIComponent(data.email)}`);
           } else {
-            navigate(ROUTES.DASHBOARD);
+            // 이메일 인증이 필요 없는 경우 (개발 환경 등)
+            toast.success("회원가입 성공! 환영합니다 🎉");
+            // 초대 토큰이 있으면 초대 수락 페이지로 이동
+            if (inviteToken) {
+              navigate(`${ROUTES.ACCEPT_INVITE}?token=${inviteToken}`);
+            } else {
+              navigate(ROUTES.DASHBOARD);
+            }
           }
         },
         onError: (error: Error) => {
