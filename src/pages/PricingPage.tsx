@@ -1,7 +1,13 @@
 import { Link } from "react-router-dom";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { PLAN_LABELS } from "@/lib/plans";
 import { ROUTES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -46,7 +52,8 @@ const plans: PlanOption[] = [
       "팀 멤버 초대 (최대 3명)",
     ],
     cta: "스타터 시작하기",
-    featured: true,
+    featured: false, // 추후 사용 예정: true로 변경 가능
+    comingSoon: true,
   },
   {
     name: "PRO",
@@ -90,16 +97,19 @@ export function PricingPage() {
                 plan.comingSoon
                   ? "opacity-75 cursor-not-allowed"
                   : "hover:shadow-lg",
-                plan.featured
-                  ? "border-primary/50 ring-1 ring-primary/20"
-                  : ""
+                // 추후 사용 예정: featured 스타일
+                // plan.featured
+                //   ? "border-primary/50 ring-1 ring-primary/20"
+                //   : ""
+                ""
               )}
             >
-              {plan.featured && !plan.comingSoon && (
+              {/* 추후 사용 예정: Most Popular 배지 */}
+              {/* {plan.featured && !plan.comingSoon && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
                   Most Popular
                 </div>
-              )}
+              )} */}
               {plan.comingSoon && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted border border-border px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   Coming Soon
@@ -107,7 +117,9 @@ export function PricingPage() {
               )}
 
               <CardHeader>
-                <CardTitle className="text-2xl">{PLAN_LABELS[plan.name]}</CardTitle>
+                <CardTitle className="text-2xl">
+                  {PLAN_LABELS[plan.name]}
+                </CardTitle>
                 <div className="mt-4 flex items-baseline">
                   <span className="text-4xl font-bold">{plan.price}</span>
                   {plan.period && (
@@ -124,7 +136,10 @@ export function PricingPage() {
               <CardContent className="flex-1 space-y-4">
                 <ul className="space-y-3">
                   {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3 text-sm">
+                    <li
+                      key={feature}
+                      className="flex items-start gap-3 text-sm"
+                    >
                       <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <Check className="h-3 w-3" />
                       </div>
@@ -145,10 +160,13 @@ export function PricingPage() {
                   ) : (
                     <Link to={ROUTES.REGISTER} className="block">
                       <Button
-                        variant={plan.featured ? "default" : "outline"}
+                        variant="outline"
+                        // 추후 사용 예정: featured 버튼 스타일
+                        // variant={plan.featured ? "default" : "outline"}
                         className={cn(
-                          "w-full cursor-pointer",
-                          plan.featured && "shadow-md"
+                          "w-full cursor-pointer"
+                          // 추후 사용 예정: featured 버튼 스타일
+                          // plan.featured && "shadow-md"
                         )}
                       >
                         {plan.cta}
@@ -160,30 +178,6 @@ export function PricingPage() {
             </Card>
           ))}
         </div>
-
-        {/* CTA Section */}
-        <Card className="bg-muted/50">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-4">
-              <h2 className="text-2xl font-bold">지금 바로 시작하세요</h2>
-              <p className="text-muted-foreground">
-                무료 플랜으로 시작하고, 필요에 따라 언제든지 업그레이드할 수 있습니다.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
-                <Link to={ROUTES.REGISTER}>
-                  <Button size="lg" className="cursor-pointer">
-                    무료로 시작하기
-                  </Button>
-                </Link>
-                <Link to={ROUTES.LOGIN}>
-                  <Button size="lg" variant="outline" className="cursor-pointer">
-                    로그인
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* 엔터프라이즈 문의 */}
         <div className="mt-16 text-center">
@@ -201,4 +195,3 @@ export function PricingPage() {
     </div>
   );
 }
-

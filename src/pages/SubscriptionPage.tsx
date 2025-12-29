@@ -50,7 +50,8 @@ const plans: PlanOption[] = [
       "팀 멤버 초대 (최대 3명)",
     ],
     cta: "업그레이드",
-    featured: true,
+    featured: false, // 추후 사용 예정: true로 변경 가능
+    comingSoon: true,
   },
   {
     name: "PRO",
@@ -153,17 +154,20 @@ export function SubscriptionPage() {
                   plan.comingSoon
                     ? "opacity-75 cursor-not-allowed"
                     : "hover:shadow-lg",
-                  plan.featured
-                    ? "border-primary/50 ring-1 ring-primary/20"
-                    : "",
+                  // 추후 사용 예정: featured 스타일
+                  // plan.featured
+                  //   ? "border-primary/50 ring-1 ring-primary/20"
+                  //   : "",
+                  "",
                   isCurrentPlan && "ring-2 ring-primary"
                 )}
               >
-                {plan.featured && !plan.comingSoon && (
+                {/* 추후 사용 예정: Most Popular 배지 */}
+                {/* {plan.featured && !plan.comingSoon && (
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
                     Most Popular
                   </div>
-                )}
+                )} */}
                 {plan.comingSoon && (
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted border border-border px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Coming Soon
@@ -217,10 +221,13 @@ export function SubscriptionPage() {
                       </Button>
                     ) : (
                       <Button
-                        variant={plan.featured ? "default" : "outline"}
+                        variant="outline"
+                        // 추후 사용 예정: featured 버튼 스타일
+                        // variant={plan.featured ? "default" : "outline"}
                         className={cn(
-                          "w-full cursor-pointer",
-                          plan.featured && "shadow-md"
+                          "w-full cursor-pointer"
+                          // 추후 사용 예정: featured 버튼 스타일
+                          // plan.featured && "shadow-md"
                         )}
                         onClick={() => handleUpgrade(plan.name)}
                       >
