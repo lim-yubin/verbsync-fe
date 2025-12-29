@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Save, Trash2, Info, Plus, Upload } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -44,6 +44,8 @@ import {
   extractNamespaces,
   sortKeys,
 } from "@/lib/translation-utils";
+import { canAddKey, getUpgradeMessage } from "@/lib/plans";
+import { ROUTES } from "@/lib/constants";
 import {
   TranslationFilters,
   TranslationTableHeader,
@@ -55,6 +57,7 @@ import {
 
 export function TranslationsPage() {
   const { id: projectId } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { data: project } = useProject(projectId!);
   const { data: planInfo } = usePlan();
   
@@ -243,6 +246,33 @@ export function TranslationsPage() {
     if (!trimmedKeyName.includes(".")) {
       toast.error("키 이름은 namespace를 포함해야 합니다 (예: login.title)");
       return;
+    }
+
+    // 플랜 제한 체크
+    if (planInfo && keys) {
+      if (!canAddKey(planInfo.plan, keys.length)) {
+        const limit =
+          planInfo.plan === "FREE"
+            ? 100
+            : planInfo.plan === "STARTER"
+            ? 1000
+            : planInfo.plan === "PRO"
+            ? 10000
+            : Infinity;
+        toast.error(
+          `번역 키 추가 제한에 도달했습니다. (현재 플랜: ${limit}개)`,
+          {
+            description: getUpgradeMessage(planInfo.plan, "keys"),
+            action: {
+              label: "플랜 보기",
+              onClick: () => {
+                navigate(ROUTES.PRICING);
+              },
+            },
+          }
+        );
+        return;
+      }
     }
 
     createKey(

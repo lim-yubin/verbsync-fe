@@ -21,10 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCreateProject } from "@/hooks/useProjects";
+import { useCreateProject, useProjects } from "@/hooks/useProjects";
 import { useCreateLocale } from "@/hooks/useLocales";
+import { usePlan } from "@/hooks/usePlan";
 import { ROUTES } from "@/lib/constants";
 import { SUPPORTED_LOCALES } from "@/lib/locales";
+import { canCreateProject, getUpgradeMessage } from "@/lib/plans";
 
 const projectSchema = z.object({
   name: z
@@ -46,7 +48,10 @@ export function ProjectCreateDialog({
   onOpenChange,
 }: ProjectCreateDialogProps) {
   const navigate = useNavigate();
-  const { mutate: createProject, isPending: isCreatingProject } = useCreateProject();
+  const { mutate: createProject, isPending: isCreatingProject } =
+    useCreateProject();
+  const { data: projects } = useProjects();
+  const { data: planInfo } = usePlan();
 
   const {
     register,
@@ -109,6 +114,33 @@ export function ProjectCreateDialog({
   }, [pendingLocaleCreation]);
 
   const onSubmit = (data: ProjectFormData) => {
+    // 플랜 제한 체크
+    if (planInfo) {
+      const ownedProjects = projects?.filter((p) => p.isOwner) || [];
+      if (!canCreateProject(planInfo.plan, ownedProjects.length)) {
+        const limit =
+          planInfo.plan === "FREE"
+            ? 1
+            : planInfo.plan === "STARTER"
+            ? 5
+            : Infinity;
+        toast.error(
+          `프로젝트 생성 제한에 도달했습니다. (현재 플랜: ${limit}개)`,
+          {
+            description: getUpgradeMessage(planInfo.plan, "projects"),
+            action: {
+              label: "플랜 보기",
+              onClick: () => {
+                navigate(ROUTES.PRICING);
+                onOpenChange(false);
+              },
+            },
+          }
+        );
+        return;
+      }
+    }
+
     createProject(data, {
       onSuccess: (project) => {
         // 선택된 기본 언어 정보 찾기
@@ -212,4 +244,3 @@ export function ProjectCreateDialog({
     </Dialog>
   );
 }
-

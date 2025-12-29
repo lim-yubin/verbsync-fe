@@ -14,7 +14,10 @@ import { toast } from "sonner";
 import type { Locale } from "@/hooks/useLocales";
 import { api } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
-import { QUERY_KEYS } from "@/lib/constants";
+import { QUERY_KEYS, ROUTES } from "@/lib/constants";
+import { usePlan } from "@/hooks/usePlan";
+import { canAddLocale, getUpgradeMessage } from "@/lib/plans";
+import { useNavigate } from "react-router-dom";
 
 interface AddLocaleDialogProps {
   open: boolean;
@@ -34,6 +37,8 @@ export function AddLocaleDialog({
   );
   const [isAdding, setIsAdding] = useState(false);
   const queryClient = useQueryClient();
+  const { data: planInfo } = usePlan();
+  const navigate = useNavigate();
 
   // 이미 추가된 언어 제외
   const availableLocales = SUPPORTED_LOCALES.filter(
@@ -64,6 +69,38 @@ export function AddLocaleDialog({
     if (selectedLocaleCodes.size === 0) {
       toast.error("언어를 선택해주세요");
       return;
+    }
+
+    // 플랜 제한 체크
+    if (planInfo) {
+      const activeLocales = existingLocales.filter((l) => l.isActive);
+      const willExceedLimit = !canAddLocale(
+        planInfo.plan,
+        activeLocales.length + selectedLocaleCodes.size
+      );
+
+      if (willExceedLimit) {
+        const limit =
+          planInfo.plan === "FREE"
+            ? 3
+            : planInfo.plan === "STARTER"
+            ? 10
+            : Infinity;
+        toast.error(
+          `언어 추가 제한에 도달했습니다. (현재 플랜: ${limit}개)`,
+          {
+            description: getUpgradeMessage(planInfo.plan, "locales"),
+            action: {
+              label: "플랜 보기",
+              onClick: () => {
+                navigate(ROUTES.PRICING);
+                onOpenChange(false);
+              },
+            },
+          }
+        );
+        return;
+      }
     }
 
     setIsAdding(true);
