@@ -26,6 +26,19 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface RegisterResponse {
+  user: User;
+  requiresEmailVerification: boolean;
+}
+
+export interface VerifyEmailDto {
+  token: string;
+}
+
+export interface ResendVerificationDto {
+  email: string;
+}
+
 export interface UpdateProfileDto {
   name?: string;
   email?: string;

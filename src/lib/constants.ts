@@ -27,6 +27,8 @@ export const ROUTES = {
   HOME: "/",
   LOGIN: "/login",
   REGISTER: "/register",
+  VERIFY_EMAIL: "/verify-email",
+  VERIFY_EMAIL_SUCCESS: "/verify-email/success",
   DASHBOARD: "/dashboard",
   SETTINGS: "/settings",
   PRICING: "/pricing",

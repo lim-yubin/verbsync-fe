@@ -3,6 +3,9 @@ import { ROUTES } from "@/lib/constants";
 import {
   LoginPage,
   RegisterPage,
+  VerifyEmailPage,
+  VerifyEmailSuccessPage,
+  EmailVerificationPendingPage,
   DashboardPage,
   ProjectDetailPage,
   LocalesPage,
@@ -48,6 +51,18 @@ function App() {
               <RegisterPage />
             </PublicRoute>
           }
+        />
+        <Route
+          path={ROUTES.VERIFY_EMAIL}
+          element={<VerifyEmailPage />}
+        />
+        <Route
+          path={ROUTES.VERIFY_EMAIL_SUCCESS}
+          element={<VerifyEmailSuccessPage />}
+        />
+        <Route
+          path="/email-verification-pending"
+          element={<EmailVerificationPendingPage />}
         />
         <Route
           path={ROUTES.ACCEPT_INVITE}
