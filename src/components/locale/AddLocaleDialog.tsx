@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { SUPPORTED_LOCALES } from "@/lib/locales";
+import { SUPPORTED_LOCALES, getLocaleName } from "@/lib/locales";
 import { toast } from "sonner";
 import type { Locale } from "@/hooks/useLocales";
 import { api } from "@/lib/api";
@@ -33,7 +33,7 @@ export function AddLocaleDialog({
   projectId,
   existingLocales,
 }: AddLocaleDialogProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedLocaleCodes, setSelectedLocaleCodes] = useState<Set<string>>(
     new Set()
   );
@@ -118,7 +118,7 @@ export function AddLocaleDialog({
       try {
         await api.post<Locale>(`/projects/${projectId}/locales`, {
           code: locale.code,
-          name: locale.name,
+          name: locale.nameKo,
         });
         successCount++;
       } catch (error) {
@@ -220,7 +220,7 @@ export function AddLocaleDialog({
                         >
                           <div className="flex items-center justify-between">
                             <span>
-                              {locale.name} ({locale.code.toUpperCase()})
+                              {getLocaleName(locale, i18n.language)} ({locale.code.toUpperCase()})
                             </span>
                           </div>
                         </Label>

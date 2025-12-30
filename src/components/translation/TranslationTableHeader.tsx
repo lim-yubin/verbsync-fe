@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { getLocaleNameByCode } from "@/lib/locales";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   TableHead,
@@ -20,7 +21,7 @@ export function TranslationTableHeader({
   totalCount,
   onSelectAll,
 }: TranslationTableHeaderProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isAllSelected = totalCount > 0 && selectedCount === totalCount;
 
   return (
@@ -38,7 +39,7 @@ export function TranslationTableHeader({
         </TableHead>
         {locales.map((locale) => (
           <TableHead key={locale.code} className="min-w-[300px]">
-            <div className="font-semibold">{locale.name}</div>
+            <div className="font-semibold">{getLocaleNameByCode(locale.code, i18n.language)}</div>
             <div className="text-xs text-muted-foreground font-normal">
               {locale.code}
             </div>

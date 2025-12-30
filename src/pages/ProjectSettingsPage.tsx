@@ -46,7 +46,7 @@ import {
   useDeleteProject,
 } from "@/hooks/useProjects";
 import { useLocales } from "@/hooks/useLocales";
-import { SUPPORTED_LOCALES } from "@/lib/locales";
+import { SUPPORTED_LOCALES, getLocaleName } from "@/lib/locales";
 import { ROUTES } from "@/lib/constants";
 import type { UpdateProjectDto } from "@/types/api";
 
@@ -57,7 +57,7 @@ type ProjectSettingsFormData = {
 };
 
 export function ProjectSettingsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id: projectId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   
@@ -311,7 +311,7 @@ export function ProjectSettingsPage() {
                   <SelectContent>
                     {availableLocales.map((locale) => (
                       <SelectItem key={locale.code} value={locale.code}>
-                        {locale.name} ({locale.code})
+                        {getLocaleName(locale, i18n.language)} ({locale.code})
                       </SelectItem>
                     ))}
                   </SelectContent>

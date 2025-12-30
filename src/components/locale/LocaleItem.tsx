@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getLocaleNameByCode } from "@/lib/locales";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -31,7 +32,7 @@ interface LocaleItemProps {
 }
 
 export function LocaleItem({ locale, projectId, isDefault, canEdit = true }: LocaleItemProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { mutate: updateStatus, isPending: isUpdating } = useUpdateLocaleStatus(
     projectId,
@@ -95,7 +96,7 @@ export function LocaleItem({ locale, projectId, isDefault, canEdit = true }: Loc
           <div className="flex items-center gap-3 flex-1">
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <span className="font-semibold">{locale.name}</span>
+                <span className="font-semibold">{getLocaleNameByCode(locale.code, i18n.language)}</span>
                 <Badge variant="secondary" className="text-xs">
                   {locale.code}
                 </Badge>

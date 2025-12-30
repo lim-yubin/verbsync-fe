@@ -26,7 +26,7 @@ import { useCreateProject, useProjects } from "@/hooks/useProjects";
 import { useCreateLocale } from "@/hooks/useLocales";
 import { usePlan } from "@/hooks/usePlan";
 import { ROUTES } from "@/lib/constants";
-import { SUPPORTED_LOCALES } from "@/lib/locales";
+import { SUPPORTED_LOCALES, getLocaleName } from "@/lib/locales";
 import { canCreateProject, getUpgradeMessage } from "@/lib/plans";
 
 interface ProjectCreateDialogProps {
@@ -38,9 +38,9 @@ export function ProjectCreateDialog({
   open,
   onOpenChange,
 }: ProjectCreateDialogProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  
+
   const projectSchema = z.object({
     name: z
       .string()
@@ -126,19 +126,16 @@ export function ProjectCreateDialog({
             : planInfo.plan === "STARTER"
             ? 5
             : Infinity;
-        toast.error(
-          t("projectCreate.projectLimitReached", { limit }),
-          {
-            description: getUpgradeMessage(planInfo.plan, "projects"),
-            action: {
-              label: t("projectCreate.viewPlan"),
-              onClick: () => {
-                navigate(ROUTES.PRICING);
-                onOpenChange(false);
-              },
+        toast.error(t("projectCreate.projectLimitReached", { limit }), {
+          description: getUpgradeMessage(planInfo.plan, "projects"),
+          action: {
+            label: t("projectCreate.viewPlan"),
+            onClick: () => {
+              navigate(ROUTES.PRICING);
+              onOpenChange(false);
             },
-          }
-        );
+          },
+        });
         return;
       }
     }
@@ -159,7 +156,7 @@ export function ProjectCreateDialog({
         setPendingLocaleCreation({
           projectId: project.id,
           code: data.defaultLocale,
-          name: selectedLocaleInfo.name,
+          name: selectedLocaleInfo.nameKo,
         });
       },
       onError: (error) => {
@@ -183,7 +180,8 @@ export function ProjectCreateDialog({
           {/* 프로젝트 이름 */}
           <div className="space-y-2">
             <Label htmlFor="name">
-              {t("project.projectName")} <span className="text-destructive">*</span>
+              {t("project.projectName")}{" "}
+              <span className="text-destructive">*</span>
             </Label>
             <Input
               id="name"
@@ -199,7 +197,8 @@ export function ProjectCreateDialog({
           {/* 기본 언어 */}
           <div className="space-y-2">
             <Label htmlFor="defaultLocale">
-              {t("project.defaultLocale")} <span className="text-destructive">*</span>
+              {t("project.defaultLocale")}{" "}
+              <span className="text-destructive">*</span>
             </Label>
             <Select
               value={selectedLocale}
@@ -207,12 +206,15 @@ export function ProjectCreateDialog({
               disabled={isPending}
             >
               <SelectTrigger>
-                <SelectValue placeholder={t("projectCreate.defaultLocalePlaceholder")} />
+                <SelectValue
+                  placeholder={t("projectCreate.defaultLocalePlaceholder")}
+                />
               </SelectTrigger>
               <SelectContent>
                 {SUPPORTED_LOCALES.map((locale) => (
                   <SelectItem key={locale.code} value={locale.code}>
-                    {locale.name} ({locale.code.toUpperCase()})
+                    {getLocaleName(locale, i18n.language)} (
+                    {locale.code.toUpperCase()})
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -238,8 +240,14 @@ export function ProjectCreateDialog({
             >
               {t("common.cancel")}
             </Button>
-            <Button type="submit" disabled={isPending} className="cursor-pointer">
-              {isPending ? t("projectCreate.creating") : t("projectCreate.create")}
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="cursor-pointer"
+            >
+              {isPending
+                ? t("projectCreate.creating")
+                : t("projectCreate.create")}
             </Button>
           </div>
         </form>
