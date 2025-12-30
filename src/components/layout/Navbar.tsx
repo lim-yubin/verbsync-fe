@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/constants";
 import { ThemeToggle } from "./ThemeToggle";
+import { LanguageToggle } from "./LanguageToggle";
 import { UserMenu } from "./UserMenu";
 import { MobileNav } from "./MobileNav";
 import { Logo } from "@/components/ui/Logo";
@@ -25,6 +26,7 @@ export function Navbar() {
         <div className="flex flex-1 items-center justify-end">
           {/* Right Side Actions */}
           <nav className="flex items-center gap-2">
+            <LanguageToggle />
             <ThemeToggle />
             <UserMenu />
           </nav>

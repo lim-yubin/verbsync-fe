@@ -1,10 +1,14 @@
+import { useTranslation } from "react-i18next";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { LanguageToggle } from "@/components/layout/LanguageToggle";
 import { AuthHero } from "@/components/auth/AuthHero";
 import { Logo } from "@/components/ui/Logo";
 import { AuthFooter } from "@/components/layout/AuthFooter";
 
 export function LoginPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 flex">
@@ -15,7 +19,8 @@ export function LoginPage() {
 
         {/* Right Side - Login Form */}
         <div className="flex-1 flex items-center justify-center p-4 sm:p-8 relative">
-          <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
+          <div className="absolute top-4 right-4 sm:top-8 sm:right-8 flex items-center gap-2">
+            <LanguageToggle />
             <ThemeToggle />
           </div>
 
@@ -24,17 +29,17 @@ export function LoginPage() {
             <div className="lg:hidden text-center">
               <a
                 href="/"
-                className="inline-flex items-center gap-2 justify-center"
+                className="inline-flex items-center gap-2 justify-center cursor-pointer"
               >
                 <Logo width={32} height={32} />
-                <h1 className="text-2xl font-bold text-foreground">Verbsync</h1>
+                <h1 className="text-2xl font-bold text-foreground">{t("common.appName")}</h1>
               </a>
             </div>
 
             <div>
-              <h2 className="text-2xl font-bold text-foreground mb-2">로그인</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-2">{t("auth.loginTitle")}</h2>
               <p className="text-muted-foreground">
-                Verbsync 계정으로 로그인하세요
+                {t("auth.loginDescription")}
               </p>
             </div>
 

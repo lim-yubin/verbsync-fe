@@ -1,7 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/constants";
 
 export function AuthFooter() {
+  const { t } = useTranslation();
+  
   return (
     <footer className="border-t bg-muted/30 py-6">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -11,29 +14,29 @@ export function AuthFooter() {
               to={ROUTES.TERMS}
               className="hover:text-foreground transition-colors cursor-pointer"
             >
-              이용약관
+              {t("authFooter.terms")}
             </Link>
             <Link
               to={ROUTES.PRIVACY}
               className="hover:text-foreground transition-colors cursor-pointer"
             >
-              개인정보처리방침
+              {t("authFooter.privacy")}
             </Link>
             <Link
               to={ROUTES.REFUND}
               className="hover:text-foreground transition-colors cursor-pointer"
             >
-              환불정책
+              {t("authFooter.refund")}
             </Link>
             <Link
               to={ROUTES.PRICING}
               className="hover:text-foreground transition-colors cursor-pointer"
             >
-              가격
+              {t("authFooter.pricing")}
             </Link>
           </div>
           <div className="text-center sm:text-right">
-            <p>© {new Date().getFullYear()} Verbsync. All rights reserved.</p>
+            <p>{t("authFooter.copyright", { year: new Date().getFullYear() })}</p>
           </div>
         </div>
       </div>

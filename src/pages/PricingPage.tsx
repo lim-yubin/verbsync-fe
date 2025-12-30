@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,66 +25,68 @@ interface PlanOption {
   comingSoon?: boolean;
 }
 
-const plans: PlanOption[] = [
-  {
-    name: "FREE",
-    price: "$0",
-    description: "개인 개발자 및 사이드 프로젝트를 위한 무료 플랜",
-    features: [
-      "프로젝트 1개",
-      "번역 키 100개",
-      "언어 3개 지원",
-      "실시간 OTA 업데이트",
-      "도메인 보안 설정",
-    ],
-    cta: "무료로 시작하기",
-    featured: false,
-  },
-  {
-    name: "STARTER",
-    price: "$19",
-    period: "/month",
-    description: "성장하는 프로젝트와 소규모 팀을 위한 플랜",
-    features: [
-      "프로젝트 5개",
-      "번역 키 1,000개",
-      "언어 10개 지원",
-      "Excel/CSV Import & Export",
-      "팀 멤버 초대 (최대 3명)",
-    ],
-    cta: "스타터 시작하기",
-    featured: false, // 추후 사용 예정: true로 변경 가능
-    comingSoon: true,
-  },
-  {
-    name: "PRO",
-    price: "$79",
-    period: "/month",
-    description: "대규모 프로젝트와 전문적인 관리가 필요한 팀",
-    features: [
-      "프로젝트 무제한",
-      "번역 키 10,000개",
-      "모든 언어 무제한 지원",
-      "AI 자동 번역 (1,000회/월)",
-      "번역 히스토리 및 롤백",
-    ],
-    cta: "프로 시작하기",
-    featured: false,
-    comingSoon: true,
-  },
-];
-
 export function PricingPage() {
+  const { t } = useTranslation();
+  
+  const plans: PlanOption[] = [
+    {
+      name: "FREE",
+      price: "$0",
+      description: t("subscription.freeDescription"),
+      features: [
+        t("subscription.freeFeatures1"),
+        t("subscription.freeFeatures2"),
+        t("subscription.freeFeatures3"),
+        t("subscription.freeFeatures4"),
+        t("subscription.freeFeatures5"),
+      ],
+      cta: t("pricing.getStarted"),
+      featured: false,
+    },
+    {
+      name: "STARTER",
+      price: "$19",
+      period: "/month",
+      description: t("subscription.starterDescription"),
+      features: [
+        t("subscription.starterFeatures1"),
+        t("subscription.starterFeatures2"),
+        t("subscription.starterFeatures3"),
+        t("subscription.starterFeatures4"),
+        t("subscription.starterFeatures5"),
+      ],
+      cta: t("pricing.starterGetStarted"),
+      featured: false,
+      comingSoon: true,
+    },
+    {
+      name: "PRO",
+      price: "$79",
+      period: "/month",
+      description: t("subscription.proDescription"),
+      features: [
+        t("subscription.proFeatures1"),
+        t("subscription.proFeatures2"),
+        t("subscription.proFeatures3"),
+        t("subscription.proFeatures4"),
+        t("subscription.proFeatures5"),
+      ],
+      cta: t("pricing.proGetStarted"),
+      featured: false,
+      comingSoon: true,
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl font-bold tracking-tight mb-4">
-            간단하고 투명한 가격
+            {t("pricing.subtitle")}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            프로젝트 규모에 맞는 최적의 플랜을 선택하세요.
+            {t("pricing.description")}
           </p>
         </div>
 
@@ -112,7 +115,7 @@ export function PricingPage() {
               )} */}
               {plan.comingSoon && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted border border-border px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                  Coming Soon
+                  {t("subscription.comingSoon")}
                 </div>
               )}
 
@@ -155,19 +158,13 @@ export function PricingPage() {
                       variant="outline"
                       className="w-full cursor-not-allowed"
                     >
-                      추후 업데이트 예정
+                      {t("pricing.updateLater")}
                     </Button>
                   ) : (
                     <Link to={ROUTES.REGISTER} className="block">
                       <Button
                         variant="outline"
-                        // 추후 사용 예정: featured 버튼 스타일
-                        // variant={plan.featured ? "default" : "outline"}
-                        className={cn(
-                          "w-full cursor-pointer"
-                          // 추후 사용 예정: featured 버튼 스타일
-                          // plan.featured && "shadow-md"
-                        )}
+                        className={cn("w-full cursor-pointer")}
                       >
                         {plan.cta}
                       </Button>
@@ -182,12 +179,12 @@ export function PricingPage() {
         {/* 엔터프라이즈 문의 */}
         <div className="mt-16 text-center">
           <p className="text-sm text-muted-foreground">
-            대규모 팀을 위한 엔터프라이즈 플랜이 필요하신가요?{" "}
+            {t("pricing.enterpriseInquiry")}{" "}
             <a
               href="mailto:verbsync@gmail.com"
               className="font-semibold text-primary hover:underline underline-offset-4 cursor-pointer"
             >
-              영업팀에 문의하기
+              {t("pricing.contactSales")}
             </a>
           </p>
         </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Globe, Key, Languages } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
@@ -12,24 +13,26 @@ export function ProjectStats({
   keysCount,
   translationsCount,
 }: ProjectStatsProps) {
+  const { t } = useTranslation();
+  
   const stats = [
     {
-      label: "언어",
+      label: t("stats.languages"),
       value: localesCount,
       icon: Globe,
-      description: "활성화된 언어 수",
+      description: t("stats.languagesDescription"),
     },
     {
-      label: "번역 키",
+      label: t("stats.keys"),
       value: keysCount,
       icon: Key,
-      description: "등록된 키 수",
+      description: t("stats.keysDescription"),
     },
     {
-      label: "번역",
+      label: t("stats.translations"),
       value: translationsCount,
       icon: Languages,
-      description: "작성된 번역 수",
+      description: t("stats.translationsDescription"),
     },
   ];
 

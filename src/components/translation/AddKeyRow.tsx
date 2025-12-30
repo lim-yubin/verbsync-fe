@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,6 +38,7 @@ export function AddKeyRow({
   onCancel,
   onKeyDown,
 }: AddKeyRowProps) {
+  const { t } = useTranslation();
   const isMac =
     navigator.platform.includes("Mac") || navigator.userAgent.includes("Mac");
 
@@ -54,12 +56,12 @@ export function AddKeyRow({
             value={keyName}
             onChange={onKeyNameChange}
             existingKeys={existingKeys}
-            placeholder="새 키 이름 (예: login.title)"
+            placeholder={t("addKey.namePlaceholder")}
             onKeyDown={onKeyDown}
             autoFocus
           />
           <Textarea
-            placeholder="설명 (선택)"
+            placeholder={t("addKey.descriptionPlaceholder")}
             value={keyDescription}
             onChange={(e) => onKeyDescriptionChange(e.target.value)}
             onKeyDown={onKeyDown}
@@ -77,15 +79,15 @@ export function AddKeyRow({
                       disabled={
                         isCreating || !keyName.trim() || !isValidKeyName
                       }
-                      className="h-7"
+                      className="h-7 cursor-pointer"
                     >
                       <Plus className="h-3 w-3 mr-1" />
-                      {isCreating ? "추가 중..." : "추가"}
+                      {isCreating ? t("addKey.adding") : t("addKey.add")}
                     </Button>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>키 이름은 dot notation이어야 합니다 (예: login.title)</p>
+                  <p>{t("addKey.tooltip")}</p>
                 </TooltipContent>
               </Tooltip>
             ) : (
@@ -93,10 +95,10 @@ export function AddKeyRow({
                 size="sm"
                 onClick={onAdd}
                 disabled={isCreating || !keyName.trim() || !isValidKeyName}
-                className="h-7"
+                className="h-7 cursor-pointer"
               >
                 <Plus className="h-3 w-3 mr-1" />
-                {isCreating ? "추가 중..." : "추가"}
+                {isCreating ? t("addKey.adding") : t("addKey.add")}
               </Button>
             )}
             <Button
@@ -104,13 +106,13 @@ export function AddKeyRow({
               variant="ghost"
               onClick={onCancel}
               disabled={isCreating}
-              className="h-7"
+              className="h-7 cursor-pointer"
             >
-              취소
+              {t("addKey.cancel")}
             </Button>
             {keyName && (
               <span className="text-xs text-muted-foreground">
-                {isMac ? "Cmd+Enter" : "Ctrl+Enter"}: 추가, Esc: 취소
+                {t("addKey.shortcut", { shortcut: isMac ? "Cmd+Enter" : "Ctrl+Enter" })}
               </span>
             )}
           </div>
@@ -120,7 +122,7 @@ export function AddKeyRow({
         <TableCell key={locale.code} className="p-2">
           <div className="min-h-[60px] p-3 rounded bg-muted/50 flex items-center justify-center border-2 border-dashed">
             <span className="text-xs text-muted-foreground italic">
-              키 추가 후 번역 가능
+              {t("addKey.afterAdd")}
             </span>
           </div>
         </TableCell>

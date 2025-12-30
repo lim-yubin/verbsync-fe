@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { Home, Globe, Languages, Settings, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -5,13 +6,14 @@ import { ROUTES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 
 interface NavItem {
-  title: string;
+  titleKey: string;
   href: string;
   icon: React.ElementType;
   disabled?: boolean;
 }
 
 export function ProjectSidebar() {
+  const { t } = useTranslation();
   const location = useLocation();
   const { id: projectId } = useParams<{ id: string }>();
 
@@ -19,22 +21,22 @@ export function ProjectSidebar() {
 
   const navItems: NavItem[] = [
     {
-      title: "개요",
+      titleKey: "project.overview",
       href: ROUTES.PROJECT_DETAIL(projectId),
       icon: Home,
     },
     {
-      title: "언어",
+      titleKey: "project.locales",
       href: ROUTES.PROJECT_LOCALES(projectId),
       icon: Globe,
     },
     {
-      title: "번역",
+      titleKey: "project.translations",
       href: ROUTES.PROJECT_TRANSLATIONS(projectId),
       icon: Languages,
     },
     {
-      title: "설정",
+      titleKey: "project.settings",
       href: ROUTES.PROJECT_SETTINGS(projectId),
       icon: Settings,
     },
@@ -47,13 +49,13 @@ export function ProjectSidebar() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
+          className="h-8 w-8 cursor-pointer"
           onClick={() => window.history.back()}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <span className="text-sm font-semibold text-muted-foreground">
-          프로젝트
+          {t("project.title")}
         </span>
       </div>
 
@@ -77,7 +79,7 @@ export function ProjectSidebar() {
                 )}
               >
                 <Icon className="h-4 w-4" />
-                <span>{item.title}</span>
+                <span>{t(item.titleKey)}</span>
               </Link>
             );
           })}

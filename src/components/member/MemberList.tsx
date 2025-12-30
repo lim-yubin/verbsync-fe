@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -39,6 +40,7 @@ function sortMembers(members: ProjectMember[]): ProjectMember[] {
 }
 
 export function MemberList({ canManage, members: propMembers }: MemberListProps) {
+  const { t } = useTranslation();
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const { data: fetchedMembers, isLoading } = useMembers();
   const { data: planInfo } = usePlan();
@@ -70,9 +72,9 @@ export function MemberList({ canManage, members: propMembers }: MemberListProps)
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted mb-4">
           <Users className="h-6 w-6 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-semibold mb-2">멤버가 없습니다</h3>
+        <h3 className="text-lg font-semibold mb-2">{t("memberList.noMembers")}</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          팀 멤버를 초대하여 함께 작업하세요
+          {t("memberList.noMembersDescription")}
         </p>
         {canManage && (
           canInviteMembers ? (
@@ -81,7 +83,7 @@ export function MemberList({ canManage, members: propMembers }: MemberListProps)
               className="cursor-pointer"
             >
               <Plus className="mr-2 h-4 w-4" />
-              멤버 초대
+              {t("memberList.invite")}
             </Button>
           ) : (
             <Tooltip>
@@ -91,13 +93,13 @@ export function MemberList({ canManage, members: propMembers }: MemberListProps)
                   className="cursor-not-allowed opacity-50"
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  멤버 초대
+                  {t("memberList.invite")}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                Starter 플랜 이상에서 사용 가능합니다.{" "}
-                <a href="/pricing" className="underline">
-                  업그레이드하기
+                {t("memberList.starterRequired")}{" "}
+                <a href="/pricing" className="underline cursor-pointer">
+                  {t("memberList.upgrade")}
                 </a>
               </TooltipContent>
             </Tooltip>
@@ -112,9 +114,9 @@ export function MemberList({ canManage, members: propMembers }: MemberListProps)
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold">팀 멤버</h3>
+            <h3 className="text-lg font-semibold">{t("memberList.teamMembers")}</h3>
             <p className="text-sm text-muted-foreground mt-1">
-              총 {members.length}명
+              {t("memberList.totalCount", { count: members.length })}
             </p>
           </div>
         {canManage && (
@@ -124,7 +126,7 @@ export function MemberList({ canManage, members: propMembers }: MemberListProps)
               className="cursor-pointer"
             >
               <Plus className="mr-2 h-4 w-4" />
-              멤버 초대
+              {t("memberList.invite")}
             </Button>
           ) : (
             <Tooltip>
@@ -134,13 +136,13 @@ export function MemberList({ canManage, members: propMembers }: MemberListProps)
                   className="cursor-not-allowed opacity-50"
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  멤버 초대
+                  {t("memberList.invite")}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                Starter 플랜 이상에서 사용 가능합니다.{" "}
-                <a href="/pricing" className="underline">
-                  업그레이드하기
+                {t("memberList.starterRequired")}{" "}
+                <a href="/pricing" className="underline cursor-pointer">
+                  {t("memberList.upgrade")}
                 </a>
               </TooltipContent>
             </Tooltip>

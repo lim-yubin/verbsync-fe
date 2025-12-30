@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Trash2, Mail, User } from "lucide-react";
 import { format } from "date-fns";
-import { ko } from "date-fns/locale";
+import { ko, enUS } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -28,7 +29,6 @@ import {
   useRemoveMember,
 } from "@/hooks/useMembers";
 import type { ProjectMember } from "@/types/api";
-import { ROLE_LABELS } from "@/lib/permissions";
 import { useAuthStore } from "@/store/authStore";
 
 interface MemberItemProps {
@@ -40,6 +40,7 @@ export function MemberItem({
   member,
   canManage,
 }: MemberItemProps) {
+  const { t, i18n } = useTranslation();
   const currentUserId = useAuthStore((state) => state.user?.id);
   const isCurrentUser = member.userId === currentUserId;
   const isOwner = member.role === "OWNER";
@@ -69,7 +70,7 @@ export function MemberItem({
       },
       {
         onSuccess: () => {
-          toast.success("멤버 역할이 변경되었습니다");
+          toast.success(t("member.roleChangeSuccess"));
           setRoleChangeDialogOpen(false);
         },
         onError: (error: Error) => {
@@ -77,7 +78,7 @@ export function MemberItem({
             response?: { data?: { message?: string } };
           };
           toast.error(
-            axiosError.response?.data?.message || "역할 변경에 실패했습니다"
+            axiosError.response?.data?.message || t("member.roleChangeFailed")
           );
         },
       }
@@ -87,7 +88,7 @@ export function MemberItem({
   const handleRemove = () => {
     removeMember(member.id, {
       onSuccess: () => {
-        toast.success("멤버가 제거되었습니다");
+        toast.success(t("member.removeSuccess"));
         setRemoveDialogOpen(false);
       },
       onError: (error: Error) => {
@@ -95,15 +96,15 @@ export function MemberItem({
           response?: { data?: { message?: string } };
         };
         toast.error(
-          axiosError.response?.data?.message || "멤버 제거에 실패했습니다"
+          axiosError.response?.data?.message || t("member.removeFailed")
         );
       },
     });
   };
 
-  const displayName = member.user?.name || member.user?.email || "알 수 없음";
-  const displayEmail = member.user?.email || "이메일 없음";
-  const dateLabel = isPending ? "초대일" : "가입일";
+  const displayName = member.user?.name || member.user?.email || t("common.unknown");
+  const displayEmail = member.user?.email || t("common.noEmail");
+  const dateLabel = isPending ? t("member.inviteDate") : t("member.joinDate");
   const dateValue = isPending ? member.invitedAt : member.joinedAt || member.invitedAt;
 
   return (
@@ -126,12 +127,12 @@ export function MemberItem({
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-semibold truncate">{displayName}</span>
                 {isCurrentUser && (
-                  <span className="text-xs text-muted-foreground">(나)</span>
+                  <span className="text-xs text-muted-foreground">({t("common.me")})</span>
                 )}
                 <RoleBadge role={member.role} />
                 {isPending && (
                   <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                    초대 대기 중
+                    {t("member.pendingInvite")}
                   </span>
                 )}
               </div>
@@ -139,7 +140,11 @@ export function MemberItem({
                 {displayEmail}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                {dateLabel}: {format(new Date(dateValue), "yyyy년 M월 d일", { locale: ko })}
+                {dateLabel}: {format(
+                  new Date(dateValue),
+                  i18n.language === "ko" ? "yyyy년 M월 d일" : "MMMM d, yyyy",
+                  { locale: i18n.language === "ko" ? ko : enUS }
+                )}
               </p>
             </div>
           </div>
@@ -162,8 +167,8 @@ export function MemberItem({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="EDITOR">{ROLE_LABELS.EDITOR}</SelectItem>
-                      <SelectItem value="VIEWER">{ROLE_LABELS.VIEWER}</SelectItem>
+                      <SelectItem value="EDITOR">{t("member.editor")}</SelectItem>
+                      <SelectItem value="VIEWER">{t("member.viewer")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </>
@@ -182,7 +187,7 @@ export function MemberItem({
 
           {isOwner && canManage && (
             <div className="text-xs text-muted-foreground flex-shrink-0">
-              역할 변경 불가
+              {t("member.roleChangeNotAllowed")}
             </div>
           )}
         </div>
@@ -192,13 +197,13 @@ export function MemberItem({
       <AlertDialog open={roleChangeDialogOpen} onOpenChange={setRoleChangeDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>멤버 역할 변경</AlertDialogTitle>
+            <AlertDialogTitle>{t("member.roleChangeTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              <span className="font-semibold">{displayName}</span>의 역할을{" "}
-              <span className="font-semibold">{ROLE_LABELS[member.role]}</span>
-              에서{" "}
-              <span className="font-semibold">{ROLE_LABELS[selectedRole]}</span>
-              로 변경하시겠습니까?
+              {t("member.roleChangeDescription", {
+                name: displayName,
+                from: t(`member.${member.role.toLowerCase()}`),
+                to: t(`member.${selectedRole.toLowerCase()}`),
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -211,13 +216,14 @@ export function MemberItem({
                 );
               }}
             >
-              취소
+              {t("common.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleRoleChange}
               disabled={isUpdatingRole}
+              className="cursor-pointer"
             >
-              {isUpdatingRole ? "변경 중..." : "변경"}
+              {isUpdatingRole ? t("member.changing") : t("member.change")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -227,24 +233,22 @@ export function MemberItem({
       <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>멤버 제거 확인</AlertDialogTitle>
+            <AlertDialogTitle>{t("member.removeTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              <span className="font-semibold">{displayName}</span>을(를) 프로젝트에서
-              제거하시겠습니까?
+              {t("member.removeDescription", { name: displayName })}
               <br />
               <br />
-              이 작업은 되돌릴 수 없으며, 해당 멤버는 더 이상 프로젝트에 접근할 수
-              없습니다.
+              {t("member.removeWarning")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isRemoving}>취소</AlertDialogCancel>
+            <AlertDialogCancel disabled={isRemoving}>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleRemove}
               disabled={isRemoving}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 cursor-pointer"
             >
-              {isRemoving ? "제거 중..." : "제거"}
+              {isRemoving ? t("member.removing") : t("member.remove")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

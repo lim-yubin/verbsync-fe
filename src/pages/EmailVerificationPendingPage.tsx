@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Mail, Loader2, RefreshCw } from "lucide-react";
@@ -7,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { LanguageToggle } from "@/components/layout/LanguageToggle";
 import { AuthFooter } from "@/components/layout/AuthFooter";
 import { ROUTES } from "@/lib/constants";
 import { api } from "@/lib/api";
 
 export function EmailVerificationPendingPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
@@ -19,18 +22,18 @@ export function EmailVerificationPendingPage() {
 
   const handleResendEmail = async () => {
     if (!email) {
-      toast.error("이메일 주소를 찾을 수 없습니다.");
+      toast.error(t("emailVerificationPending.emailNotFound"));
       return;
     }
 
     setIsResending(true);
     try {
       await api.post("/auth/resend-verification", { email });
-      toast.success("인증 이메일이 재발송되었습니다.");
+      toast.success(t("emailVerificationPending.resendSuccess"));
     } catch (error: unknown) {
       const axiosError = error as { response?: { data?: { message?: string } } };
       toast.error(
-        axiosError.response?.data?.message || "이메일 재발송에 실패했습니다."
+        axiosError.response?.data?.message || t("emailVerificationPending.resendFailed")
       );
     } finally {
       setIsResending(false);
@@ -40,7 +43,8 @@ export function EmailVerificationPendingPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4 sm:p-8 relative">
-        <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
+        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 flex items-center gap-2">
+          <LanguageToggle />
           <ThemeToggle />
         </div>
 
@@ -52,7 +56,7 @@ export function EmailVerificationPendingPage() {
               className="inline-flex items-center gap-2 justify-center cursor-pointer"
             >
               <Logo width={32} height={32} />
-              <h1 className="text-2xl font-bold text-foreground">Verbsync</h1>
+              <h1 className="text-2xl font-bold text-foreground">{t("common.appName")}</h1>
             </a>
           </div>
 
@@ -61,27 +65,24 @@ export function EmailVerificationPendingPage() {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
                 <Mail className="h-8 w-8 text-muted-foreground" />
               </div>
-              <CardTitle>이메일 인증이 필요합니다</CardTitle>
+              <CardTitle>{t("emailVerificationPending.title")}</CardTitle>
               <CardDescription>
-                회원가입이 완료되었습니다. 이메일 인증을 완료해주세요.
+                {t("emailVerificationPending.description")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-lg bg-muted p-4 text-center">
                 <p className="text-sm text-muted-foreground mb-2">
-                  <strong className="text-foreground">{email}</strong>로
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  인증 이메일을 발송했습니다.
+                  <strong className="text-foreground">{email}</strong> {t("emailVerificationPending.emailSent")}
                 </p>
               </div>
 
               <div className="space-y-2 text-sm text-muted-foreground">
-                <p>이메일을 확인하고 인증 링크를 클릭해주세요.</p>
+                <p>{t("emailVerificationPending.checkEmail")}</p>
                 <p className="text-xs">
-                  • 이메일이 보이지 않는다면 스팸 폴더를 확인해주세요.
+                  {t("emailVerificationPending.spamFolder")}
                   <br />
-                  • 인증 링크는 24시간 동안 유효합니다.
+                  {t("emailVerificationPending.linkExpiry")}
                 </p>
               </div>
 
@@ -90,26 +91,26 @@ export function EmailVerificationPendingPage() {
                   onClick={handleResendEmail}
                   disabled={isResending}
                   variant="outline"
-                  className="w-full"
+                  className="w-full cursor-pointer"
                 >
                   {isResending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      발송 중...
+                      {t("emailVerificationPending.resending")}
                     </>
                   ) : (
                     <>
                       <RefreshCw className="mr-2 h-4 w-4" />
-                      인증 이메일 재발송
+                      {t("emailVerificationPending.resend")}
                     </>
                   )}
                 </Button>
                 <Button
                   onClick={() => navigate(ROUTES.LOGIN)}
                   variant="ghost"
-                  className="w-full"
+                  className="w-full cursor-pointer"
                 >
-                  로그인 페이지로 이동
+                  {t("emailVerificationPending.goToLogin")}
                 </Button>
               </div>
             </CardContent>

@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { Save, Trash2, Info, Plus, Upload } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -56,11 +57,12 @@ import {
 } from "@/components/translation";
 
 export function TranslationsPage() {
+  const { t } = useTranslation();
   const { id: projectId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: project } = useProject(projectId!);
   const { data: planInfo } = usePlan();
-  
+
   // 편집 권한 확인 (OWNER 또는 EDITOR만 편집 가능, VIEWER는 조회만)
   const canEdit = project?.isOwner || project?.role === "EDITOR";
   const canImport = planInfo?.features.canImport ?? false;
@@ -161,13 +163,7 @@ export function TranslationsPage() {
       ...sortedMatrix,
       rows: filtered,
     };
-  }, [
-    sortedMatrix,
-    searchQuery,
-    selectedNamespaces,
-    sortBy,
-    keys,
-  ]);
+  }, [sortedMatrix, searchQuery, selectedNamespaces, sortBy, keys]);
 
   // Namespace 목록 추출
   const availableNamespaces = useMemo(() => {
@@ -211,7 +207,7 @@ export function TranslationsPage() {
     });
 
     if (updates.length === 0) {
-      toast.info("변경사항이 없습니다");
+      toast.info(t("translation.noChangesMessage"));
       return;
     }
 
@@ -219,7 +215,9 @@ export function TranslationsPage() {
       { updates },
       {
         onSuccess: () => {
-          toast.success(`${updates.length}개의 번역이 저장되었습니다`);
+          toast.success(
+            t("translation.saveSuccess", { count: updates.length })
+          );
           setChanges({});
         },
         onError: (error: Error) => {
@@ -227,7 +225,7 @@ export function TranslationsPage() {
             response?: { data?: { message?: string } };
           };
           toast.error(
-            axiosError.response?.data?.message || "저장에 실패했습니다"
+            axiosError.response?.data?.message || t("translation.saveFailed")
           );
         },
       }
@@ -238,13 +236,13 @@ export function TranslationsPage() {
     const trimmedKeyName = keyName.trim();
 
     if (!trimmedKeyName) {
-      toast.error("키 이름을 입력해주세요");
+      toast.error(t("translation.keyNameRequired"));
       return;
     }
 
     // dot(.)이 없으면 namespace가 없는 키이므로 추가 불가
     if (!trimmedKeyName.includes(".")) {
-      toast.error("키 이름은 namespace를 포함해야 합니다 (예: login.title)");
+      toast.error(t("translation.keyNameNamespaceRequired"));
       return;
     }
 
@@ -259,18 +257,15 @@ export function TranslationsPage() {
             : planInfo.plan === "PRO"
             ? 10000
             : Infinity;
-        toast.error(
-          `번역 키 추가 제한에 도달했습니다. (현재 플랜: ${limit}개)`,
-          {
-            description: getUpgradeMessage(planInfo.plan, "keys"),
-            action: {
-              label: "플랜 보기",
-              onClick: () => {
-                navigate(ROUTES.PRICING);
-              },
+        toast.error(t("translation.keyLimitReached", { limit }), {
+          description: getUpgradeMessage(planInfo.plan, "keys"),
+          action: {
+            label: t("translation.viewPlan"),
+            onClick: () => {
+              navigate(ROUTES.PRICING);
             },
-          }
-        );
+          },
+        });
         return;
       }
     }
@@ -279,7 +274,7 @@ export function TranslationsPage() {
       { name: trimmedKeyName, description: keyDescription.trim() || undefined },
       {
         onSuccess: () => {
-          toast.success("번역 키가 추가되었습니다");
+          toast.success(t("translation.keyAddSuccess"));
           setKeyName("");
           setKeyDescription("");
           setIsAddingKey(false);
@@ -289,7 +284,7 @@ export function TranslationsPage() {
             response?: { data?: { message?: string } };
           };
           toast.error(
-            axiosError.response?.data?.message || "키 추가에 실패했습니다"
+            axiosError.response?.data?.message || t("translation.keyAddFailed")
           );
         },
       }
@@ -369,7 +364,7 @@ export function TranslationsPage() {
       },
       {
         onSuccess: () => {
-          toast.success("번역 키가 수정되었습니다");
+          toast.success(t("translation.keyUpdateSuccess"));
           setEditingKey(null);
         },
         onError: (error: Error) => {
@@ -377,7 +372,8 @@ export function TranslationsPage() {
             response?: { data?: { message?: string } };
           };
           toast.error(
-            axiosError.response?.data?.message || "키 수정에 실패했습니다"
+            axiosError.response?.data?.message ||
+              t("translation.keyUpdateFailed")
           );
         },
       }
@@ -396,7 +392,7 @@ export function TranslationsPage() {
 
     deleteKey(keyData.id, {
       onSuccess: () => {
-        toast.success("번역 키가 삭제되었습니다");
+        toast.success(t("translation.keyDeleteSuccess"));
         setDeleteDialogKey(null);
       },
       onError: (error: Error) => {
@@ -404,7 +400,7 @@ export function TranslationsPage() {
           response?: { data?: { message?: string } };
         };
         toast.error(
-          axiosError.response?.data?.message || "키 삭제에 실패했습니다"
+          axiosError.response?.data?.message || t("translation.keyDeleteFailed")
         );
       },
     });
@@ -442,10 +438,12 @@ export function TranslationsPage() {
           completed++;
           if (completed + failed === keysToDelete.length) {
             if (failed === 0) {
-              toast.success(`${completed}개의 번역 키가 삭제되었습니다`);
+              toast.success(
+                t("translation.keysDeleteSuccess", { count: completed })
+              );
             } else {
               toast.warning(
-                `${completed}개 삭제 완료, ${failed}개 실패했습니다`
+                t("translation.keysDeletePartial", { completed, failed })
               );
             }
             setSelectedKeys(new Set());
@@ -457,10 +455,10 @@ export function TranslationsPage() {
           if (completed + failed === keysToDelete.length) {
             if (completed > 0) {
               toast.warning(
-                `${completed}개 삭제 완료, ${failed}개 실패했습니다`
+                t("translation.keysDeletePartial", { completed, failed })
               );
             } else {
-              toast.error("키 삭제에 실패했습니다");
+              toast.error(t("translation.keysDeleteFailed"));
             }
             setSelectedKeys(new Set());
             setDeleteSelectedDialogOpen(false);
@@ -528,7 +526,7 @@ export function TranslationsPage() {
 
     // 3. 번역 업데이트
     if (translationsToUpdate.length === 0) {
-      toast.info("업데이트할 번역이 없습니다.");
+      toast.info(t("translation.importNoUpdates"));
       return;
     }
 
@@ -537,10 +535,11 @@ export function TranslationsPage() {
         { updates: translationsToUpdate },
         {
           onSuccess: () => {
-            const keyMessage =
-              newKeys.length > 0 ? `${newKeys.length}개 키 추가, ` : "";
             toast.success(
-              `${keyMessage}${translationsToUpdate.length}개 번역 업데이트 완료`
+              t("translation.importSuccess", {
+                keyCount: newKeys.length,
+                translationCount: translationsToUpdate.length,
+              })
             );
             resolve();
           },
@@ -572,18 +571,18 @@ export function TranslationsPage() {
       <AppLayout>
         <div className="mx-auto max-w-7xl space-y-6">
           <PageHeader
-            title="번역"
-            description="번역 테이블에서 모든 번역을 관리하세요"
+            title={t("translation.title")}
+            description={t("translation.title")}
           />
           <Card className="p-12">
             <div className="text-center">
               <p className="text-lg font-semibold mb-2 text-destructive">
-                데이터를 불러올 수 없습니다
+                {t("translation.loadError")}
               </p>
               <p className="text-sm text-muted-foreground mb-4">
                 {error instanceof Error
                   ? error.message
-                  : "알 수 없는 오류가 발생했습니다"}
+                  : t("translation.loadErrorDescription")}
               </p>
             </div>
           </Card>
@@ -622,8 +621,11 @@ export function TranslationsPage() {
     <AppLayout>
       <div className="mx-auto max-w-full space-y-6">
         <PageHeader
-          title="번역"
-          description={`${displayMatrix.rows.length}개 키 × ${displayMatrix.locales.length}개 언어`}
+          title={t("translation.title")}
+          description={t("translation.description", {
+            keys: displayMatrix.rows.length,
+            locales: displayMatrix.locales.length,
+          })}
           action={
             <div className="flex items-center gap-2">
               {canEdit && selectedKeys.size > 0 && (
@@ -634,7 +636,7 @@ export function TranslationsPage() {
                   className="cursor-pointer"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  선택 삭제 ({selectedKeys.size})
+                  {t("translation.selectDelete", { count: selectedKeys.size })}
                 </Button>
               )}
               {displayMatrix && project && (
@@ -642,20 +644,17 @@ export function TranslationsPage() {
                   <ExportButton
                     matrix={displayMatrix}
                     projectName={project.name}
-                    isFiltered={
-                      !!searchQuery ||
-                      selectedNamespaces.length > 0
-                    }
+                    isFiltered={!!searchQuery || selectedNamespaces.length > 0}
                   />
-                  {canEdit && (
-                    canImport ? (
+                  {canEdit &&
+                    (canImport ? (
                       <Button
                         variant="outline"
                         onClick={() => setImportDialogOpen(true)}
                         className="cursor-pointer"
                       >
                         <Upload className="mr-2 h-4 w-4" />
-                        가져오기
+                        {t("translation.import")}
                       </Button>
                     ) : (
                       <Tooltip>
@@ -666,18 +665,20 @@ export function TranslationsPage() {
                             className="cursor-not-allowed opacity-50"
                           >
                             <Upload className="mr-2 h-4 w-4" />
-                            가져오기
+                            {t("translation.import")}
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          Starter 플랜 이상에서 사용 가능합니다.{" "}
-                          <a href="/pricing" className="underline">
-                            업그레이드하기
+                          {t("translation.importNotAvailable")}{" "}
+                          <a
+                            href="/pricing"
+                            className="underline cursor-pointer"
+                          >
+                            {t("translation.importUpgrade")}
                           </a>
                         </TooltipContent>
                       </Tooltip>
-                    )
-                  )}
+                    ))}
                 </>
               )}
               {canEdit && (
@@ -688,10 +689,12 @@ export function TranslationsPage() {
                 >
                   <Save className="mr-2 h-4 w-4" />
                   {isSaving
-                    ? "저장 중..."
+                    ? t("translation.saving")
                     : hasChanges
-                    ? `저장 (${Object.keys(changes).length})`
-                    : "저장"}
+                    ? `${t("translation.save")} (${
+                        Object.keys(changes).length
+                      })`
+                    : t("translation.save")}
                 </Button>
               )}
             </div>
@@ -724,12 +727,12 @@ export function TranslationsPage() {
         {canEdit ? (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Info className="h-3.5 w-3.5" />
-            <span>셀을 더블클릭하여 번역을 편집할 수 있습니다</span>
+            <span>{t("translation.editHint")}</span>
           </div>
         ) : project?.role === "VIEWER" ? (
           <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400">
             <Info className="h-3.5 w-3.5" />
-            <span>조회자 권한으로는 번역을 수정할 수 없습니다</span>
+            <span>{t("translation.cannotEdit")}</span>
           </div>
         ) : null}
 
@@ -876,9 +879,7 @@ export function TranslationsPage() {
                       if (trimmedKeyName.includes(".")) {
                         handleAddKey();
                       } else {
-                        toast.error(
-                          "키 이름은 dot notation이어야 합니다 (예: login.title)"
-                        );
+                        toast.error(t("translation.keyNameDotNotation"));
                       }
                     } else if (e.key === "Escape") {
                       handleCancelAddKey();
@@ -898,14 +899,17 @@ export function TranslationsPage() {
               onClick={() => setIsAddingKey(true)}
               className="w-full max-w-md"
             >
-              <Plus className="mr-2 h-4 w-4" />새 번역 키 추가
+              <Plus className="mr-2 h-4 w-4" />
+              {t("translation.addKey")}
             </Button>
             <span className="text-xs text-muted-foreground">
-              {navigator.platform.includes("Mac") ||
-              navigator.userAgent.includes("Mac")
-                ? "Cmd+Shift+Enter"
-                : "Ctrl+Shift+Enter"}
-              로 빠르게 추가
+              {t("translation.quickAddHint", {
+                shortcut:
+                  navigator.platform.includes("Mac") ||
+                  navigator.userAgent.includes("Mac")
+                    ? "Cmd+Shift+Enter"
+                    : "Ctrl+Shift+Enter",
+              })}
             </span>
           </div>
         )}
@@ -915,8 +919,10 @@ export function TranslationsPage() {
             <Button size="lg" onClick={handleSave} disabled={isSaving}>
               <Save className="mr-2 h-5 w-5" />
               {isSaving
-                ? "저장 중..."
-                : `${Object.keys(changes).length}개 저장`}
+                ? t("translation.saving")
+                : t("translation.changesCount", {
+                    count: Object.keys(changes).length,
+                  })}
             </Button>
           </div>
         )}
@@ -928,16 +934,24 @@ export function TranslationsPage() {
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>선택한 키 삭제</AlertDialogTitle>
+              <AlertDialogTitle>
+                {t("translation.deleteSelectedTitle")}
+              </AlertDialogTitle>
               <AlertDialogDescription>
-                선택한 {selectedKeys.size}개의 번역 키를 삭제하시겠습니까?
-                <br />이 작업은 되돌릴 수 없습니다.
+                {t("translation.deleteSelectedDescription", {
+                  count: selectedKeys.size,
+                })}
+                <br />
+                {t("translation.deleteSelectedWarning")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>취소</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeleteSelectedKeys}>
-                삭제
+              <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteSelectedKeys}
+                className="cursor-pointer"
+              >
+                {t("common.delete")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -950,26 +964,29 @@ export function TranslationsPage() {
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>번역 키 삭제 확인</AlertDialogTitle>
+              <AlertDialogTitle>
+                {t("translation.deleteKeyTitle")}
+              </AlertDialogTitle>
               <AlertDialogDescription>
                 <span className="font-mono font-semibold">
                   {deleteDialogKey}
                 </span>{" "}
-                키를 삭제하시겠습니까?
+                {t("translation.deleteKeyDescription")}
                 <br />
-                <br />이 작업은 되돌릴 수 없으며, 해당 키의 모든 번역 데이터가
-                영구적으로 삭제됩니다.
+                <br />
+                {t("translation.deleteKeyWarning")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel disabled={isDeletingKey}>
-                취소
+                {t("common.cancel")}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteKey}
                 disabled={isDeletingKey}
+                className="cursor-pointer"
               >
-                {isDeletingKey ? "삭제 중..." : "삭제"}
+                {isDeletingKey ? t("translation.deleting") : t("common.delete")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

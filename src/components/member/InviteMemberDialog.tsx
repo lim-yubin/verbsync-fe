@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -20,17 +21,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useInviteMember } from "@/hooks/useMembers";
-import { ROLE_LABELS } from "@/lib/permissions";
-
-const inviteMemberSchema = z.object({
-  email: z
-    .string()
-    .min(1, "이메일을 입력해주세요")
-    .email("올바른 이메일 형식이 아닙니다"),
-  role: z.enum(["EDITOR", "VIEWER"] as const),
-});
-
-type InviteMemberFormData = z.infer<typeof inviteMemberSchema>;
 
 interface InviteMemberDialogProps {
   open: boolean;
@@ -41,7 +31,18 @@ export function InviteMemberDialog({
   open,
   onOpenChange,
 }: InviteMemberDialogProps) {
+  const { t } = useTranslation();
   const { mutate: inviteMember, isPending } = useInviteMember();
+  
+  const inviteMemberSchema = z.object({
+    email: z
+      .string()
+      .min(1, t("auth.email"))
+      .email(t("auth.emailInvalid")),
+    role: z.enum(["EDITOR", "VIEWER"] as const),
+  });
+
+  type InviteMemberFormData = z.infer<typeof inviteMemberSchema>;
 
   const {
     register,
@@ -65,7 +66,7 @@ export function InviteMemberDialog({
   const onSubmit = (data: InviteMemberFormData) => {
     inviteMember(data, {
       onSuccess: () => {
-        toast.success("멤버 초대 이메일이 발송되었습니다");
+        toast.success(t("member.inviteSuccess"));
         reset();
         onOpenChange(false);
       },
@@ -74,7 +75,7 @@ export function InviteMemberDialog({
           response?: { data?: { message?: string } };
         };
         toast.error(
-          axiosError.response?.data?.message || "멤버 초대에 실패했습니다"
+          axiosError.response?.data?.message || t("member.inviteFailed")
         );
       },
     });
@@ -84,9 +85,9 @@ export function InviteMemberDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>멤버 초대</DialogTitle>
+          <DialogTitle>{t("member.inviteTitle")}</DialogTitle>
           <DialogDescription>
-            이메일 주소로 팀 멤버를 초대하세요. 초대 이메일이 발송됩니다.
+            {t("member.inviteDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -94,7 +95,7 @@ export function InviteMemberDialog({
           {/* 이메일 */}
           <div className="space-y-2">
             <Label htmlFor="email">
-              이메일 <span className="text-destructive">*</span>
+              {t("member.emailRequired")} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="email"
@@ -111,7 +112,7 @@ export function InviteMemberDialog({
           {/* 역할 */}
           <div className="space-y-2">
             <Label htmlFor="role">
-              역할 <span className="text-destructive">*</span>
+              {t("member.roleRequired")} <span className="text-destructive">*</span>
             </Label>
             <Select
               value={selectedRole}
@@ -121,11 +122,11 @@ export function InviteMemberDialog({
               disabled={isPending}
             >
               <SelectTrigger id="role">
-                <SelectValue placeholder="역할을 선택하세요" />
+                <SelectValue placeholder={t("member.role")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="EDITOR">{ROLE_LABELS.EDITOR}</SelectItem>
-                <SelectItem value="VIEWER">{ROLE_LABELS.VIEWER}</SelectItem>
+                <SelectItem value="EDITOR">{t("member.editor")}</SelectItem>
+                <SelectItem value="VIEWER">{t("member.viewer")}</SelectItem>
               </SelectContent>
             </Select>
             {errors.role && (
@@ -133,8 +134,8 @@ export function InviteMemberDialog({
             )}
             <p className="text-xs text-muted-foreground">
               {selectedRole === "EDITOR"
-                ? "편집자: 번역 편집, 키/언어 추가/수정 가능"
-                : "조회자: 읽기 전용"}
+                ? t("member.editorDescription")
+                : t("member.viewerDescription")}
             </p>
           </div>
 
@@ -147,10 +148,10 @@ export function InviteMemberDialog({
               disabled={isPending}
               className="cursor-pointer"
             >
-              취소
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={isPending} className="cursor-pointer">
-              {isPending ? "초대 중..." : "초대하기"}
+              {isPending ? t("member.inviting") : t("member.inviteButton")}
             </Button>
           </div>
         </form>

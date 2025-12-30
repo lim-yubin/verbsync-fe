@@ -1,4 +1,4 @@
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import Papa from "papaparse";
 import JSZip from "jszip";
 import type { TranslationUpdateItem } from "@/types/api";
@@ -59,98 +59,98 @@ export async function parseExcelFile(
   file: File,
   existingLocales: LocaleMapping[] = []
 ): Promise<ParsedImportData> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(arrayBuffer);
 
-    reader.onload = (e) => {
-      try {
-        const data = new Uint8Array(e.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: "array" });
+    // 첫 번째 시트 사용
+    const worksheet = workbook.worksheets[0];
+    if (!worksheet) {
+      throw new Error("Excel 파일에 시트가 없습니다.");
+    }
 
-        // 첫 번째 시트 사용
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
+    // 헤더 행 읽기
+    const headerRow = worksheet.getRow(1);
+    const headers: string[] = [];
+    headerRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+      const value = cell.value;
+      headers[colNumber - 1] = value ? String(value).trim() : "";
+    });
 
-        // JSON으로 변환
-        const jsonData = XLSX.utils.sheet_to_json<string[]>(worksheet, {
-          header: 1,
-          defval: "",
-        });
+    if (headers.length < 3) {
+      throw new Error("파일 형식이 올바르지 않습니다. Key, Description, 그리고 최소 1개의 언어 열이 필요합니다.");
+    }
 
-        if (jsonData.length < 2) {
-          reject(new Error("파일 형식이 올바르지 않습니다. 최소 2행(헤더 + 데이터)이 필요합니다."));
-          return;
+    // 헤더 검증: 첫 번째 열은 Key, 두 번째 열은 Description
+    if (headers[0].toLowerCase() !== "key") {
+      throw new Error("첫 번째 열은 'Key'여야 합니다.");
+    }
+
+    // 언어 열 추출 (3번째 열부터)
+    const locales: string[] = [];
+
+    // 데이터 행 처리
+    const keys: Array<{ name: string; description: string | null }> = [];
+    const translations: TranslationUpdateItem[] = [];
+
+    // 2번째 행부터 데이터 읽기
+    for (let rowNumber = 2; rowNumber <= worksheet.rowCount; rowNumber++) {
+      const row = worksheet.getRow(rowNumber);
+      const rowData: string[] = [];
+
+      // 행의 모든 셀 읽기
+      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        const value = cell.value;
+        rowData[colNumber - 1] = value ? String(value).trim() : "";
+      });
+
+      if (rowData.length === 0) continue;
+
+      const keyName = rowData[0] || "";
+      if (!keyName) continue; // 빈 키는 건너뛰기
+
+      const description = rowData[1] || null;
+      keys.push({ name: keyName, description: description || null });
+
+      // 각 언어별 번역 값 처리
+      for (let j = 2; j < headers.length; j++) {
+        const localeHeader = headers[j] || "";
+        if (!localeHeader) continue;
+
+        // 언어 코드 추출
+        const localeCode = extractLocaleCode(localeHeader, existingLocales);
+        if (!localeCode) {
+          // 언어 코드를 찾을 수 없으면 건너뛰기
+          continue;
         }
 
-        // 첫 번째 행이 헤더
-        const headers = jsonData[0];
-        if (headers.length < 3) {
-          reject(new Error("파일 형식이 올바르지 않습니다. Key, Description, 그리고 최소 1개의 언어 열이 필요합니다."));
-          return;
+        if (!locales.includes(localeCode)) {
+          locales.push(localeCode);
         }
 
-        // 헤더 검증: 첫 번째 열은 Key, 두 번째 열은 Description
-        if (headers[0].toLowerCase() !== "key") {
-          reject(new Error("첫 번째 열은 'Key'여야 합니다."));
-          return;
+        const value = rowData[j] || "";
+        if (value) {
+          translations.push({
+            key: keyName,
+            locale: localeCode,
+            value,
+          });
         }
-
-        // 언어 열 추출 (3번째 열부터)
-        const locales: string[] = [];
-
-        // 데이터 행 처리
-        const keys: Array<{ name: string; description: string | null }> = [];
-        const translations: TranslationUpdateItem[] = [];
-
-        for (let i = 1; i < jsonData.length; i++) {
-          const row = jsonData[i];
-          if (!row || row.length === 0) continue;
-
-          const keyName = String(row[0] || "").trim();
-          if (!keyName) continue; // 빈 키는 건너뛰기
-
-          const description = String(row[1] || "").trim() || null;
-          keys.push({ name: keyName, description });
-
-          // 각 언어별 번역 값 처리
-          for (let j = 2; j < headers.length; j++) {
-            const localeHeader = String(headers[j] || "").trim();
-            if (!localeHeader) continue;
-
-            // 언어 코드 추출
-            const localeCode = extractLocaleCode(localeHeader, existingLocales);
-            if (!localeCode) {
-              // 언어 코드를 찾을 수 없으면 건너뛰기
-              continue;
-            }
-
-            if (!locales.includes(localeCode)) {
-              locales.push(localeCode);
-            }
-
-            const value = String(row[j] || "").trim();
-            if (value) {
-              translations.push({
-                key: keyName,
-                locale: localeCode,
-                value,
-              });
-            }
-          }
-        }
-
-        resolve({ keys, translations, locales });
-      } catch (error) {
-        reject(error instanceof Error ? error : new Error("파일 파싱 중 오류가 발생했습니다."));
       }
-    };
+    }
 
-    reader.onerror = () => {
-      reject(new Error("파일 읽기 중 오류가 발생했습니다."));
-    };
+    if (keys.length === 0) {
+      throw new Error("파일 형식이 올바르지 않습니다. 최소 2행(헤더 + 데이터)이 필요합니다.");
+    }
 
-    reader.readAsArrayBuffer(file);
-  });
+    return { keys, translations, locales };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("파일 파싱 중 오류가 발생했습니다.");
+  }
 }
 
 /**

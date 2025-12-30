@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { SUPPORTED_LOCALES } from "@/lib/locales";
+import { SUPPORTED_LOCALES, getLocaleName } from "@/lib/locales";
 import { toast } from "sonner";
 import type { Locale } from "@/hooks/useLocales";
 import { api } from "@/lib/api";
@@ -32,6 +33,7 @@ export function AddLocaleDialog({
   projectId,
   existingLocales,
 }: AddLocaleDialogProps) {
+  const { t, i18n } = useTranslation();
   const [selectedLocaleCodes, setSelectedLocaleCodes] = useState<Set<string>>(
     new Set()
   );
@@ -67,7 +69,7 @@ export function AddLocaleDialog({
 
   const handleCreate = async () => {
     if (selectedLocaleCodes.size === 0) {
-      toast.error("언어를 선택해주세요");
+      toast.error(t("addLocale.selectLocaleFirst"));
       return;
     }
 
@@ -87,11 +89,11 @@ export function AddLocaleDialog({
             ? 10
             : Infinity;
         toast.error(
-          `언어 추가 제한에 도달했습니다. (현재 플랜: ${limit}개)`,
+          t("addLocale.localeLimitReached", { limit }),
           {
             description: getUpgradeMessage(planInfo.plan, "locales"),
             action: {
-              label: "플랜 보기",
+              label: t("projectCreate.viewPlan"),
               onClick: () => {
                 navigate(ROUTES.PRICING);
                 onOpenChange(false);
@@ -116,7 +118,7 @@ export function AddLocaleDialog({
       try {
         await api.post<Locale>(`/projects/${projectId}/locales`, {
           code: locale.code,
-          name: locale.name,
+          name: locale.nameKo,
         });
         successCount++;
       } catch (error) {
@@ -136,15 +138,15 @@ export function AddLocaleDialog({
     setIsAdding(false);
 
     if (successCount > 0) {
-      toast.success(
-        `${successCount}개의 언어가 추가되었습니다${
-          failCount > 0 ? ` (${failCount}개 실패)` : ""
-        }`
-      );
+      if (failCount > 0) {
+        toast.success(t("addLocale.addPartial", { count: successCount, failed: failCount }));
+      } else {
+        toast.success(t("addLocale.addSuccess", { count: successCount }));
+      }
       setSelectedLocaleCodes(new Set());
       onOpenChange(false);
     } else {
-      toast.error("언어 추가에 실패했습니다");
+      toast.error(t("addLocale.addFailed"));
     }
   };
 
@@ -159,28 +161,28 @@ export function AddLocaleDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>새 언어 추가</DialogTitle>
+          <DialogTitle>{t("addLocale.title")}</DialogTitle>
           <DialogDescription>
-            프로젝트에 지원할 언어를 선택하세요 (여러 개 선택 가능)
+            {t("addLocale.description")}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 mt-4 flex-1 overflow-hidden flex flex-col">
           {availableLocales.length === 0 ? (
             <div className="rounded-md border p-4 text-center">
               <p className="text-sm text-muted-foreground">
-                추가 가능한 언어가 없습니다
+                {t("addLocale.noAvailableLocales")}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                모든 지원 언어가 이미 추가되었습니다
+                {t("addLocale.allLocalesAdded")}
               </p>
             </div>
           ) : (
             <>
               <div className="flex items-center justify-between">
                 <Label>
-                  언어 선택{" "}
+                  {t("addLocale.selectLocales")}{" "}
                   <span className="text-destructive">
-                    ({selectedLocaleCodes.size}개 선택됨)
+                    ({t("addLocale.selectedCount", { count: selectedLocaleCodes.size })})
                   </span>
                 </Label>
                 <Button
@@ -189,10 +191,11 @@ export function AddLocaleDialog({
                   size="sm"
                   onClick={handleSelectAll}
                   disabled={isAdding}
+                  className="cursor-pointer"
                 >
                   {selectedLocaleCodes.size === availableLocales.length
-                    ? "전체 해제"
-                    : "전체 선택"}
+                    ? t("addLocale.deselectAll")
+                    : t("addLocale.selectAll")}
                 </Button>
               </div>
               <div className="border rounded-md overflow-auto flex-1 max-h-[400px]">
@@ -217,7 +220,7 @@ export function AddLocaleDialog({
                         >
                           <div className="flex items-center justify-between">
                             <span>
-                              {locale.name} ({locale.code.toUpperCase()})
+                              {getLocaleName(locale, i18n.language)} ({locale.code.toUpperCase()})
                             </span>
                           </div>
                         </Label>
@@ -233,8 +236,9 @@ export function AddLocaleDialog({
               variant="outline"
               onClick={handleClose}
               disabled={isAdding}
+              className="cursor-pointer"
             >
-              취소
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={handleCreate}
@@ -243,10 +247,11 @@ export function AddLocaleDialog({
                 selectedLocaleCodes.size === 0 ||
                 availableLocales.length === 0
               }
+              className="cursor-pointer"
             >
               {isAdding
-                ? `추가 중... (${selectedLocaleCodes.size}개)`
-                : `${selectedLocaleCodes.size}개 추가`}
+                ? t("addLocale.adding", { count: selectedLocaleCodes.size })
+                : t("addLocale.add", { count: selectedLocaleCodes.size })}
             </Button>
           </div>
         </div>

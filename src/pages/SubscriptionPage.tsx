@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Check } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -22,57 +23,58 @@ interface PlanOption {
   comingSoon?: boolean;
 }
 
-const plans: PlanOption[] = [
-  {
-    name: "FREE",
-    price: "$0",
-    description: "개인 개발자 및 사이드 프로젝트를 위한 무료 플랜",
-    features: [
-      "프로젝트 1개",
-      "번역 키 100개",
-      "언어 3개 지원",
-      "실시간 OTA 업데이트",
-      "도메인 보안 설정",
-    ],
-    cta: "현재 플랜",
-    featured: false,
-  },
-  {
-    name: "STARTER",
-    price: "$19",
-    period: "/month",
-    description: "성장하는 프로젝트와 소규모 팀을 위한 플랜",
-    features: [
-      "프로젝트 5개",
-      "번역 키 1,000개",
-      "언어 10개 지원",
-      "Excel/CSV Import & Export",
-      "팀 멤버 초대 (최대 3명)",
-    ],
-    cta: "업그레이드",
-    featured: false, // 추후 사용 예정: true로 변경 가능
-    comingSoon: true,
-  },
-  {
-    name: "PRO",
-    price: "$79",
-    period: "/month",
-    description: "대규모 프로젝트와 전문적인 관리가 필요한 팀",
-    features: [
-      "프로젝트 무제한",
-      "번역 키 10,000개",
-      "모든 언어 무제한 지원",
-      "AI 자동 번역 (1,000회/월)",
-      "번역 히스토리 및 롤백",
-    ],
-    cta: "업그레이드",
-    featured: false,
-    comingSoon: true,
-  },
-];
-
 export function SubscriptionPage() {
+  const { t } = useTranslation();
   const { data: planInfo, isLoading } = usePlan();
+  
+  const plans: PlanOption[] = [
+    {
+      name: "FREE",
+      price: "$0",
+      description: t("subscription.freeDescription"),
+      features: [
+        t("subscription.freeFeatures1"),
+        t("subscription.freeFeatures2"),
+        t("subscription.freeFeatures3"),
+        t("subscription.freeFeatures4"),
+        t("subscription.freeFeatures5"),
+      ],
+      cta: t("subscription.freeCta"),
+      featured: false,
+    },
+    {
+      name: "STARTER",
+      price: "$19",
+      period: "/month",
+      description: t("subscription.starterDescription"),
+      features: [
+        t("subscription.starterFeatures1"),
+        t("subscription.starterFeatures2"),
+        t("subscription.starterFeatures3"),
+        t("subscription.starterFeatures4"),
+        t("subscription.starterFeatures5"),
+      ],
+      cta: t("subscription.starterCta"),
+      featured: false,
+      comingSoon: true,
+    },
+    {
+      name: "PRO",
+      price: "$79",
+      period: "/month",
+      description: t("subscription.proDescription"),
+      features: [
+        t("subscription.proFeatures1"),
+        t("subscription.proFeatures2"),
+        t("subscription.proFeatures3"),
+        t("subscription.proFeatures4"),
+        t("subscription.proFeatures5"),
+      ],
+      cta: t("subscription.proCta"),
+      featured: false,
+      comingSoon: true,
+    },
+  ];
   const currentPlan = planInfo?.plan || "FREE";
 
   const handleUpgrade = async (plan: Plan) => {
@@ -98,8 +100,8 @@ export function SubscriptionPage() {
     <AppLayout>
       <div className="mx-auto max-w-7xl space-y-6">
         <PageHeader
-          title="구독 관리"
-          description="현재 플랜을 확인하고 업그레이드할 수 있습니다"
+          title={t("subscription.title")}
+          description={t("subscription.description")}
         />
 
         {/* 현재 플랜 정보 (로그인한 경우에만 표시) */}
@@ -112,25 +114,25 @@ export function SubscriptionPage() {
         ) : planInfo ? (
           <Card>
             <CardHeader>
-              <CardTitle>현재 플랜</CardTitle>
+              <CardTitle>{t("subscription.currentPlan")}</CardTitle>
               <CardDescription>
-                현재 사용 중인 구독 플랜 정보입니다
+                {t("subscription.currentPlanInfo")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">플랜:</span>
+                <span className="text-sm font-medium">{t("subscription.plan")}</span>
                 <PlanBadge plan={planInfo.plan} />
               </div>
               {planInfo.planStartedAt && (
                 <div className="text-sm text-muted-foreground">
-                  플랜 시작일:{" "}
+                  {t("settings.planStartDate")}{" "}
                   {new Date(planInfo.planStartedAt).toLocaleDateString("ko-KR")}
                 </div>
               )}
               {planInfo.planEndsAt && (
                 <div className="text-sm text-muted-foreground">
-                  플랜 만료일:{" "}
+                  {t("settings.planEndDate")}{" "}
                   {new Date(planInfo.planEndsAt).toLocaleDateString("ko-KR")}
                 </div>
               )}
@@ -170,12 +172,12 @@ export function SubscriptionPage() {
                 )} */}
                 {plan.comingSoon && (
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted border border-border px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Coming Soon
+                    {t("subscription.comingSoon")}
                   </div>
                 )}
                 {isCurrentPlan && (
                   <div className="absolute top-4 right-4">
-                    <Badge variant="default">현재 플랜</Badge>
+                    <Badge variant="default">{t("subscription.currentPlanBadge")}</Badge>
                   </div>
                 )}
 
@@ -213,25 +215,19 @@ export function SubscriptionPage() {
                         variant="outline"
                         className="w-full cursor-not-allowed"
                       >
-                        추후 업데이트 예정
+                        {t("subscription.updateLater")}
                       </Button>
                     ) : isCurrentPlan ? (
                       <Button disabled variant="outline" className="w-full">
-                        현재 플랜
+                        {t("subscription.currentPlanBadge")}
                       </Button>
                     ) : (
                       <Button
                         variant="outline"
-                        // 추후 사용 예정: featured 버튼 스타일
-                        // variant={plan.featured ? "default" : "outline"}
-                        className={cn(
-                          "w-full cursor-pointer"
-                          // 추후 사용 예정: featured 버튼 스타일
-                          // plan.featured && "shadow-md"
-                        )}
+                        className={cn("w-full cursor-pointer")}
                         onClick={() => handleUpgrade(plan.name)}
                       >
-                        {isUpgradeable ? "업그레이드" : plan.cta}
+                        {isUpgradeable ? t("subscription.upgrade") : plan.cta}
                       </Button>
                     )}
                   </div>
@@ -246,12 +242,12 @@ export function SubscriptionPage() {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                대규모 팀을 위한 엔터프라이즈 플랜이 필요하신가요?{" "}
+                {t("subscription.enterpriseInquiry")}{" "}
                 <a
                   href="mailto:support@verbsync.com"
-                  className="font-semibold text-primary hover:underline underline-offset-4"
+                  className="font-semibold text-primary hover:underline underline-offset-4 cursor-pointer"
                 >
-                  영업팀에 문의하기
+                  {t("subscription.contactSales")}
                 </a>
               </p>
             </div>

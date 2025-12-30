@@ -1,4 +1,5 @@
 import { memo, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +55,7 @@ function TranslationNamespaceTreeComponent({
   colSpan,
   canEdit = true,
 }: TranslationNamespaceTreeProps) {
+  const { t } = useTranslation();
   const isCollapsed = collapsedGroups.has(node.fullPath);
   const hasChildren = node.children.size > 0 || node.keys.length > 0;
   
@@ -73,7 +75,7 @@ function TranslationNamespaceTreeComponent({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0"
+                className="h-6 w-6 p-0 cursor-pointer"
                 onClick={() => onToggleGroup(node.fullPath)}
               >
                 {isCollapsed ? (
@@ -85,10 +87,10 @@ function TranslationNamespaceTreeComponent({
             )}
             {!hasChildren && <div className="w-6" />}
             <span className="font-semibold text-sm">
-              {node.namespace}
+              {node.namespace || t("translationTable.root")}
             </span>
             <Badge variant="secondary" className="text-xs">
-              {allKeysCount}개 키
+              {t("translationTable.keyCount", { count: allKeysCount })}
             </Badge>
           </div>
         </TableCell>

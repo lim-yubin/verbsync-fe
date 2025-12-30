@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -11,6 +12,7 @@ import { useProject } from "@/hooks/useProjects";
 import { LocaleItem, AddLocaleDialog } from "@/components/locale";
 
 export function LocalesPage() {
+  const { t } = useTranslation();
   const { id: projectId } = useParams<{ id: string }>();
   const { data: locales, isLoading } = useLocales(projectId!);
   const { data: project } = useProject(projectId!);
@@ -23,13 +25,13 @@ export function LocalesPage() {
     <AppLayout>
       <div className="mx-auto max-w-7xl space-y-6">
         <PageHeader
-          title="언어 관리"
-          description="프로젝트에서 지원하는 언어를 관리하세요"
+          title={t("locale.title")}
+          description={t("locale.description")}
           action={
             canEdit && (
-              <Button onClick={() => setDialogOpen(true)}>
+              <Button onClick={() => setDialogOpen(true)} className="cursor-pointer">
                 <Plus className="mr-2 h-4 w-4" />
-                언어 추가
+                {t("locale.addLocale")}
               </Button>
             )
           }
@@ -45,7 +47,7 @@ export function LocalesPage() {
           <Card className="p-12">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                아직 추가된 언어가 없습니다
+                {t("locale.noLocalesDescription")}
               </p>
             </div>
           </Card>

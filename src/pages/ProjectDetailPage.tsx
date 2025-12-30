@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
 import { Globe, Languages, Settings, ArrowRight, Plus, Users } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -24,6 +25,7 @@ import {
 import { ROUTES } from "@/lib/constants";
 
 export function ProjectDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { data: project, isLoading: isProjectLoading } = useProject(id!);
   const { data: locales, isLoading: isLocalesLoading } = useLocales(id!);
@@ -82,10 +84,10 @@ export function ProjectDetailPage() {
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <p className="text-lg font-semibold">
-                프로젝트를 찾을 수 없습니다
+                {t("project.notFound")}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                삭제되었거나 접근 권한이 없습니다
+                {t("project.notFoundDescription")}
               </p>
             </div>
           </div>
@@ -102,7 +104,7 @@ export function ProjectDetailPage() {
           title={project.name}
           description={
             <div className="flex items-center gap-2 mt-1">
-              <span>프로젝트 개요 및 설정</span>
+              <span>{t("project.overviewDescription")}</span>
               <Badge variant="secondary" className="text-xs">
                 {project.defaultLocale}
               </Badge>
@@ -113,7 +115,7 @@ export function ProjectDetailPage() {
         {/* Quick Actions */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card className="cursor-pointer hover:border-primary/50 transition-colors">
-            <Link to={ROUTES.PROJECT_LOCALES(id!)}>
+            <Link to={ROUTES.PROJECT_LOCALES(id!)} className="cursor-pointer">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-950">
@@ -121,16 +123,16 @@ export function ProjectDetailPage() {
                   </div>
                   <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <CardTitle className="text-base mt-4">언어 관리</CardTitle>
+                <CardTitle className="text-base mt-4">{t("project.localeManagement")}</CardTitle>
                 <CardDescription className="text-xs">
-                  언어를 추가하고 활성화하세요
+                  {t("project.localeManagementDescription")}
                 </CardDescription>
               </CardHeader>
             </Link>
           </Card>
 
           <Card className="cursor-pointer hover:border-primary/50 transition-colors">
-            <Link to={ROUTES.PROJECT_TRANSLATIONS(id!)}>
+            <Link to={ROUTES.PROJECT_TRANSLATIONS(id!)} className="cursor-pointer">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-950">
@@ -138,16 +140,16 @@ export function ProjectDetailPage() {
                   </div>
                   <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <CardTitle className="text-base mt-4">번역 관리</CardTitle>
+                <CardTitle className="text-base mt-4">{t("project.translationManagement")}</CardTitle>
                 <CardDescription className="text-xs">
-                  번역을 작성하고 편집하세요
+                  {t("project.translationManagementDescription")}
                 </CardDescription>
               </CardHeader>
             </Link>
           </Card>
 
           <Card className="cursor-pointer hover:border-primary/50 transition-colors">
-            <Link to={ROUTES.PROJECT_SETTINGS(id!)}>
+            <Link to={ROUTES.PROJECT_SETTINGS(id!)} className="cursor-pointer">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-950">
@@ -155,16 +157,16 @@ export function ProjectDetailPage() {
                   </div>
                   <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <CardTitle className="text-base mt-4">프로젝트 설정</CardTitle>
+                <CardTitle className="text-base mt-4">{t("project.projectSettings")}</CardTitle>
                 <CardDescription className="text-xs">
-                  프로젝트 정보와 보안 설정
+                  {t("project.projectSettingsDescription")}
                 </CardDescription>
               </CardHeader>
             </Link>
           </Card>
 
           <Card className="border-dashed cursor-pointer hover:border-primary/50 transition-colors">
-            <Link to={ROUTES.PROJECT_TRANSLATIONS(id!)}>
+            <Link to={ROUTES.PROJECT_TRANSLATIONS(id!)} className="cursor-pointer">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
@@ -172,9 +174,9 @@ export function ProjectDetailPage() {
                   </div>
                   <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <CardTitle className="text-base mt-4">번역 시작하기</CardTitle>
+                <CardTitle className="text-base mt-4">{t("project.startTranslation")}</CardTitle>
                 <CardDescription className="text-xs">
-                  번역 키를 추가하고 번역을 작성하세요
+                  {t("project.startTranslationDescription")}
                 </CardDescription>
               </CardHeader>
             </Link>
@@ -194,10 +196,10 @@ export function ProjectDetailPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                팀 멤버
+                {t("project.teamMembers")}
               </CardTitle>
               <CardDescription>
-                이 프로젝트에 접근할 수 있는 팀 멤버 목록입니다
+                {t("project.teamMembersDescription")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -215,7 +217,7 @@ export function ProjectDetailPage() {
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>멤버가 없습니다</p>
+                  <p>{t("project.noMembers")}</p>
                 </div>
               )}
             </CardContent>

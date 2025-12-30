@@ -3,6 +3,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { queryClient } from "@/lib/queryClient";
 import { AuthProvider } from "./AuthProvider";
+import "@/lib/i18n";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (

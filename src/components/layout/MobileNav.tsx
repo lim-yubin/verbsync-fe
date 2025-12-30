@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, Home, Settings, Users, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,7 +16,7 @@ import { useMemberPermissions } from "@/hooks/useMembers";
 import { usePlan } from "@/hooks/usePlan";
 
 interface NavItem {
-  title: string;
+  titleKey: string;
   href: string;
   icon: React.ElementType;
   disabled?: boolean;
@@ -23,28 +24,29 @@ interface NavItem {
 
 const allNavItems: NavItem[] = [
   {
-    title: "대시보드",
+    titleKey: "nav.dashboard",
     href: ROUTES.DASHBOARD,
     icon: Home,
   },
   {
-    title: "멤버",
+    titleKey: "nav.members",
     href: ROUTES.MEMBERS,
     icon: Users,
   },
   {
-    title: "구독",
+    titleKey: "nav.subscription",
     href: ROUTES.SUBSCRIPTION,
     icon: CreditCard,
   },
   {
-    title: "설정",
+    titleKey: "nav.settings",
     href: ROUTES.SETTINGS,
     icon: Settings,
   },
 ];
 
 export function MobileNav() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const { data: permissions } = useMemberPermissions();
@@ -57,7 +59,7 @@ export function MobileNav() {
   
   const navItems = allNavItems.filter(
     (item) => {
-      if (item.title === "멤버") {
+      if (item.titleKey === "nav.members") {
         return canSeeMembers;
       }
       return true;
@@ -67,15 +69,15 @@ export function MobileNav() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden h-9 w-9">
+        <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 cursor-pointer">
           <Menu className="h-5 w-5" />
-          <span className="sr-only">메뉴 열기</span>
+          <span className="sr-only">{t("common.menu")}</span>
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-60 p-0">
         <SheetHeader className="flex h-14 items-center border-b px-6">
           <SheetTitle className="text-sm font-semibold text-muted-foreground">
-            메뉴
+            {t("common.menu")}
           </SheetTitle>
         </SheetHeader>
         <nav className="flex flex-col gap-1 p-4">
@@ -97,7 +99,7 @@ export function MobileNav() {
                 )}
               >
                 <Icon className="h-4 w-4" />
-                <span>{item.title}</span>
+                <span>{t(item.titleKey)}</span>
               </Link>
             );
           })}

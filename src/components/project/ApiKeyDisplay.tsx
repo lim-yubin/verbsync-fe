@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Copy, Check, Eye, EyeOff, Lock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,7 @@ interface ApiKeyDisplayProps {
 }
 
 export function ApiKeyDisplay({ projectId }: ApiKeyDisplayProps) {
+  const { t } = useTranslation();
   const { data, isLoading, isError } = useProjectApiKey(projectId);
   const [isVisible, setIsVisible] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -32,10 +34,10 @@ export function ApiKeyDisplay({ projectId }: ApiKeyDisplayProps) {
     try {
       await navigator.clipboard.writeText(apiKey);
       setCopied(true);
-      toast.success("API Key가 복사되었습니다");
+      toast.success(t("apiKey.copySuccess"));
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error("복사에 실패했습니다");
+      toast.error(t("apiKey.copyFailed"));
     }
   };
 
@@ -43,15 +45,15 @@ export function ApiKeyDisplay({ projectId }: ApiKeyDisplayProps) {
     try {
       await navigator.clipboard.writeText(code);
       setCopiedCode(type);
-      toast.success(`${type} 코드가 복사되었습니다`);
+      toast.success(t("apiKey.codeCopySuccess", { type }));
       setTimeout(() => setCopiedCode(null), 2000);
     } catch {
-      toast.error("복사에 실패했습니다");
+      toast.error(t("apiKey.codeCopyFailed"));
     }
   };
 
   const displayValue = isLoading
-    ? "Loading..."
+    ? t("common.loading")
     : isVisible
     ? apiKey
     : "•".repeat(32);
@@ -126,26 +128,25 @@ function WelcomeComponent() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Lock className="h-5 w-5" />
-          i18next 연동 및 사용 가이드
+          {t("apiKey.title")}
         </CardTitle>
         <CardDescription>
-          Verbsync는 i18next와 완벽하게 호환됩니다. 아래 가이드를 따라 실시간
-          번역 동기화를 시작하세요.
+          {t("apiKey.description")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-8">
         {/* 1. API Key 섹션 */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium">프로젝트 API Key</Label>
+            <Label className="text-sm font-medium">{t("apiKey.projectApiKey")}</Label>
             <Badge variant="outline" className="text-[10px] uppercase">
-              Secret
+              {t("apiKey.secret")}
             </Badge>
           </div>
           {isError ? (
             <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3">
               <p className="text-sm text-destructive">
-                API Key를 불러올 수 없습니다.
+                {t("apiKey.loadError")}
               </p>
             </div>
           ) : (
@@ -199,34 +200,32 @@ function WelcomeComponent() {
             {/* 2. 대시보드 세팅 가이드 */}
             <div className="space-y-4">
           <div className="space-y-1">
-            <p className="text-sm font-semibold">1. 대시보드에 키 등록하기</p>
+            <p className="text-sm font-semibold">{t("apiKey.step1Title")}</p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              점(<code>.</code>)을 사용하여 네임스페이스와 키를 구분합니다.
-              i18next 설정의 <code>ns</code>(namespaces) 배열에 등록한 이름을 맨
-              앞에 붙여주세요.
+              {t("apiKey.step1Description")}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="rounded-md border p-3 bg-muted/20">
               <p className="text-[11px] font-bold text-muted-foreground mb-2 uppercase">
-                Key Name
+                {t("apiKey.keyName")}
               </p>
               <code className="text-xs font-mono text-primary">
                 home.welcome
               </code>
               <p className="text-[10px] text-muted-foreground mt-1">
-                홈 네임스페이스의 환영 문구
+                {t("apiKey.homeWelcome")}
               </p>
             </div>
             <div className="rounded-md border p-3 bg-muted/20">
               <p className="text-[11px] font-bold text-muted-foreground mb-2 uppercase">
-                Key Name
+                {t("apiKey.keyName")}
               </p>
               <code className="text-xs font-mono text-primary">
                 common.button.save
               </code>
               <p className="text-[10px] text-muted-foreground mt-1">
-                공통 네임스페이스의 저장 버튼
+                {t("apiKey.commonSave")}
               </p>
             </div>
           </div>
@@ -238,10 +237,10 @@ function WelcomeComponent() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="text-sm font-semibold">
-                  2. i18n.ts 설정 (표준 방식)
+                  {t("apiKey.step2Title")}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  프로젝트 루트의 설정 파일에 아래 코드를 추가합니다.
+                  {t("apiKey.step2Description")}
                 </p>
               </div>
               <Button
@@ -255,7 +254,7 @@ function WelcomeComponent() {
                 ) : (
                   <Copy className="mr-2 h-3 w-3" />
                 )}
-                코드 복사
+                {t("apiKey.copyCode")}
               </Button>
             </div>
             <pre className="font-mono text-[11px] bg-muted/50 p-4 rounded-lg border overflow-x-auto whitespace-pre leading-relaxed">
@@ -267,10 +266,10 @@ function WelcomeComponent() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="text-sm font-semibold">
-                  3. React 컴포넌트에서 사용
+                  {t("apiKey.step3Title")}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  네임스페이스를 지정하여 번역을 불러옵니다.
+                  {t("apiKey.step3Description")}
                 </p>
               </div>
               <Button
@@ -284,7 +283,7 @@ function WelcomeComponent() {
                 ) : (
                   <Copy className="mr-2 h-3 w-3" />
                 )}
-                코드 복사
+                {t("apiKey.copyCode")}
               </Button>
             </div>
             <pre className="font-mono text-[11px] bg-muted/50 p-4 rounded-lg border overflow-x-auto whitespace-pre leading-relaxed">
@@ -300,12 +299,10 @@ function WelcomeComponent() {
               <Lock className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-blue-900 dark:text-blue-300">
-                  도메인 제한 필수
+                  {t("apiKey.securityTitle")}
                 </p>
                 <p className="text-[11px] text-blue-800/80 dark:text-blue-400/80 leading-normal">
-                  브라우저에서 직접 호출할 경우, 반드시{" "}
-                  <strong>프로젝트 설정 &gt; 도메인 제한</strong>에서 서비스
-                  도메인을 등록하세요.
+                  {t("apiKey.securityDescription")}
                 </p>
               </div>
             </div>

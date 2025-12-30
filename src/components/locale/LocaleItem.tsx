@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { getLocaleNameByCode } from "@/lib/locales";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -30,6 +32,7 @@ interface LocaleItemProps {
 }
 
 export function LocaleItem({ locale, projectId, isDefault, canEdit = true }: LocaleItemProps) {
+  const { t, i18n } = useTranslation();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { mutate: updateStatus, isPending: isUpdating } = useUpdateLocaleStatus(
     projectId,
@@ -40,7 +43,7 @@ export function LocaleItem({ locale, projectId, isDefault, canEdit = true }: Loc
 
   const handleToggle = (checked: boolean) => {
     if (isDefault && !checked) {
-      toast.error("기본 언어는 비활성화할 수 없습니다");
+      toast.error(t("locale.cannotDisableDefault"));
       return;
     }
 
@@ -49,7 +52,7 @@ export function LocaleItem({ locale, projectId, isDefault, canEdit = true }: Loc
       {
         onSuccess: () => {
           toast.success(
-            checked ? "언어가 활성화되었습니다" : "언어가 비활성화되었습니다"
+            checked ? t("locale.activated") : t("locale.deactivated")
           );
         },
         onError: (error: Error) => {
@@ -57,7 +60,7 @@ export function LocaleItem({ locale, projectId, isDefault, canEdit = true }: Loc
             response?: { data?: { message?: string } };
           };
           toast.error(
-            axiosError.response?.data?.message || "상태 변경에 실패했습니다"
+            axiosError.response?.data?.message || t("locale.statusChangeFailed")
           );
         },
       }
@@ -67,7 +70,7 @@ export function LocaleItem({ locale, projectId, isDefault, canEdit = true }: Loc
   const handleDelete = () => {
     deleteLocale(locale.id, {
       onSuccess: () => {
-        toast.success("언어가 삭제되었습니다");
+        toast.success(t("locale.deleted"));
         setDeleteDialogOpen(false);
       },
       onError: (error: Error) => {
@@ -75,7 +78,7 @@ export function LocaleItem({ locale, projectId, isDefault, canEdit = true }: Loc
           response?: { data?: { message?: string } };
         };
         toast.error(
-          axiosError.response?.data?.message || "삭제에 실패했습니다"
+          axiosError.response?.data?.message || t("locale.deleteFailed")
         );
       },
     });
@@ -93,13 +96,13 @@ export function LocaleItem({ locale, projectId, isDefault, canEdit = true }: Loc
           <div className="flex items-center gap-3 flex-1">
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <span className="font-semibold">{locale.name}</span>
+                <span className="font-semibold">{getLocaleNameByCode(locale.code, i18n.language)}</span>
                 <Badge variant="secondary" className="text-xs">
                   {locale.code}
                 </Badge>
                 {isDefault && (
                   <Badge variant="outline" className="text-xs">
-                    기본 언어
+                    {t("locale.defaultLocale")}
                   </Badge>
                 )}
                 {!locale.isActive && (
@@ -107,13 +110,13 @@ export function LocaleItem({ locale, projectId, isDefault, canEdit = true }: Loc
                     variant="outline"
                     className="text-xs text-muted-foreground"
                   >
-                    비활성화
+                    {t("locale.isInactive")}
                   </Badge>
                 )}
               </div>
               {isDefault && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  기본 언어 (삭제 불가)
+                  {t("locale.defaultLocale")} ({t("common.delete")} {t("common.cannot")})
                 </p>
               )}
             </div>
@@ -127,7 +130,7 @@ export function LocaleItem({ locale, projectId, isDefault, canEdit = true }: Loc
                     className="cursor-pointer"
                   />
                   <span className="text-sm text-muted-foreground">
-                    {locale.isActive ? "활성화" : "비활성화"}
+                    {locale.isActive ? t("locale.isActive") : t("locale.isInactive")}
                   </span>
                 </div>
                 {!isDefault && (
@@ -151,23 +154,22 @@ export function LocaleItem({ locale, projectId, isDefault, canEdit = true }: Loc
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>언어 삭제 확인</AlertDialogTitle>
+            <AlertDialogTitle>{t("locale.deleteConfirm")}</AlertDialogTitle>
             <AlertDialogDescription>
               <span className="font-semibold">{locale.name}</span> (
-              {locale.code}) 언어를 삭제하시겠습니까?
+              {locale.code}) {t("locale.deleteConfirmDescription")}
               <br />
-              <br />이 작업은 되돌릴 수 없으며, 해당 언어의 모든 번역 데이터가
-              영구적으로 삭제됩니다.
+              <br />{t("locale.deleteWarning")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>취소</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 cursor-pointer"
             >
-              {isDeleting ? "삭제 중..." : "삭제"}
+              {isDeleting ? t("common.deleting") : t("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

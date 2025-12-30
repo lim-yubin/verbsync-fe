@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Upload, FileSpreadsheet, FileText, FileJson, AlertCircle } from "lucide-react";
 import {
   Dialog,
@@ -45,6 +46,7 @@ export function ImportDialog({
   existingLocales,
   existingKeys = [],
 }: ImportDialogProps) {
+  const { t } = useTranslation();
   const [file, setFile] = useState<File | null>(null);
   const [mode, setMode] = useState<ImportMode>("merge");
   const [isLoading, setIsLoading] = useState(false);
@@ -61,7 +63,7 @@ export function ImportDialog({
     try {
       // 파일 크기 제한 (10MB)
       if (selectedFile.size > 10 * 1024 * 1024) {
-        throw new Error("파일 크기는 10MB를 초과할 수 없습니다.");
+        throw new Error(t("import.fileSizeError"));
       }
 
       let data: ParsedImportData;
@@ -75,15 +77,13 @@ export function ImportDialog({
       } else if (fileName.endsWith(".json") || fileName.endsWith(".zip")) {
         data = await parseJSONFile(selectedFile);
       } else {
-        throw new Error(
-          "지원하지 않는 파일 형식입니다. Excel (.xlsx, .xls), CSV (.csv), 또는 JSON (.json, .zip) 파일을 선택해주세요."
-        );
+        throw new Error(t("import.unsupportedFormat"));
       }
 
       setParsedData(data);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "파일 파싱 중 오류가 발생했습니다.";
+        err instanceof Error ? err.message : t("import.parseError");
       setError(message);
       toast.error(message);
     } finally {
@@ -113,7 +113,7 @@ export function ImportDialog({
       handleClose();
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "가져오기 중 오류가 발생했습니다.";
+        err instanceof Error ? err.message : t("import.importError");
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -147,16 +147,16 @@ export function ImportDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>번역 가져오기</DialogTitle>
+          <DialogTitle>{t("import.title")}</DialogTitle>
           <DialogDescription>
-            Excel, CSV, 또는 JSON 파일을 업로드하여 번역을 가져옵니다.
+            {t("import.description")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* 파일 선택 */}
           <div className="space-y-2">
-            <Label>파일 선택</Label>
+            <Label>{t("import.selectFile")}</Label>
             <div className="flex items-center gap-2">
               <input
                 ref={fileInputRef}
@@ -174,7 +174,7 @@ export function ImportDialog({
                 className="cursor-pointer"
               >
                 <Upload className="mr-2 h-4 w-4" />
-                파일 선택
+                {t("import.selectFile")}
               </Button>
               {file && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -196,7 +196,7 @@ export function ImportDialog({
 
           {/* 로딩 상태 */}
           {isLoading && (
-            <div className="text-sm text-muted-foreground">파일을 파싱하는 중...</div>
+            <div className="text-sm text-muted-foreground">{t("import.parsing")}</div>
           )}
 
           {/* 에러 메시지 */}
@@ -211,25 +211,25 @@ export function ImportDialog({
           {parsedData && !error && (
             <div className="space-y-4 rounded-lg border p-4">
               <div className="space-y-2">
-                <div className="text-sm font-medium">파싱 결과</div>
+                <div className="text-sm font-medium">{t("import.parsingResult")}</div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-muted-foreground">전체 키:</span>{" "}
-                    <span className="font-medium">{parsedData.keys.length}개</span>
+                    <span className="text-muted-foreground">{t("import.totalKeys")}</span>{" "}
+                    <span className="font-medium">{parsedData.keys.length}{t("common.count")}</span>
                     {newKeys.length > 0 && (
                       <span className="ml-2 text-primary">
-                        (신규 {newKeys.length}개)
+                        ({t("import.newKeys")} {newKeys.length}{t("common.count")})
                       </span>
                     )}
                   </div>
                   <div>
-                    <span className="text-muted-foreground">번역 개수:</span>{" "}
+                    <span className="text-muted-foreground">{t("import.translations")}</span>{" "}
                     <span className="font-medium">
-                      {parsedData.translations.length}개
+                      {parsedData.translations.length}{t("common.count")}
                     </span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">언어:</span>{" "}
+                    <span className="text-muted-foreground">{t("import.locales")}</span>{" "}
                     <span className="font-medium">
                       {parsedData.locales.join(", ")}
                     </span>
@@ -242,8 +242,7 @@ export function ImportDialog({
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>{newKeys.length}개의 새로운 번역 키</strong>가
-                    자동으로 추가됩니다:
+                    <strong>{t("import.newKeysAlert", { count: newKeys.length })}</strong>
                     <ul className="mt-2 ml-4 list-disc space-y-1">
                       {newKeys.slice(0, 5).map((key) => (
                         <li key={key.name} className="text-xs">
@@ -259,7 +258,7 @@ export function ImportDialog({
                       ))}
                       {newKeys.length > 5 && (
                         <li className="text-xs text-muted-foreground">
-                          외 {newKeys.length - 5}개...
+                          {t("import.andMore", { count: newKeys.length - 5 })}
                         </li>
                       )}
                     </ul>
@@ -272,29 +271,28 @@ export function ImportDialog({
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    파일에 다음 언어가 포함되어 있지만 프로젝트에 없습니다:{" "}
+                    {t("import.newLocalesAlert")}{" "}
                     <strong>{newLocales.join(", ")}</strong>
                     <br />
-                    번역은 가져오지만, 언어를 프로젝트에 추가해야 Public API에서
-                    사용할 수 있습니다.
+                    {t("import.newLocalesDescription")}
                   </AlertDescription>
                 </Alert>
               )}
 
               {/* 업로드 모드 선택 */}
               <div className="space-y-2">
-                <Label>업로드 모드</Label>
+                <Label>{t("import.uploadMode")}</Label>
                 <RadioGroup value={mode} onValueChange={(v) => setMode(v as ImportMode)}>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="merge" id="merge" />
                     <Label htmlFor="merge" className="cursor-pointer font-normal">
-                      병합 모드: 기존 번역은 유지하고, 빈 번역만 채우기
+                      {t("import.mergeMode")}
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="overwrite" id="overwrite" />
                     <Label htmlFor="overwrite" className="cursor-pointer font-normal">
-                      덮어쓰기 모드: 기존 번역을 새 데이터로 완전히 교체
+                      {t("import.overwriteMode")}
                     </Label>
                   </div>
                 </RadioGroup>
@@ -311,7 +309,7 @@ export function ImportDialog({
             disabled={isLoading}
             className="cursor-pointer"
           >
-            취소
+            {t("common.cancel")}
           </Button>
           <Button
             type="button"
@@ -319,7 +317,7 @@ export function ImportDialog({
             disabled={!parsedData || isLoading}
             className="cursor-pointer"
           >
-            {isLoading ? "가져오는 중..." : "가져오기"}
+            {isLoading ? t("import.importing") : t("import.import")}
           </Button>
         </DialogFooter>
       </DialogContent>

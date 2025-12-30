@@ -1,25 +1,28 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 
 export function LandingPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       {/* Header */}
       <header className="border-b border-gray-200 dark:border-gray-800">
         <div className="container mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="font-semibold text-lg text-gray-900 dark:text-gray-100">
-            Verbsync
+            {t("common.appName")}
           </div>
           <div className="flex items-center gap-3">
             <a
               href="/login"
               className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors cursor-pointer"
             >
-              로그인
+              {t("auth.login")}
             </a>
             <Button asChild size="sm">
-              <a href="/register">시작하기</a>
+              <a href="/register" className="cursor-pointer">{t("landing.getStarted")}</a>
             </Button>
           </div>
         </div>
@@ -29,23 +32,20 @@ export function LandingPage() {
       <section className="container mx-auto px-4 sm:px-6 py-20 md:py-28">
         <div className="max-w-3xl mx-auto text-center">
           <Badge variant="secondary" className="mb-6">
-            개발자를 위한 i18n 솔루션
+            {t("landing.badge")}
           </Badge>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-6">
-            다국어 관리를
-            <br />더 쉽게
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-6 whitespace-pre-line">
+            {t("landing.title")}
           </h1>
-          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8">
-            엑셀처럼 직관적인 테이블로 번역을 관리하고,
-            <br className="hidden sm:block" />
-            API 하나로 모든 플랫폼에 배포하세요
+          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 whitespace-pre-line">
+            {t("landing.description")}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg">
-              <a href="/register">무료로 시작하기</a>
+              <a href="/register" className="cursor-pointer">{t("landing.getStarted")}</a>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <a href="/login">로그인</a>
+              <a href="/login" className="cursor-pointer">{t("auth.login")}</a>
             </Button>
           </div>
         </div>

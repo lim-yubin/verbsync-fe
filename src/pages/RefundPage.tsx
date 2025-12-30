@@ -1,7 +1,14 @@
+import { useTranslation } from "react-i18next";
+import { format } from "date-fns";
+import { ko, enUS } from "date-fns/locale";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/lib/constants";
 
 export function RefundPage() {
+  const { t, i18n } = useTranslation();
+  const dateFormatLocale = i18n.language === "ko" ? ko : enUS;
+  const dateFormat = i18n.language === "ko" ? "yyyy년 M월 d일" : "MMMM d, yyyy";
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8 max-w-4xl">
@@ -10,91 +17,98 @@ export function RefundPage() {
             to={ROUTES.HOME}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
-            ← 홈으로 돌아가기
+            ← {t("refund.backToHome")}
           </Link>
         </div>
 
-        <h1 className="text-4xl font-bold tracking-tight mb-4">환불 정책</h1>
+        <h1 className="text-4xl font-bold tracking-tight mb-4">
+          {t("refund.title")}
+        </h1>
         <p className="text-muted-foreground mb-12">
-          최종 수정일:{" "}
-          {new Date().toLocaleDateString("ko-KR", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
+          {t("refund.lastUpdated")}{" "}
+          {format(new Date(), dateFormat, { locale: dateFormatLocale })}
         </p>
 
         <div className="prose prose-zinc dark:prose-invert max-w-none space-y-8">
           <section>
-            <h2 className="text-2xl font-semibold mb-4">1. 총칙</h2>
+            <h2 className="text-2xl font-semibold mb-4">
+              {t("refund.section1Title")}
+            </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Verbsync 유료 플랜(Starter, Pro, Enterprise)의 모든 구매는{" "}
-              <strong className="text-foreground">Paddle.com</strong>을 통해
-              처리되며, Paddle은 모든 거래에 대한{" "}
+              {t("refund.section1Content1")}{" "}
               <strong className="text-foreground">
-                Merchant of Record(판매자 대행)
+                {t("refund.section1Content2")}
               </strong>
-              로 작동합니다.
+              {t("refund.section1Content3")}{" "}
+              <strong className="text-foreground">
+                {t("refund.section1Content4")}
+              </strong>
+              {t("refund.section1Content5")}
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              환불은 Paddle의 Buyer Terms(구매자 약관)에 따라 처리됩니다.
+              {t("refund.section1Content6")}
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">
-              2. 소비자 취소 권리
+              {t("refund.section2Title")}
             </h2>
             <div className="space-y-4 text-muted-foreground">
               <div className="bg-primary/10 border border-primary/20 p-6 rounded-lg">
                 <p className="text-lg font-semibold text-foreground mb-2">
-                  14일 이내 전액 환불 보장
+                  {t("refund.section2Highlight")}
                 </p>
                 <p className="leading-relaxed">
-                  소비자인 경우, 구매 완료일로부터{" "}
-                  <strong className="text-foreground">14일 이내</strong>에
-                  구매를 취소하고{" "}
-                  <strong className="text-foreground">전액 환불</strong>을
-                  받을 수 있는 권리가 있습니다. 별도의 사유 없이도 환불이
-                  가능합니다.
+                  {t("refund.section2Content1")}{" "}
+                  <strong className="text-foreground">
+                    {t("refund.section2Content2")}
+                  </strong>{" "}
+                  {t("refund.section2Content3")}{" "}
+                  <strong className="text-foreground">
+                    {t("refund.section2Content4")}
+                  </strong>{" "}
+                  {t("refund.section2Content5")}
                 </p>
               </div>
-              <p className="leading-relaxed">
-                이 14일 취소 기간은 구매가 완료된 다음 날부터 시작됩니다.
+              <p className="leading-relaxed">{t("refund.section2Content6")}</p>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">
+              {t("refund.section3Title")}
+            </h2>
+            <div className="space-y-3 text-muted-foreground">
+              <p>
+                {t("refund.section3Content1")}{" "}
+                <strong className="text-foreground">
+                  {t("refund.section3Content2")}
+                </strong>
+                {t("refund.section3Content3")}
+              </p>
+              <p>
+                {t("refund.section3Content4")}{" "}
+                <strong className="text-foreground">
+                  {t("refund.section3Content5")}
+                </strong>{" "}
+                {t("refund.section3Content6")}
               </p>
             </div>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">3. 환불 처리</h2>
+            <h2 className="text-2xl font-semibold mb-4">
+              {t("refund.section4Title")}
+            </h2>
             <div className="space-y-3 text-muted-foreground">
-              <p>
-                모든 환불 요청은{" "}
-                <strong className="text-foreground">Paddle</strong>에서
-                처리합니다.
-              </p>
-              <p>
-                14일 기간 내에 유효한 환불 요청이 제출되면, Paddle은 Paddle의
-                Buyer Terms에 따라
-                <strong className="text-foreground"> 14일 이내</strong>에 원래
-                결제 수단으로 환불을 처리합니다.
-              </p>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">4. 환불 요청 방법</h2>
-            <div className="space-y-3 text-muted-foreground">
-              <p>
-                환불을 요청하시려면 구매 영수증 이메일에 포함된 환불 링크를
-                사용하거나, 다음 주소로 직접 Paddle에 문의해주세요:
-              </p>
+              <p>{t("refund.section4Content1")}</p>
               <div className="bg-muted/50 p-4 rounded-lg">
                 <p className="font-semibold text-foreground mb-2">
-                  Paddle 고객 지원
+                  {t("refund.section4Content2")}
                 </p>
                 <p>
-                  웹사이트:{" "}
+                  {t("refund.section4Content3")}{" "}
                   <a
                     href="https://paddle.net"
                     target="_blank"
@@ -109,8 +123,8 @@ export function RefundPage() {
               {/* Extra clarity to avoid review ambiguity */}
               <div className="bg-destructive/10 border border-destructive/20 p-4 rounded-lg">
                 <p className="text-sm leading-relaxed text-foreground">
-                  <strong>중요:</strong> Verbsync는 결제/환불을 직접 처리하지
-                  않습니다. 환불 요청은 반드시 Paddle을 통해 접수해 주세요.
+                  <strong>{t("refund.section4Important")}</strong>{" "}
+                  {t("refund.section4Content4")}
                 </p>
               </div>
             </div>
@@ -118,18 +132,19 @@ export function RefundPage() {
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">
-              5. 14일 기간 경과 후
+              {t("refund.section5Title")}
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              14일 취소 기간이 경과한 후 제출된 환불 요청은 보장되지 않으며,
-              Paddle의 재량에 따라 검토될 수 있습니다.
+              {t("refund.section5Content1")}
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">6. 추가 정보</h2>
+            <h2 className="text-2xl font-semibold mb-4">
+              {t("refund.section6Title")}
+            </h2>
             <div className="space-y-3 text-muted-foreground">
-              <p>더 자세한 정보는 Paddle의 Buyer Terms를 참조해주세요:</p>
+              <p>{t("refund.section6Content1")}</p>
               <div className="bg-muted/50 p-4 rounded-lg">
                 <a
                   href="https://www.paddle.com/legal/invoiced-consumer-terms"
@@ -145,27 +160,31 @@ export function RefundPage() {
 
           {/* ✅ Updated section to reduce Paddle review risk */}
           <section>
-            <h2 className="text-2xl font-semibold mb-4">7. 일반 문의</h2>
+            <h2 className="text-2xl font-semibold mb-4">
+              {t("refund.section7Title")}
+            </h2>
             <div className="bg-muted/50 p-6 rounded-lg space-y-3 text-muted-foreground">
               <p>
-                Verbsync 서비스 이용(기능/계정/기술 지원 등)과 관련된{" "}
-                <strong className="text-foreground">일반 문의</strong>는
-                아래로 연락해 주세요.
+                {t("refund.section7Content1")}{" "}
+                <strong className="text-foreground">
+                  {t("refund.section7Content2")}
+                </strong>{" "}
+                {t("refund.section7Content3")}
               </p>
               <div>
                 <p className="font-semibold text-foreground mb-2">
-                  Verbsync 고객 지원 (비결제/비환불)
+                  {t("refund.section7Content4")}
                 </p>
-                <p>이메일: verbsync@gmail.com</p>
-                <p className="mt-2">응답 시간: 영업일 기준 24시간 이내</p>
+                <p>{t("refund.section7Content5")} verbsync@gmail.com</p>
+                <p className="mt-2">{t("refund.section7Content6")}</p>
               </div>
 
               <p className="text-sm mt-4">
-                ※ 결제/환불 요청은 Verbsync에서 처리할 수 없으며,{" "}
+                {t("refund.section7Content7")}{" "}
                 <strong className="text-foreground">
-                  반드시 Paddle을 통해서만
+                  {t("refund.section7Content8")}
                 </strong>{" "}
-                접수됩니다. (위의 Paddle 링크를 이용해 주세요.)
+                {t("refund.section7Content9")}
               </p>
             </div>
           </section>
@@ -176,11 +195,10 @@ export function RefundPage() {
             to={ROUTES.HOME}
             className="text-sm text-primary hover:underline cursor-pointer"
           >
-            홈으로 돌아가기
+            {t("refund.backToHome")}
           </Link>
         </div>
       </div>
     </div>
   );
 }
-

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -15,6 +16,7 @@ export function EditableCell({
   isModified,
   disabled = false,
 }: EditableCellProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [localValue, setLocalValue] = useState(value);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -82,9 +84,9 @@ export function EditableCell({
         isModified && "bg-yellow-100 dark:bg-yellow-950/30",
         !isEmpty && !isModified && "bg-background"
       )}
-      title={disabled ? "조회자 권한으로는 번역을 수정할 수 없습니다" : undefined}
+      title={disabled ? t("translation.cannotEdit") : undefined}
     >
-      {isEmpty ? "(비어있음)" : value}
+      {isEmpty ? t("translation.empty") : value}
     </div>
   );
 }

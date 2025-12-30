@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
@@ -8,11 +9,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { LanguageToggle } from "@/components/layout/LanguageToggle";
 import { AuthFooter } from "@/components/layout/AuthFooter";
 import { ROUTES } from "@/lib/constants";
 import { api } from "@/lib/api";
 
 export function VerifyEmailPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
@@ -23,7 +26,7 @@ export function VerifyEmailPage() {
   useEffect(() => {
     if (!token) {
       setStatus("error");
-      setErrorMessage("인증 토큰이 없습니다.");
+      setErrorMessage(t("verifyEmail.noToken"));
       return;
     }
 
@@ -31,7 +34,7 @@ export function VerifyEmailPage() {
       try {
         await api.post("/auth/verify-email", { token });
         setStatus("success");
-        toast.success("이메일 인증이 완료되었습니다!");
+        toast.success(t("verifyEmail.successDescription"));
         
         // 2초 후 로그인 페이지로 이동
         setTimeout(() => {
@@ -41,18 +44,19 @@ export function VerifyEmailPage() {
         setStatus("error");
         const axiosError = error as { response?: { data?: { message?: string } } };
         setErrorMessage(
-          axiosError.response?.data?.message || "이메일 인증에 실패했습니다."
+          axiosError.response?.data?.message || t("verifyEmail.verifyFailed")
         );
       }
     };
 
     verifyEmail();
-  }, [token, navigate]);
+  }, [token, navigate, t]);
 
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 flex items-center justify-center p-4 sm:p-8 relative">
-        <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
+        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 flex items-center gap-2">
+          <LanguageToggle />
           <ThemeToggle />
         </div>
 
@@ -64,7 +68,7 @@ export function VerifyEmailPage() {
               className="inline-flex items-center gap-2 justify-center cursor-pointer"
             >
               <Logo width={32} height={32} />
-              <h1 className="text-2xl font-bold text-foreground">Verbsync</h1>
+              <h1 className="text-2xl font-bold text-foreground">{t("common.appName")}</h1>
             </a>
           </div>
 
@@ -82,13 +86,13 @@ export function VerifyEmailPage() {
                 )}
               </div>
               <CardTitle>
-                {status === "loading" && "이메일 인증 중..."}
-                {status === "success" && "이메일 인증 완료"}
-                {status === "error" && "이메일 인증 실패"}
+                {status === "loading" && t("verifyEmail.verifying")}
+                {status === "success" && t("verifyEmail.success")}
+                {status === "error" && t("verifyEmail.failed")}
               </CardTitle>
               <CardDescription>
-                {status === "loading" && "잠시만 기다려주세요."}
-                {status === "success" && "이메일 인증이 성공적으로 완료되었습니다."}
+                {status === "loading" && t("verifyEmail.verifyingDescription")}
+                {status === "success" && t("verifyEmail.successDescription")}
                 {status === "error" && errorMessage}
               </CardDescription>
             </CardHeader>
@@ -97,7 +101,7 @@ export function VerifyEmailPage() {
                 <Alert>
                   <CheckCircle2 className="h-4 w-4" />
                   <AlertDescription>
-                    로그인 페이지로 이동합니다...
+                    {t("verifyEmail.redirecting")}
                   </AlertDescription>
                 </Alert>
               )}
@@ -111,16 +115,16 @@ export function VerifyEmailPage() {
                   <div className="flex flex-col gap-2">
                     <Button
                       onClick={() => navigate(ROUTES.LOGIN)}
-                      className="w-full"
+                      className="w-full cursor-pointer"
                     >
-                      로그인 페이지로 이동
+                      {t("verifyEmail.goToLogin")}
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => navigate(ROUTES.REGISTER)}
-                      className="w-full"
+                      className="w-full cursor-pointer"
                     >
-                      회원가입 페이지로 이동
+                      {t("verifyEmail.goToRegister")}
                     </Button>
                   </div>
                 </div>
