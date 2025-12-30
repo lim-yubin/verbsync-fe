@@ -49,22 +49,22 @@ export function getPlanLimit(plan: Plan, type: "projects" | "keys" | "locales" |
 
 export function canCreateProject(plan: Plan, currentProjectCount: number): boolean {
   const limit = getPlanLimit(plan, "projects");
-  return currentProjectCount < limit;
+  return currentProjectCount <= limit;
 }
 
 export function canAddKey(plan: Plan, currentKeyCount: number): boolean {
   const limit = getPlanLimit(plan, "keys");
-  return currentKeyCount < limit;
+  return currentKeyCount <= limit;
 }
 
 export function canAddLocale(plan: Plan, currentLocaleCount: number): boolean {
   const limit = getPlanLimit(plan, "locales");
-  return currentLocaleCount < limit;
+  return currentLocaleCount <= limit;
 }
 
 export function canInviteMember(plan: Plan, currentMemberCount: number): boolean {
   const limit = getPlanLimit(plan, "members");
-  return currentMemberCount < limit;
+  return currentMemberCount <= limit;
 }
 
 export function getUpgradeMessage(plan: Plan, type: "projects" | "keys" | "locales" | "members"): string {
