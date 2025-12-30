@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import { useEffect } from "react";
@@ -16,14 +17,8 @@ import {
 import { useLogin } from "@/hooks/useAuth";
 import { ROUTES } from "@/lib/constants";
 
-const loginSchema = z.object({
-  email: z.string().email("올바른 이메일 주소를 입력해주세요"),
-  password: z.string().min(6, "비밀번호는 최소 6자 이상이어야 합니다"),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
-
 export function LoginForm() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { mutate: login, isPending } = useLogin();
@@ -31,6 +26,13 @@ export function LoginForm() {
   // URL 파라미터에서 이메일과 초대 토큰 가져오기
   const emailParam = searchParams.get("email");
   const inviteToken = searchParams.get("inviteToken");
+
+  const loginSchema = z.object({
+    email: z.string().email(t("auth.email")),
+    password: z.string().min(6, t("auth.password")),
+  });
+
+  type LoginFormData = z.infer<typeof loginSchema>;
 
   const {
     register,
@@ -54,7 +56,7 @@ export function LoginForm() {
   const onSubmit = (data: LoginFormData) => {
     login(data, {
       onSuccess: () => {
-        toast.success("로그인 성공!");
+        toast.success(t("auth.login") + " " + t("common.success"));
         // 초대 토큰이 있으면 초대 수락 페이지로 이동
         if (inviteToken) {
           navigate(`${ROUTES.ACCEPT_INVITE}?token=${inviteToken}`);
@@ -66,7 +68,7 @@ export function LoginForm() {
         console.error(error);
         const axiosError = error as AxiosError<{ message?: string }>;
         toast.error(
-          axiosError.response?.data?.message || "로그인에 실패했습니다"
+          axiosError.response?.data?.message || t("auth.login") + " " + t("common.error")
         );
       },
     });
@@ -77,7 +79,7 @@ export function LoginForm() {
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">이메일</Label>
+            <Label htmlFor="email">{t("auth.email")}</Label>
             <Input
               id="email"
               type="email"
@@ -91,7 +93,7 @@ export function LoginForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">비밀번호</Label>
+            <Label htmlFor="password">{t("auth.password")}</Label>
             <Input
               id="password"
               type="password"
@@ -104,20 +106,20 @@ export function LoginForm() {
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "로그인 중..." : "로그인"}
+          <Button type="submit" className="w-full cursor-pointer" disabled={isPending}>
+            {isPending ? t("common.loading") : t("auth.login")}
           </Button>
         </form>
 
         <div className="mt-4 text-center text-sm">
           <span className="text-muted-foreground">
-            계정이 없으신가요?{" "}
+            {t("auth.dontHaveAccount")}{" "}
           </span>
           <Link
             to={ROUTES.REGISTER}
             className="text-foreground font-medium hover:underline cursor-pointer"
           >
-            회원가입
+            {t("auth.register")}
           </Link>
         </div>
       </CardContent>

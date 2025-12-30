@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { Edit2, Trash2, Check, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -53,6 +54,8 @@ function TranslationKeyRowComponent({
   isDeletingKey,
   canEdit = true,
 }: TranslationKeyRowProps) {
+  const { t } = useTranslation();
+  
   return (
     <TableRow
       className={cn(isSelected && "bg-accent/50")}
@@ -71,14 +74,14 @@ function TranslationKeyRowComponent({
               value={editingName}
               onChange={(e) => onEditNameChange(e.target.value)}
               className="font-mono text-sm h-8"
-              placeholder="키 이름"
+              placeholder={t("translationTable.keyNamePlaceholder")}
             />
             <Textarea
               value={editingDescription || ""}
               onChange={(e) =>
                 onEditDescriptionChange(e.target.value || null)
               }
-              placeholder="설명 (선택)"
+              placeholder={t("translationTable.descriptionPlaceholder")}
               rows={2}
               className="text-xs resize-none"
             />
@@ -88,7 +91,7 @@ function TranslationKeyRowComponent({
                 variant="ghost"
                 onClick={onSaveEdit}
                 disabled={isUpdatingKey}
-                className="h-7 px-2"
+                className="h-7 px-2 cursor-pointer"
               >
                 <Check className="h-3 w-3" />
               </Button>
@@ -97,7 +100,7 @@ function TranslationKeyRowComponent({
                 variant="ghost"
                 onClick={onCancelEdit}
                 disabled={isUpdatingKey}
-                className="h-7 px-2"
+                className="h-7 px-2 cursor-pointer"
               >
                 <X className="h-3 w-3" />
               </Button>
@@ -118,7 +121,7 @@ function TranslationKeyRowComponent({
                   variant="ghost"
                   onClick={onStartEdit}
                   disabled={isDeletingKey}
-                  className="h-7 w-7 p-0"
+                  className="h-7 w-7 p-0 cursor-pointer"
                 >
                   <Edit2 className="h-3 w-3" />
                 </Button>
@@ -127,7 +130,7 @@ function TranslationKeyRowComponent({
                   variant="ghost"
                   onClick={onDelete}
                   disabled={isDeletingKey}
-                  className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
                 >
                   <Trash2 className="h-3 w-3" />
                 </Button>

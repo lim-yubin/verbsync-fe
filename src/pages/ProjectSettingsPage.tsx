@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import type { FieldErrors } from "react-hook-form";
@@ -49,20 +50,25 @@ import { SUPPORTED_LOCALES } from "@/lib/locales";
 import { ROUTES } from "@/lib/constants";
 import type { UpdateProjectDto } from "@/types/api";
 
-const projectSettingsSchema = z.object({
-  name: z
-    .string()
-    .min(1, "프로젝트 이름을 입력해주세요")
-    .max(100, "프로젝트 이름은 100자 이내로 입력해주세요"),
-  defaultLocale: z.string().min(1, "기본 언어를 선택해주세요"),
-  allowedDomains: z.array(z.string()).optional(),
-});
-
-type ProjectSettingsFormData = z.infer<typeof projectSettingsSchema>;
+type ProjectSettingsFormData = {
+  name: string;
+  defaultLocale: string;
+  allowedDomains?: string[];
+};
 
 export function ProjectSettingsPage() {
+  const { t } = useTranslation();
   const { id: projectId } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  
+  const projectSettingsSchema = z.object({
+    name: z
+      .string()
+      .min(1, t("projectSettings.nameRequired"))
+      .max(100, t("projectSettings.nameMaxLength")),
+    defaultLocale: z.string().min(1, t("projectSettings.defaultLocaleRequired")),
+    allowedDomains: z.array(z.string()).optional(),
+  });
   const { data: project, isLoading: isProjectLoading } = useProject(projectId!);
   const { data: locales, isLoading: isLocalesLoading } = useLocales(projectId!);
   const { mutate: updateProject, isPending: isUpdating } = useUpdateProject(
@@ -109,7 +115,7 @@ export function ProjectSettingsPage() {
   const handleAddDomain = () => {
     const trimmed = newDomain.trim();
     if (!trimmed) {
-      toast.error("도메인을 입력해주세요");
+      toast.error(t("projectSettings.domainRequired"));
       return;
     }
 
@@ -124,7 +130,7 @@ export function ProjectSettingsPage() {
         ? `*.${normalizedDomain}`
         : normalizedDomain;
       if (allowedDomains.includes(finalDomain)) {
-        toast.error("이미 추가된 도메인입니다");
+        toast.error(t("projectSettings.domainExists"));
         return;
       }
       setValue("allowedDomains", [...allowedDomains, finalDomain]);
@@ -136,9 +142,7 @@ export function ProjectSettingsPage() {
     const domainRegex = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/;
 
     if (!domainRegex.test(normalizedDomain)) {
-      toast.error(
-        "올바른 도메인 형식이 아닙니다 (예: example.com, *.example.com)"
-      );
+      toast.error(t("projectSettings.domainInvalid"));
       return;
     }
 
@@ -183,18 +187,18 @@ export function ProjectSettingsPage() {
 
     // 필드 중 하나라도 존재할 때만 API 호출
     if (Object.values(updates).every((v) => v === undefined)) {
-      toast.info("변경사항이 없습니다");
+      toast.info(t("projectSettings.noChanges"));
       return;
     }
 
     updateProject(updates, {
       onSuccess: () => {
-        toast.success("프로젝트 설정이 저장되었습니다");
+        toast.success(t("projectSettings.saveSuccess"));
       },
       onError: (error: Error) => {
         const axiosError = error as AxiosError<{ message?: string }>;
         toast.error(
-          axiosError.response?.data?.message || "설정 저장에 실패했습니다"
+          axiosError.response?.data?.message || t("projectSettings.saveFailed")
         );
       },
     });
@@ -205,13 +209,13 @@ export function ProjectSettingsPage() {
 
     deleteProject(projectId, {
       onSuccess: () => {
-        toast.success("프로젝트가 삭제되었습니다");
+        toast.success(t("projectSettings.deleteSuccess"));
         navigate(ROUTES.DASHBOARD);
       },
       onError: (error: Error) => {
         const axiosError = error as AxiosError<{ message?: string }>;
         toast.error(
-          axiosError.response?.data?.message || "프로젝트 삭제에 실패했습니다"
+          axiosError.response?.data?.message || t("projectSettings.deleteFailed")
         );
       },
     });
@@ -235,10 +239,10 @@ export function ProjectSettingsPage() {
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <p className="text-lg font-semibold">
-                프로젝트를 찾을 수 없습니다
+                {t("project.notFound")}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                삭제되었거나 접근 권한이 없습니다
+                {t("project.notFoundDescription")}
               </p>
             </div>
           </div>
@@ -256,8 +260,8 @@ export function ProjectSettingsPage() {
     <AppLayout>
       <div className="mx-auto max-w-4xl space-y-6">
         <PageHeader
-          title="프로젝트 설정"
-          description="프로젝트 정보를 수정하거나 삭제할 수 있습니다"
+          title={t("projectSettings.title")}
+          description={t("projectSettings.description")}
         />
 
         <form
@@ -267,24 +271,24 @@ export function ProjectSettingsPage() {
           {/* 프로젝트 정보 수정 */}
           <Card>
             <CardHeader>
-              <CardTitle>프로젝트 정보</CardTitle>
+              <CardTitle>{t("projectSettings.projectInfo")}</CardTitle>
               <CardDescription>
-                프로젝트 이름과 기본 언어를 변경할 수 있습니다
+                {t("projectSettings.projectInfoDescription")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name">프로젝트 이름</Label>
+                <Label htmlFor="name">{t("project.projectName")}</Label>
                 <Input
                   id="name"
                   {...register("name")}
-                  placeholder="프로젝트 이름"
+                  placeholder={t("projectSettings.namePlaceholder")}
                   disabled={isUpdating || !isOwner}
                   readOnly={!isOwner}
                 />
                 {!isOwner && (
                   <p className="text-xs text-muted-foreground">
-                    프로젝트 소유자만 이름을 변경할 수 있습니다
+                    {t("projectSettings.onlyOwnerCanChangeName")}
                   </p>
                 )}
                 {errors.name && (
@@ -295,14 +299,14 @@ export function ProjectSettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="defaultLocale">기본 언어</Label>
+                <Label htmlFor="defaultLocale">{t("project.defaultLocale")}</Label>
                 <Select
                   value={selectedLocale}
                   onValueChange={(value) => setValue("defaultLocale", value)}
                   disabled={isUpdating || availableLocales.length === 0}
                 >
                   <SelectTrigger id="defaultLocale">
-                    <SelectValue placeholder="기본 언어 선택" />
+                    <SelectValue placeholder={t("projectSettings.defaultLocalePlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
                     {availableLocales.map((locale) => (
@@ -319,7 +323,7 @@ export function ProjectSettingsPage() {
                 )}
                 {availableLocales.length === 0 && (
                   <p className="text-sm text-muted-foreground">
-                    활성화된 언어가 없습니다. 먼저 언어를 추가해주세요.
+                    {t("projectSettings.noActiveLocales")}
                   </p>
                 )}
               </div>
@@ -332,7 +336,7 @@ export function ProjectSettingsPage() {
                     className="cursor-pointer"
                   >
                     <Save className="mr-2 h-4 w-4" />
-                    {isUpdating ? "저장 중..." : "저장"}
+                    {isUpdating ? t("common.loading") : t("common.save")}
                   </Button>
                 </div>
               )}
@@ -344,16 +348,15 @@ export function ProjectSettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lock className="h-5 w-5" />
-                API 보안 설정
+                {t("projectSettings.apiSecurity")}
               </CardTitle>
               <CardDescription>
-                헤더 기반 API Key 사용 시 허용된 도메인을 설정할 수 있습니다.
-                설정하지 않으면 모든 도메인에서 사용 가능합니다.
+                {t("projectSettings.apiSecurityDescription")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>허용된 도메인</Label>
+                <Label>{t("projectSettings.allowedDomains")}</Label>
                 <div className="flex gap-2">
                   <Input
                     value={newDomain}
@@ -364,7 +367,7 @@ export function ProjectSettingsPage() {
                         handleAddDomain();
                       }
                     }}
-                    placeholder="example.com"
+                    placeholder={t("projectSettings.domainPlaceholder")}
                     disabled={isUpdating || !canEdit}
                     readOnly={!canEdit}
                   />
@@ -382,33 +385,28 @@ export function ProjectSettingsPage() {
                 </div>
                 {!canEdit && (
                   <p className="text-xs text-muted-foreground">
-                    조회자 권한으로는 API 보안 설정을 수정할 수 없습니다
+                    {t("projectSettings.viewerCannotEdit")}
                   </p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  도메인만 입력하세요 (예: example.com, app.example.com,
-                  *.example.com). 프로토콜(http://)이나 경로(/)는 제외하세요.
+                  {t("projectSettings.domainHint")}
                   <br />
                   <span className="font-semibold text-primary">
-                    💡 로컬 테스트:
+                    {t("projectSettings.localTest")}
                   </span>{" "}
-                  로컬 개발 환경에서 테스트하려면{" "}
-                  <code className="text-xs bg-muted px-1 rounded">
-                    localhost
-                  </code>
-                  를 추가하세요.
+                  {t("projectSettings.localhost")}
                   <br />
-                  <span className="font-semibold">와일드카드:</span>{" "}
+                  <span className="font-semibold">{t("projectSettings.wildcard")}</span>{" "}
                   <code className="text-xs bg-muted px-1 rounded">
                     *.example.com
                   </code>
-                  을 입력하면 모든 서브도메인을 허용합니다.
+                  {t("projectSettings.wildcardDescription")}
                 </p>
               </div>
 
               {allowedDomains.length > 0 && (
                 <div className="space-y-2">
-                  <Label>추가된 도메인</Label>
+                  <Label>{t("projectSettings.addedDomains")}</Label>
                   <div className="flex flex-wrap gap-2">
                     {allowedDomains.map((domain) => (
                       <div
@@ -437,9 +435,7 @@ export function ProjectSettingsPage() {
               {allowedDomains.length === 0 && (
                 <div className="rounded-md border border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800 p-3">
                   <p className="text-xs text-amber-900 dark:text-amber-100">
-                    도메인을 설정하지 않으면 모든 도메인에서 API Key를 사용할 수
-                    있습니다. 보안을 위해 허용된 도메인을 설정하는 것을
-                    권장합니다.
+                    {t("projectSettings.noDomainWarning")}
                   </p>
                 </div>
               )}
@@ -452,7 +448,7 @@ export function ProjectSettingsPage() {
                     className="cursor-pointer"
                   >
                     <Save className="mr-2 h-4 w-4" />
-                    {isUpdating ? "저장 중..." : "저장"}
+                    {isUpdating ? t("common.loading") : t("common.save")}
                   </Button>
                 </div>
               )}
@@ -467,10 +463,9 @@ export function ProjectSettingsPage() {
             {/* 위험 구역 */}
             <Card className="border-destructive">
               <CardHeader>
-                <CardTitle className="text-destructive">위험 구역</CardTitle>
+                <CardTitle className="text-destructive">{t("settings.dangerZone")}</CardTitle>
                 <CardDescription>
-                  프로젝트를 삭제하면 모든 데이터가 영구적으로 삭제되며 복구할 수
-                  없습니다
+                  {t("projectSettings.deleteWarning")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -478,9 +473,10 @@ export function ProjectSettingsPage() {
                   variant="destructive"
                   onClick={() => setDeleteDialogOpen(true)}
                   disabled={isDeleting}
+                  className="cursor-pointer"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  {isDeleting ? "삭제 중..." : "프로젝트 삭제"}
+                  {isDeleting ? t("common.deleting") : t("projectSettings.deleteButton")}
                 </Button>
               </CardContent>
             </Card>
@@ -491,29 +487,24 @@ export function ProjectSettingsPage() {
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>프로젝트 삭제 확인</AlertDialogTitle>
+              <AlertDialogTitle>{t("projectSettings.deleteTitle")}</AlertDialogTitle>
               <AlertDialogDescription>
-                <span className="font-semibold">{project.name}</span> 프로젝트를
-                삭제하시겠습니까?
+                <span className="font-semibold">{project.name}</span> {t("projectSettings.deleteDescription")}
                 <br />
-                <br />이 작업은 되돌릴 수 없으며, 다음 데이터가 영구적으로
-                삭제됩니다:
+                <br />{t("projectSettings.deleteWarning")}
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                  <li>모든 언어 설정</li>
-                  <li>모든 번역 키</li>
-                  <li>모든 번역 데이터</li>
-                  <li>API Key</li>
+                  <li>{t("projectSettings.deleteItems")}</li>
                 </ul>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isDeleting}>취소</AlertDialogCancel>
+              <AlertDialogCancel disabled={isDeleting}>{t("common.cancel")}</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 cursor-pointer"
               >
-                {isDeleting ? "삭제 중..." : "삭제"}
+                {isDeleting ? t("common.deleting") : t("common.delete")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

@@ -21,6 +21,7 @@ export function ProjectCard({
   createdAt,
   role,
 }: ProjectCardProps) {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -29,7 +30,7 @@ export function ProjectCard({
 
   const timeAgo = formatDistanceToNow(new Date(createdAt), {
     addSuffix: true,
-    locale: ko,
+    locale: i18n.language === "ko" ? ko : enUS,
   });
 
   return (
@@ -53,11 +54,11 @@ export function ProjectCard({
             <span>{defaultLocale}</span>
           </div>
           <Badge variant="secondary" className="text-xs">
-            기본 언어
+            {t("common.defaultLanguage")}
           </Badge>
           {role && role !== "OWNER" && (
             <Badge variant="outline" className="text-xs">
-              {role === "EDITOR" ? "편집자" : "조회자"}
+              {role === "EDITOR" ? t("member.editor") : t("member.viewer")}
             </Badge>
           )}
         </div>

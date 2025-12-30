@@ -1,4 +1,4 @@
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import Papa from "papaparse";
 import JSZip from "jszip";
 import type { TranslationMatrix } from "@/types/api";
@@ -6,45 +6,67 @@ import type { TranslationMatrix } from "@/types/api";
 /**
  * Excel 파일로 내보내기
  */
-export function exportToExcel(
+export async function exportToExcel(
   matrix: TranslationMatrix,
   projectName: string
-): void {
+): Promise<void> {
   // 워크북 생성
-  const wb = XLSX.utils.book_new();
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("Translations");
 
-  // 데이터 준비: [Key, Description, ...Locales]
   // 헤더 형식: "언어명 (코드)" (예: "한국어 (ko)")
   const headers = [
     "Key",
     "Description",
     ...matrix.locales.map((l) => `${l.name} (${l.code})`),
   ];
-  const data = matrix.rows.map((row) => [
-    row.key,
-    row.description || "",
-    ...matrix.locales.map((locale) => row.translations[locale.code] || ""),
-  ]);
 
-  // 워크시트 생성
-  const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+  // 헤더 행 추가
+  worksheet.addRow(headers);
+
+  // 헤더 행 스타일 설정
+  const headerRow = worksheet.getRow(1);
+  headerRow.font = { bold: true };
+  headerRow.fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "FFE0E0E0" },
+  };
+
+  // 데이터 행 추가
+  for (const row of matrix.rows) {
+    const rowData = [
+      row.key,
+      row.description || "",
+      ...matrix.locales.map((locale) => row.translations[locale.code] || ""),
+    ];
+    worksheet.addRow(rowData);
+  }
 
   // 열 너비 설정
-  ws["!cols"] = [
-    { wch: 30 }, // Key
-    { wch: 30 }, // Description
-    ...matrix.locales.map(() => ({ wch: 25 })), // Locales
-  ];
-
-  // 워크북에 워크시트 추가
-  XLSX.utils.book_append_sheet(wb, ws, "Translations");
+  worksheet.getColumn(1).width = 30; // Key
+  worksheet.getColumn(2).width = 30; // Description
+  for (let i = 3; i <= headers.length; i++) {
+    worksheet.getColumn(i).width = 25; // Locales
+  }
 
   // 파일명 생성
   const date = new Date().toISOString().split("T")[0];
   const fileName = `${projectName}_translations_${date}.xlsx`;
 
-  // 파일 다운로드
-  XLSX.writeFile(wb, fileName);
+  // 버퍼로 변환 후 다운로드
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 /**

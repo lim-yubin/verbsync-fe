@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Trash2, Lock } from "lucide-react";
 import type { AxiosError } from "axios";
@@ -36,20 +37,14 @@ import { useMe, useChangePassword, useDeleteAccount } from "@/hooks/useAuth";
 import { usePlan } from "@/hooks/usePlan";
 import { PlanBadge } from "@/components/subscription/PlanBadge";
 
-const passwordSchema = z
-  .object({
-    currentPassword: z.string().min(6, "비밀번호는 최소 6자 이상이어야 합니다"),
-    newPassword: z.string().min(6, "비밀번호는 최소 6자 이상이어야 합니다"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "비밀번호가 일치하지 않습니다",
-    path: ["confirmPassword"],
-  });
-
-type PasswordFormData = z.infer<typeof passwordSchema>;
+type PasswordFormData = {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
 
 export function SettingsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: user, isLoading } = useMe();
   const { data: planInfo, isLoading: isLoadingPlan } = usePlan();
@@ -59,6 +54,17 @@ export function SettingsPage() {
     useDeleteAccount();
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const passwordSchema = z
+    .object({
+      currentPassword: z.string().min(6, t("auth.passwordMinLength")),
+      newPassword: z.string().min(6, t("auth.passwordMinLength")),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.newPassword === data.confirmPassword, {
+      message: t("auth.passwordMismatch"),
+      path: ["confirmPassword"],
+    });
 
   const passwordForm = useForm<PasswordFormData>({
     resolver: zodResolver(passwordSchema),
@@ -77,13 +83,13 @@ export function SettingsPage() {
       },
       {
         onSuccess: () => {
-          toast.success("비밀번호가 변경되었습니다");
+          toast.success(t("settings.passwordChanged"));
           passwordForm.reset();
         },
         onError: (error: Error) => {
           const axiosError = error as AxiosError<{ message?: string }>;
           toast.error(
-            axiosError.response?.data?.message || "비밀번호 변경에 실패했습니다"
+            axiosError.response?.data?.message || t("settings.passwordChangeFailed")
           );
         },
       }
@@ -93,13 +99,13 @@ export function SettingsPage() {
   const handleDeleteAccount = () => {
     deleteAccount(undefined, {
       onSuccess: () => {
-        toast.success("계정이 삭제되었습니다");
+        toast.success(t("settings.accountDeleted"));
         navigate(ROUTES.HOME);
       },
       onError: (error: Error) => {
         const axiosError = error as AxiosError<{ message?: string }>;
         toast.error(
-          axiosError.response?.data?.message || "계정 삭제에 실패했습니다"
+          axiosError.response?.data?.message || t("settings.accountDeleteFailed")
         );
       },
     });
@@ -123,7 +129,7 @@ export function SettingsPage() {
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <p className="text-lg font-semibold">
-                사용자 정보를 불러올 수 없습니다
+                {t("settings.userInfoError")}
               </p>
             </div>
           </div>
@@ -136,24 +142,24 @@ export function SettingsPage() {
     <AppLayout>
       <div className="mx-auto max-w-4xl space-y-6">
         <PageHeader
-          title="설정"
-          description="계정 정보를 확인하거나 삭제할 수 있습니다"
+          title={t("settings.title")}
+          description={t("settings.description")}
         />
 
         {/* 계정 정보 (읽기 전용) */}
         <Card>
           <CardHeader>
-            <CardTitle>계정 정보</CardTitle>
-            <CardDescription>계정 정보를 확인할 수 있습니다</CardDescription>
+            <CardTitle>{t("settings.accountInfo")}</CardTitle>
+            <CardDescription>{t("settings.accountInfoDescription")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>이름</Label>
+              <Label>{t("auth.name")}</Label>
               <Input value={user.name} disabled className="bg-muted" />
             </div>
 
             <div className="space-y-2">
-              <Label>이메일</Label>
+              <Label>{t("auth.email")}</Label>
               <Input value={user.email} disabled className="bg-muted" />
             </div>
           </CardContent>
@@ -164,9 +170,9 @@ export function SettingsPage() {
         {/* 구독 플랜 */}
         <Card>
           <CardHeader>
-            <CardTitle>구독 플랜</CardTitle>
+            <CardTitle>{t("settings.subscriptionPlan")}</CardTitle>
             <CardDescription>
-              현재 플랜 정보를 확인하고 업그레이드할 수 있습니다
+              {t("settings.subscriptionPlanDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -175,7 +181,7 @@ export function SettingsPage() {
             ) : planInfo ? (
               <>
                 <div className="flex items-center gap-2">
-                  <Label>현재 플랜:</Label>
+                  <Label>{t("settings.currentPlan")}</Label>
                   <PlanBadge plan={planInfo.plan} />
                   <Button
                     variant="outline"
@@ -183,12 +189,12 @@ export function SettingsPage() {
                     onClick={() => (window.location.href = ROUTES.SUBSCRIPTION)}
                     className="cursor-pointer"
                   >
-                    플랜 관리
+                    {t("settings.planManagement")}
                   </Button>
                 </div>
                 {planInfo.planStartedAt && (
                   <div className="text-sm text-muted-foreground">
-                    플랜 시작일:{" "}
+                    {t("settings.planStartDate")}{" "}
                     {new Date(planInfo.planStartedAt).toLocaleDateString(
                       "ko-KR"
                     )}
@@ -196,14 +202,14 @@ export function SettingsPage() {
                 )}
                 {planInfo.planEndsAt && (
                   <div className="text-sm text-muted-foreground">
-                    플랜 만료일:{" "}
+                    {t("settings.planEndDate")}{" "}
                     {new Date(planInfo.planEndsAt).toLocaleDateString("ko-KR")}
                   </div>
                 )}
               </>
             ) : (
               <p className="text-sm text-muted-foreground">
-                플랜 정보를 불러올 수 없습니다
+                {t("settings.planInfoError")}
               </p>
             )}
           </CardContent>
@@ -214,8 +220,8 @@ export function SettingsPage() {
         {/* 비밀번호 변경 */}
         <Card>
           <CardHeader>
-            <CardTitle>비밀번호</CardTitle>
-            <CardDescription>비밀번호를 변경할 수 있습니다</CardDescription>
+            <CardTitle>{t("settings.password")}</CardTitle>
+            <CardDescription>{t("settings.passwordDescription")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form
@@ -223,12 +229,12 @@ export function SettingsPage() {
               className="space-y-6"
             >
               <div className="space-y-2">
-                <Label htmlFor="currentPassword">현재 비밀번호</Label>
+                <Label htmlFor="currentPassword">{t("settings.currentPassword")}</Label>
                 <Input
                   id="currentPassword"
                   type="password"
                   {...passwordForm.register("currentPassword")}
-                  placeholder="현재 비밀번호"
+                  placeholder={t("settings.currentPassword")}
                   disabled={isChangingPassword}
                 />
                 {passwordForm.formState.errors.currentPassword && (
@@ -239,12 +245,12 @@ export function SettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="newPassword">새 비밀번호</Label>
+                <Label htmlFor="newPassword">{t("settings.newPassword")}</Label>
                 <Input
                   id="newPassword"
                   type="password"
                   {...passwordForm.register("newPassword")}
-                  placeholder="새 비밀번호"
+                  placeholder={t("settings.newPassword")}
                   disabled={isChangingPassword}
                 />
                 {passwordForm.formState.errors.newPassword && (
@@ -255,12 +261,12 @@ export function SettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">새 비밀번호 확인</Label>
+                <Label htmlFor="confirmPassword">{t("settings.confirmPassword")}</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
                   {...passwordForm.register("confirmPassword")}
-                  placeholder="새 비밀번호 확인"
+                  placeholder={t("settings.confirmPassword")}
                   disabled={isChangingPassword}
                 />
                 {passwordForm.formState.errors.confirmPassword && (
@@ -271,9 +277,9 @@ export function SettingsPage() {
               </div>
 
               <div className="flex justify-end">
-                <Button type="submit" disabled={isChangingPassword}>
+                <Button type="submit" disabled={isChangingPassword} className="cursor-pointer">
                   <Lock className="mr-2 h-4 w-4" />
-                  {isChangingPassword ? "변경 중..." : "비밀번호 변경"}
+                  {isChangingPassword ? t("settings.changingPassword") : t("settings.changePassword")}
                 </Button>
               </div>
             </form>
@@ -285,10 +291,9 @@ export function SettingsPage() {
         {/* 위험 구역 */}
         <Card className="border-destructive">
           <CardHeader>
-            <CardTitle className="text-destructive">위험 구역</CardTitle>
+            <CardTitle className="text-destructive">{t("settings.dangerZone")}</CardTitle>
             <CardDescription>
-              계정을 삭제하면 모든 데이터가 영구적으로 삭제되며 복구할 수
-              없습니다
+              {t("settings.dangerZoneDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -296,9 +301,10 @@ export function SettingsPage() {
               variant="destructive"
               onClick={() => setDeleteDialogOpen(true)}
               disabled={isDeletingAccount}
+              className="cursor-pointer"
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              {isDeletingAccount ? "삭제 중..." : "계정 삭제"}
+              {isDeletingAccount ? t("settings.deletingAccount") : t("settings.deleteAccount")}
             </Button>
           </CardContent>
         </Card>
@@ -307,29 +313,26 @@ export function SettingsPage() {
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>계정 삭제 확인</AlertDialogTitle>
+              <AlertDialogTitle>{t("settings.deleteAccountConfirm")}</AlertDialogTitle>
               <AlertDialogDescription>
-                정말로 계정을 삭제하시겠습니까?
+                {t("settings.deleteAccountConfirmDescription")}
                 <br />
-                <br />이 작업은 되돌릴 수 없으며, 다음 데이터가 영구적으로
-                삭제됩니다:
+                <br />{t("settings.deleteAccountWarning")}
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                  <li>모든 프로젝트</li>
-                  <li>모든 번역 데이터</li>
-                  <li>계정 정보</li>
+                  <li>{t("settings.deleteAccountItems")}</li>
                 </ul>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel disabled={isDeletingAccount}>
-                취소
+                {t("common.cancel")}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteAccount}
                 disabled={isDeletingAccount}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 cursor-pointer"
               >
-                {isDeletingAccount ? "삭제 중..." : "삭제"}
+                {isDeletingAccount ? t("settings.deletingAccount") : t("common.delete")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

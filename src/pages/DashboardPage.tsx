@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -13,6 +14,7 @@ import { usePlan } from "@/hooks/usePlan";
 import { ROUTES } from "@/lib/constants";
 
 export function DashboardPage() {
+  const { t } = useTranslation();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const { data: projects, isLoading } = useProjects();
   const { data: planInfo } = usePlan();
@@ -26,12 +28,12 @@ export function DashboardPage() {
   // 설명 텍스트 결정
   const description =
     hasOwnedProjects && hasTeamProjects
-      ? "내가 관리하는 프로젝트와 팀이 관리하는 프로젝트"
+      ? t("project.bothProjectsDescription")
       : hasOwnedProjects
-      ? "내가 관리하는 번역 프로젝트"
+      ? t("project.ownedProjectsDescription")
       : hasTeamProjects
-      ? "팀이 관리하는 번역 프로젝트"
-      : "번역 프로젝트";
+      ? t("project.teamProjectsDescription")
+      : t("project.description");
 
   return (
     <AppLayout>
@@ -40,25 +42,24 @@ export function DashboardPage() {
         {planInfo && planInfo.plan === "FREE" && (
           <Alert className="mb-6">
             <AlertDescription>
-              Starter 플랜으로 업그레이드하여 더 많은 프로젝트와 기능을
-              사용하세요.{" "}
+              {t("pricing.upgradeBanner")}{" "}
               <a href={ROUTES.PRICING} className="font-semibold underline cursor-pointer">
-                자세히 보기
+                {t("pricing.learnMore")}
               </a>
             </AlertDescription>
           </Alert>
         )}
 
         <PageHeader
-          title="프로젝트"
+          title={t("project.title")}
           description={description}
           action={
             <Button
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto cursor-pointer"
               onClick={() => setCreateDialogOpen(true)}
             >
               <Plus className="mr-2 h-4 w-4" />
-              새 프로젝트
+              {t("project.newProject")}
             </Button>
           }
         />
@@ -74,9 +75,9 @@ export function DashboardPage() {
             {hasOwnedProjects && (
               <div className="space-y-4">
                 <div>
-                  <h2 className="text-lg font-semibold">내가 관리하는 프로젝트</h2>
+                  <h2 className="text-lg font-semibold">{t("project.ownedProjects")}</h2>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {ownedProjects.length}개의 프로젝트
+                    {t("project.projectCount", { count: ownedProjects.length })}
                   </p>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -98,9 +99,9 @@ export function DashboardPage() {
               <div className="space-y-4">
                 {hasOwnedProjects && <div className="border-t pt-6" />}
                 <div>
-                  <h2 className="text-lg font-semibold">팀이 관리하는 프로젝트</h2>
+                  <h2 className="text-lg font-semibold">{t("project.teamProjects")}</h2>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {teamProjects.length}개의 프로젝트
+                    {t("project.projectCount", { count: teamProjects.length })}
                   </p>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

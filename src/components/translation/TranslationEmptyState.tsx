@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -12,25 +13,27 @@ export function TranslationEmptyState({
   type,
   onAddLocale,
 }: TranslationEmptyStateProps) {
+  const { t } = useTranslation();
+  
   return (
     <AppLayout>
       <div className="mx-auto max-w-7xl space-y-6">
         <PageHeader
-          title="번역"
-          description="번역 테이블에서 모든 번역을 관리하세요"
+          title={t("translationEmpty.title")}
+          description={t("translationEmpty.description")}
         />
         <Card className="p-12">
           <div className="text-center">
-            <p className="text-lg font-semibold mb-2">번역을 시작하려면</p>
+            <p className="text-lg font-semibold mb-2">{t("translationEmpty.startTranslation")}</p>
             <p className="text-sm text-muted-foreground mb-4">
               {type === "no-locales"
-                ? "먼저 언어를 추가해주세요"
-                : "먼저 언어와 번역 키를 추가해주세요"}
+                ? t("translationEmpty.addLocaleFirst")
+                : t("translationEmpty.addLocaleAndKeys")}
             </p>
             {onAddLocale && (
               <div className="flex justify-center gap-2">
-                <Button variant="outline" onClick={onAddLocale}>
-                  언어 추가하기
+                <Button variant="outline" onClick={onAddLocale} className="cursor-pointer">
+                  {t("translationEmpty.addLocale")}
                 </Button>
               </div>
             )}

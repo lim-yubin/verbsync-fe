@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import {
   Zap,
@@ -13,30 +14,32 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 
-const features = [
-  {
-    icon: Zap,
-    title: "배포 없는 실시간 업데이트",
-    description: "코드 수정 없이 대시보드에서 번역을 즉시 반영",
-  },
-  {
-    icon: Table2,
-    title: "엑셀처럼 편한 UI",
-    description: "직관적인 테이블 인터페이스로 모든 번역을 한눈에",
-  },
-  {
-    icon: ArrowRightLeft,
-    title: "i18next 완벽 호환",
-    description: "기존 설정 그대로, 엔드포인트만 변경하면 끝",
-  },
-  {
-    icon: ShieldCheck,
-    title: "강력한 보안",
-    description: "도메인 제한 및 API Key 기반 안전한 접근 제어",
-  },
-];
-
 export function AuthHero() {
+  const { t } = useTranslation();
+  
+  const features = [
+    {
+      icon: Zap,
+      title: t("authHero.feature1Title"),
+      description: t("authHero.feature1Description"),
+    },
+    {
+      icon: Table2,
+      title: t("authHero.feature2Title"),
+      description: t("authHero.feature2Description"),
+    },
+    {
+      icon: ArrowRightLeft,
+      title: t("authHero.feature3Title"),
+      description: t("authHero.feature3Description"),
+    },
+    {
+      icon: ShieldCheck,
+      title: t("authHero.feature4Title"),
+      description: t("authHero.feature4Description"),
+    },
+  ];
+
   return (
     <div className="relative w-full flex h-full flex-col p-8 lg:p-12 overflow-hidden">
       {/* Animated Background Grid */}
@@ -105,7 +108,7 @@ export function AuthHero() {
           >
             <Logo width={48} height={48} className="shrink-0" />
           </motion.div>
-          <span className="text-2xl font-bold tracking-tight">Verbsync</span>
+          <span className="text-2xl font-bold tracking-tight">{t("common.appName")}</span>
         </motion.div>
 
         {/* Main Content */}
@@ -131,19 +134,19 @@ export function AuthHero() {
                 <Sparkles className="h-3.5 w-3.5 text-primary" />
               </motion.div>
               <span className="text-sm font-medium text-primary">
-                개발자를 위한 스마트한 i18n 플랫폼
+                {t("authHero.badge")}
               </span>
             </div>
 
             <h1 className="text-3xl font-bold tracking-tight text-foreground lg:text-5xl leading-tight">
-              번역 업데이트
+              {t("authHero.title")}
               <br />
-              <span className="text-primary">배포 없이</span> 즉시 반영
+              <span className="text-primary">{t("authHero.titleHighlight")}</span> {t("authHero.titleEnd")}
             </h1>
             <p className="text-base text-muted-foreground leading-relaxed">
-              JSON 파일을 직접 수정하고 커밋하던 시대는 끝났습니다.
+              {t("authHero.description")}
               <br />
-              Verbsync로 코드 수정 없이 실시간으로 다국어를 관리하세요.
+              {t("authHero.description2")}
             </p>
           </div>
 
@@ -188,14 +191,14 @@ export function AuthHero() {
       >
         <div className="flex flex-wrap gap-3 text-xs">
           {[
-            { icon: CheckCircle2, text: "무료 시작", color: "text-green-500" },
-            { icon: Globe, text: "다국어 지원", color: "text-blue-500" },
+            { icon: CheckCircle2, text: t("authHero.stat1"), color: "text-green-500" },
+            { icon: Globe, text: t("authHero.stat2"), color: "text-blue-500" },
             {
               icon: ShieldCheck,
-              text: "도메인 보안",
+              text: t("authHero.stat3"),
               color: "text-purple-500",
             },
-            { icon: Code, text: "API 우선", color: "text-orange-500" },
+            { icon: Code, text: t("authHero.stat4"), color: "text-orange-500" },
           ].map((item, index) => (
             <motion.div
               key={item.text}

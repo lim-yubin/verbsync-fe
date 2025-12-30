@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import { Home, Settings, Users, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -6,7 +7,7 @@ import { useMemberPermissions } from "@/hooks/useMembers";
 import { usePlan } from "@/hooks/usePlan";
 
 interface NavItem {
-  title: string;
+  titleKey: string;
   href: string;
   icon: React.ElementType;
   disabled?: boolean;
@@ -14,28 +15,29 @@ interface NavItem {
 
 const allNavItems: NavItem[] = [
   {
-    title: "대시보드",
+    titleKey: "nav.dashboard",
     href: ROUTES.DASHBOARD,
     icon: Home,
   },
   {
-    title: "멤버",
+    titleKey: "nav.members",
     href: ROUTES.MEMBERS,
     icon: Users,
   },
   {
-    title: "구독",
+    titleKey: "nav.subscription",
     href: ROUTES.SUBSCRIPTION,
     icon: CreditCard,
   },
   {
-    title: "설정",
+    titleKey: "nav.settings",
     href: ROUTES.SETTINGS,
     icon: Settings,
   },
 ];
 
 export function Sidebar() {
+  const { t } = useTranslation();
   const location = useLocation();
   const { data: permissions } = useMemberPermissions();
   const { data: planInfo } = usePlan();
@@ -47,7 +49,7 @@ export function Sidebar() {
   
   const navItems = allNavItems.filter(
     (item) => {
-      if (item.title === "멤버") {
+      if (item.titleKey === "nav.members") {
         return canSeeMembers;
       }
       return true;
@@ -58,7 +60,7 @@ export function Sidebar() {
     <aside className="hidden md:flex w-60 flex-col fixed left-0 top-0 h-screen border-r bg-muted/30">
       <div className="flex h-14 items-center border-b px-6">
         <span className="text-sm font-semibold text-muted-foreground">
-          메뉴
+          {t("common.menu")}
         </span>
       </div>
       <nav className="flex-1 overflow-y-auto">
@@ -80,7 +82,7 @@ export function Sidebar() {
                 )}
               >
                 <Icon className="h-4 w-4" />
-                <span>{item.title}</span>
+                <span>{t(item.titleKey)}</span>
               </Link>
             );
           })}

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   TableHead,
@@ -19,6 +20,7 @@ export function TranslationTableHeader({
   totalCount,
   onSelectAll,
 }: TranslationTableHeaderProps) {
+  const { t } = useTranslation();
   const isAllSelected = totalCount > 0 && selectedCount === totalCount;
 
   return (
@@ -32,7 +34,7 @@ export function TranslationTableHeader({
           />
         </TableHead>
         <TableHead className="min-w-[300px] sticky left-0 bg-background z-10 border-r">
-          키
+          {t("translationTable.key")}
         </TableHead>
         {locales.map((locale) => (
           <TableHead key={locale.code} className="min-w-[300px]">

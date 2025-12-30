@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import { useEffect } from "react";
@@ -14,28 +15,38 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useRegister } from "@/hooks/useAuth";
 import { ROUTES } from "@/lib/constants";
 
-const registerSchema = z.object({
-  name: z.string().min(2, "이름은 최소 2자 이상이어야 합니다"),
-  email: z.string().email("올바른 이메일 주소를 입력해주세요"),
-  password: z.string().min(6, "비밀번호는 최소 6자 이상이어야 합니다"),
-  passwordConfirm: z.string(),
-  agreedToTerms: z.boolean().refine((val) => val === true, {
-    message: "이용약관에 동의해야 합니다",
-  }),
-  agreedToPrivacy: z.boolean().refine((val) => val === true, {
-    message: "개인정보처리방침에 동의해야 합니다",
-  }),
-}).refine((data) => data.password === data.passwordConfirm, {
-  message: "비밀번호가 일치하지 않습니다",
-  path: ["passwordConfirm"],
-});
-
-type RegisterFormData = z.infer<typeof registerSchema>;
+type RegisterFormData = {
+  name: string;
+  email: string;
+  password: string;
+  passwordConfirm: string;
+  agreedToTerms: boolean;
+  agreedToPrivacy: boolean;
+};
 
 export function RegisterForm() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { mutate: register, isPending } = useRegister();
+
+  const registerSchema = z
+    .object({
+      name: z.string().min(2, t("auth.nameMinLength")),
+      email: z.string().email(t("auth.emailInvalid")),
+      password: z.string().min(6, t("auth.passwordMinLength")),
+      passwordConfirm: z.string(),
+      agreedToTerms: z.boolean().refine((val) => val === true, {
+        message: t("auth.agreeToTerms"),
+      }),
+      agreedToPrivacy: z.boolean().refine((val) => val === true, {
+        message: t("auth.agreeToPrivacy"),
+      }),
+    })
+    .refine((data) => data.password === data.passwordConfirm, {
+      message: t("auth.passwordMismatch"),
+      path: ["passwordConfirm"],
+    });
 
   // URL 파라미터에서 이메일과 초대 토큰 가져오기
   const emailParam = searchParams.get("email");
@@ -68,8 +79,9 @@ export function RegisterForm() {
 
   const onSubmit = (data: RegisterFormData) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordConfirm, agreedToTerms, agreedToPrivacy, ...registerData } = data;
-    
+    const { passwordConfirm, agreedToTerms, agreedToPrivacy, ...registerData } =
+      data;
+
     register(
       {
         ...registerData,
@@ -80,11 +92,15 @@ export function RegisterForm() {
         onSuccess: (response) => {
           if (response.requiresEmailVerification) {
             // 이메일 인증이 필요한 경우
-            toast.success("회원가입이 완료되었습니다. 이메일 인증을 완료해주세요.");
-            navigate(`/email-verification-pending?email=${encodeURIComponent(data.email)}`);
+            toast.success(t("auth.registerSuccess"));
+            navigate(
+              `/email-verification-pending?email=${encodeURIComponent(
+                data.email
+              )}`
+            );
           } else {
             // 이메일 인증이 필요 없는 경우 (개발 환경 등)
-            toast.success("회원가입 성공! 환영합니다 🎉");
+            toast.success(t("auth.registerSuccessNoVerification"));
             // 초대 토큰이 있으면 초대 수락 페이지로 이동
             if (inviteToken) {
               navigate(`${ROUTES.ACCEPT_INVITE}?token=${inviteToken}`);
@@ -95,7 +111,9 @@ export function RegisterForm() {
         },
         onError: (error: Error) => {
           const axiosError = error as AxiosError<{ message?: string }>;
-          toast.error(axiosError.response?.data?.message || "회원가입에 실패했습니다");
+          toast.error(
+            axiosError.response?.data?.message || t("auth.registerFailed")
+          );
         },
       }
     );
@@ -106,11 +124,11 @@ export function RegisterForm() {
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">이름</Label>
+            <Label htmlFor="name">{t("auth.name")}</Label>
             <Input
               id="name"
               type="text"
-              placeholder="홍길동"
+              placeholder={t("auth.namePlaceholder")}
               {...registerField("name")}
               disabled={isPending}
             />
@@ -120,7 +138,7 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">이메일</Label>
+            <Label htmlFor="email">{t("auth.email")}</Label>
             <Input
               id="email"
               type="email"
@@ -134,7 +152,7 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">비밀번호</Label>
+            <Label htmlFor="password">{t("auth.password")}</Label>
             <Input
               id="password"
               type="password"
@@ -143,12 +161,14 @@ export function RegisterForm() {
               disabled={isPending}
             />
             {errors.password && (
-              <p className="text-sm text-destructive">{errors.password.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="passwordConfirm">비밀번호 확인</Label>
+            <Label htmlFor="passwordConfirm">{t("auth.passwordConfirm")}</Label>
             <Input
               id="passwordConfirm"
               type="password"
@@ -157,7 +177,9 @@ export function RegisterForm() {
               disabled={isPending}
             />
             {errors.passwordConfirm && (
-              <p className="text-sm text-destructive">{errors.passwordConfirm.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.passwordConfirm.message}
+              </p>
             )}
           </div>
 
@@ -167,7 +189,9 @@ export function RegisterForm() {
                 <Checkbox
                   id="agreedToTerms"
                   checked={agreedToTerms}
-                  onCheckedChange={(checked) => setValue("agreedToTerms", checked === true)}
+                  onCheckedChange={(checked) =>
+                    setValue("agreedToTerms", checked === true)
+                  }
                   disabled={isPending}
                   className="mt-1"
                 />
@@ -178,23 +202,27 @@ export function RegisterForm() {
                   <Link
                     to={ROUTES.TERMS}
                     target="_blank"
-                    className="text-primary hover:underline"
+                    className="text-primary hover:underline cursor-pointer"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    이용약관
+                    {t("auth.terms")}
                   </Link>
-                  에 동의합니다 (필수)
+                  {t("auth.agreeTerms")}
                 </Label>
               </div>
               {errors.agreedToTerms && (
-                <p className="text-sm text-destructive ml-6">{errors.agreedToTerms.message}</p>
+                <p className="text-sm text-destructive ml-6">
+                  {errors.agreedToTerms.message}
+                </p>
               )}
 
               <div className="flex items-start gap-2">
                 <Checkbox
                   id="agreedToPrivacy"
                   checked={agreedToPrivacy}
-                  onCheckedChange={(checked) => setValue("agreedToPrivacy", checked === true)}
+                  onCheckedChange={(checked) =>
+                    setValue("agreedToPrivacy", checked === true)
+                  }
                   disabled={isPending}
                   className="mt-1"
                 />
@@ -205,38 +233,43 @@ export function RegisterForm() {
                   <Link
                     to={ROUTES.PRIVACY}
                     target="_blank"
-                    className="text-primary hover:underline"
+                    className="text-primary hover:underline cursor-pointer"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    개인정보처리방침
+                    {t("auth.privacy")}
                   </Link>
-                  에 동의합니다 (필수)
+                  {t("auth.agreePrivacy")}
                 </Label>
               </div>
               {errors.agreedToPrivacy && (
-                <p className="text-sm text-destructive ml-6">{errors.agreedToPrivacy.message}</p>
+                <p className="text-sm text-destructive ml-6">
+                  {errors.agreedToPrivacy.message}
+                </p>
               )}
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "가입 중..." : "회원가입"}
+          <Button
+            type="submit"
+            className="w-full cursor-pointer"
+            disabled={isPending}
+          >
+            {isPending ? t("auth.registering") : t("auth.register")}
           </Button>
         </form>
 
         <div className="mt-4 text-center text-sm">
           <span className="text-muted-foreground">
-            이미 계정이 있으신가요?{" "}
+            {t("auth.alreadyHaveAccount")}{" "}
           </span>
           <Link
             to={ROUTES.LOGIN}
             className="text-foreground font-medium hover:underline cursor-pointer"
           >
-            로그인
+            {t("auth.login")}
           </Link>
         </div>
       </CardContent>
     </Card>
   );
 }
-

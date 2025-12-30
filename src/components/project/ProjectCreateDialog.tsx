@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,16 +29,6 @@ import { ROUTES } from "@/lib/constants";
 import { SUPPORTED_LOCALES } from "@/lib/locales";
 import { canCreateProject, getUpgradeMessage } from "@/lib/plans";
 
-const projectSchema = z.object({
-  name: z
-    .string()
-    .min(1, "프로젝트 이름을 입력해주세요")
-    .max(50, "프로젝트 이름은 50자 이내로 입력해주세요"),
-  defaultLocale: z.string().min(1, "기본 언어를 선택해주세요"),
-});
-
-type ProjectFormData = z.infer<typeof projectSchema>;
-
 interface ProjectCreateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -47,7 +38,18 @@ export function ProjectCreateDialog({
   open,
   onOpenChange,
 }: ProjectCreateDialogProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  
+  const projectSchema = z.object({
+    name: z
+      .string()
+      .min(1, t("projectCreate.nameRequired"))
+      .max(50, t("projectCreate.nameMaxLength")),
+    defaultLocale: z.string().min(1, t("projectCreate.defaultLocaleRequired")),
+  });
+
+  type ProjectFormData = z.infer<typeof projectSchema>;
   const { mutate: createProject, isPending: isCreatingProject } =
     useCreateProject();
   const { data: projects } = useProjects();
@@ -94,7 +96,7 @@ export function ProjectCreateDialog({
         },
         {
           onSuccess: () => {
-            toast.success("프로젝트가 생성되었습니다!");
+            toast.success(t("projectCreate.createSuccess"));
             reset();
             onOpenChange(false);
             navigate(ROUTES.PROJECT_DETAIL(pendingLocaleCreation.projectId));
@@ -102,7 +104,7 @@ export function ProjectCreateDialog({
           },
           onError: (error) => {
             console.error(error);
-            toast.error("기본 언어 추가에 실패했습니다");
+            toast.error(t("projectCreate.localeAddFailed"));
             // 프로젝트는 생성되었으므로 상세 페이지로 이동
             navigate(ROUTES.PROJECT_DETAIL(pendingLocaleCreation.projectId));
             setPendingLocaleCreation(null);
@@ -125,11 +127,11 @@ export function ProjectCreateDialog({
             ? 5
             : Infinity;
         toast.error(
-          `프로젝트 생성 제한에 도달했습니다. (현재 플랜: ${limit}개)`,
+          t("projectCreate.projectLimitReached", { limit }),
           {
             description: getUpgradeMessage(planInfo.plan, "projects"),
             action: {
-              label: "플랜 보기",
+              label: t("projectCreate.viewPlan"),
               onClick: () => {
                 navigate(ROUTES.PRICING);
                 onOpenChange(false);
@@ -149,7 +151,7 @@ export function ProjectCreateDialog({
         );
 
         if (!selectedLocaleInfo) {
-          toast.error("선택한 언어 정보를 찾을 수 없습니다");
+          toast.error(t("projectCreate.localeNotFound"));
           return;
         }
 
@@ -162,7 +164,7 @@ export function ProjectCreateDialog({
       },
       onError: (error) => {
         console.error(error);
-        toast.error("프로젝트 생성에 실패했습니다");
+        toast.error(t("projectCreate.createFailed"));
       },
     });
   };
@@ -171,9 +173,9 @@ export function ProjectCreateDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>새 프로젝트 만들기</DialogTitle>
+          <DialogTitle>{t("projectCreate.title")}</DialogTitle>
           <DialogDescription>
-            번역 프로젝트를 생성하고 다국어 관리를 시작하세요
+            {t("projectCreate.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -181,11 +183,11 @@ export function ProjectCreateDialog({
           {/* 프로젝트 이름 */}
           <div className="space-y-2">
             <Label htmlFor="name">
-              프로젝트 이름 <span className="text-destructive">*</span>
+              {t("project.projectName")} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="name"
-              placeholder="My App"
+              placeholder={t("projectCreate.namePlaceholder")}
               {...register("name")}
               disabled={isPending}
             />
@@ -197,7 +199,7 @@ export function ProjectCreateDialog({
           {/* 기본 언어 */}
           <div className="space-y-2">
             <Label htmlFor="defaultLocale">
-              기본 언어 <span className="text-destructive">*</span>
+              {t("project.defaultLocale")} <span className="text-destructive">*</span>
             </Label>
             <Select
               value={selectedLocale}
@@ -205,7 +207,7 @@ export function ProjectCreateDialog({
               disabled={isPending}
             >
               <SelectTrigger>
-                <SelectValue placeholder="언어를 선택하세요" />
+                <SelectValue placeholder={t("projectCreate.defaultLocalePlaceholder")} />
               </SelectTrigger>
               <SelectContent>
                 {SUPPORTED_LOCALES.map((locale) => (
@@ -221,7 +223,7 @@ export function ProjectCreateDialog({
               </p>
             )}
             <p className="text-xs text-muted-foreground">
-              기본 언어는 나중에 변경할 수 없습니다
+              {t("projectCreate.defaultLocaleHint")}
             </p>
           </div>
 
@@ -232,11 +234,12 @@ export function ProjectCreateDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isPending}
+              className="cursor-pointer"
             >
-              취소
+              {t("common.cancel")}
             </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "생성 중..." : "프로젝트 생성"}
+            <Button type="submit" disabled={isPending} className="cursor-pointer">
+              {isPending ? t("projectCreate.creating") : t("projectCreate.create")}
             </Button>
           </div>
         </form>

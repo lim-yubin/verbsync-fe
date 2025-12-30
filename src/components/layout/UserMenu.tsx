@@ -1,5 +1,6 @@
 import { LogOut, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/store/authStore";
 import { useLogout } from "@/hooks/useAuth";
 import { ROUTES } from "@/lib/constants";
@@ -15,6 +16,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
 export function UserMenu() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const { mutate: logout, isPending } = useLogout();
@@ -40,7 +42,7 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+        <Button variant="ghost" className="relative h-9 w-9 rounded-full cursor-pointer">
           <Avatar className="h-9 w-9">
             <AvatarFallback className="bg-muted text-sm font-medium">
               {initials}
@@ -58,14 +60,14 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate(ROUTES.SETTINGS)}>
+        <DropdownMenuItem onClick={() => navigate(ROUTES.SETTINGS)} className="cursor-pointer">
           <Settings className="mr-2 h-4 w-4" />
-          <span>설정</span>
+          <span>{t("nav.settings")}</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} disabled={isPending}>
+        <DropdownMenuItem onClick={handleLogout} disabled={isPending} className="cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />
-          <span>{isPending ? "로그아웃 중..." : "로그아웃"}</span>
+          <span>{isPending ? t("auth.loggingOut") : t("auth.logout")}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

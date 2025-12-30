@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +19,8 @@ export function TranslationGroupHeader({
   onToggle,
   colSpan,
 }: TranslationGroupHeaderProps) {
+  const { t } = useTranslation();
+  
   return (
     <TableRow className="bg-muted/30 hover:bg-muted/40">
       <TableCell colSpan={colSpan} className="p-2">
@@ -25,7 +28,7 @@ export function TranslationGroupHeader({
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 w-6 p-0"
+            className="h-6 w-6 p-0 cursor-pointer"
             onClick={onToggle}
           >
             {isCollapsed ? (
@@ -35,10 +38,10 @@ export function TranslationGroupHeader({
             )}
           </Button>
           <span className="font-semibold text-sm">
-            {namespace || "(root)"}
+            {namespace || t("translationTable.root")}
           </span>
           <Badge variant="secondary" className="text-xs">
-            {keyCount}개 키
+            {t("translationTable.keyCount", { count: keyCount })}
           </Badge>
         </div>
       </TableCell>

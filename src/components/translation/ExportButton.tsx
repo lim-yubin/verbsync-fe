@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Download, FileSpreadsheet, FileText, FileJson } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,33 +25,34 @@ export function ExportButton({
   projectName,
   isFiltered,
 }: ExportButtonProps) {
+  const { t } = useTranslation();
   const { data: planInfo } = usePlan();
   const canExportExcel = planInfo?.features.canExportExcel ?? false;
 
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
     if (!canExportExcel) {
-      toast.error("Starter 플랜 이상에서 사용 가능합니다.");
+      toast.error(t("export.notAvailable"));
       return;
     }
     try {
-      exportToExcel(matrix, projectName);
-      toast.success("Excel 파일이 다운로드되었습니다.");
+      await exportToExcel(matrix, projectName);
+      toast.success(t("export.excelSuccess"));
     } catch (error) {
-      toast.error("Excel 파일 다운로드 중 오류가 발생했습니다.");
+      toast.error(t("export.excelFailed"));
       console.error(error);
     }
   };
 
   const handleExportCSV = () => {
     if (!canExportExcel) {
-      toast.error("Starter 플랜 이상에서 사용 가능합니다.");
+      toast.error(t("export.notAvailable"));
       return;
     }
     try {
       exportToCSV(matrix, projectName);
-      toast.success("CSV 파일이 다운로드되었습니다.");
+      toast.success(t("export.csvSuccess"));
     } catch (error) {
-      toast.error("CSV 파일 다운로드 중 오류가 발생했습니다.");
+      toast.error(t("export.csvFailed"));
       console.error(error);
     }
   };
@@ -58,9 +60,9 @@ export function ExportButton({
   const handleExportJSONZip = async () => {
     try {
       await exportToJSON(matrix, projectName, true);
-      toast.success("JSON 파일(ZIP)이 다운로드되었습니다.");
+      toast.success(t("export.jsonZipSuccess"));
     } catch (error) {
-      toast.error("JSON 파일 다운로드 중 오류가 발생했습니다.");
+      toast.error(t("export.jsonFailed"));
       console.error(error);
     }
   };
@@ -68,9 +70,9 @@ export function ExportButton({
   const handleExportJSONIndividual = async () => {
     try {
       await exportToJSON(matrix, projectName, false);
-      toast.success("JSON 파일들이 다운로드되었습니다.");
+      toast.success(t("export.jsonIndividualSuccess"));
     } catch (error) {
-      toast.error("JSON 파일 다운로드 중 오류가 발생했습니다.");
+      toast.error(t("export.jsonFailed"));
       console.error(error);
     }
   };
@@ -80,15 +82,15 @@ export function ExportButton({
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="cursor-pointer">
           <Download className="mr-2 h-4 w-4" />
-          내보내기
+          {t("export.title")}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>내보내기 형식</DropdownMenuLabel>
+        <DropdownMenuLabel>{t("export.format")}</DropdownMenuLabel>
         {isFiltered && (
           <>
             <div className="px-2 py-1.5 text-xs text-muted-foreground">
-              현재 필터가 적용된 데이터만 내보내집니다.
+              {t("export.filteredWarning")}
             </div>
             <DropdownMenuSeparator />
           </>
@@ -100,14 +102,14 @@ export function ExportButton({
               className="cursor-pointer"
             >
               <FileSpreadsheet className="mr-2 h-4 w-4" />
-              Excel 다운로드
+              {t("export.excel")}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleExportCSV}
               className="cursor-pointer"
             >
               <FileText className="mr-2 h-4 w-4" />
-              CSV 다운로드
+              {t("export.csv")}
             </DropdownMenuItem>
           </>
         ) : (
@@ -122,10 +124,10 @@ export function ExportButton({
               <div className="flex flex-col items-start gap-1 w-full">
                 <div className="flex items-center w-full">
                   <FileSpreadsheet className="mr-2 h-4 w-4" />
-                  <span>Excel 다운로드</span>
+                  <span>{t("export.excel")}</span>
                 </div>
                 <span className="text-xs text-muted-foreground ml-6">
-                  Starter 플랜 이상 필요
+                  {t("export.starterRequired")}
                 </span>
               </div>
             </DropdownMenuItem>
@@ -139,10 +141,10 @@ export function ExportButton({
               <div className="flex flex-col items-start gap-1 w-full">
                 <div className="flex items-center w-full">
                   <FileText className="mr-2 h-4 w-4" />
-                  <span>CSV 다운로드</span>
+                  <span>{t("export.csv")}</span>
                 </div>
                 <span className="text-xs text-muted-foreground ml-6">
-                  Starter 플랜 이상 필요
+                  {t("export.starterRequired")}
                 </span>
               </div>
             </DropdownMenuItem>
@@ -156,7 +158,7 @@ export function ExportButton({
                   window.location.href = "/pricing";
                 }}
               >
-                플랜 업그레이드하기 →
+                {t("export.upgrade")}
               </Button>
             </div>
           </>
@@ -167,14 +169,14 @@ export function ExportButton({
           className="cursor-pointer"
         >
           <FileJson className="mr-2 h-4 w-4" />
-          JSON 다운로드 (ZIP)
+          {t("export.jsonZip")}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={handleExportJSONIndividual}
           className="cursor-pointer"
         >
           <FileJson className="mr-2 h-4 w-4" />
-          JSON 다운로드 (개별)
+          {t("export.jsonIndividual")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

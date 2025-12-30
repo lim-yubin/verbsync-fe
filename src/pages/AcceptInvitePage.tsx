@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { useGetInviteInfo, useAcceptInvite } from "@/hooks/useMembers";
 import { useAuthStore } from "@/store/authStore";
@@ -10,6 +11,7 @@ import { Loader2, CheckCircle2, XCircle, Mail, User } from "lucide-react";
 import { toast } from "sonner";
 
 export function AcceptInvitePage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get("token");
@@ -27,15 +29,15 @@ export function AcceptInvitePage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <XCircle className="h-5 w-5 text-destructive" />
-              유효하지 않은 초대 링크
+              {t("invite.invalidLink")}
             </CardTitle>
             <CardDescription>
-              초대 링크가 올바르지 않습니다.
+              {t("invite.invalidLinkDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild className="w-full">
-              <Link to={ROUTES.LOGIN}>로그인 페이지로 이동</Link>
+            <Button asChild className="w-full cursor-pointer">
+              <Link to={ROUTES.LOGIN}>{t("invite.goToLogin")}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -51,7 +53,7 @@ export function AcceptInvitePage() {
           <CardContent className="pt-6">
             <div className="flex flex-col items-center justify-center gap-4">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground">초대 정보를 불러오는 중...</p>
+              <p className="text-sm text-muted-foreground">{t("invite.loading")}</p>
             </div>
           </CardContent>
         </Card>
@@ -67,17 +69,17 @@ export function AcceptInvitePage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <XCircle className="h-5 w-5 text-destructive" />
-              초대 정보를 불러올 수 없습니다
+              {t("invite.loadError")}
             </CardTitle>
             <CardDescription>
               {error instanceof Error
                 ? error.message
-                : "유효하지 않은 초대 링크이거나 이미 만료되었습니다."}
+                : t("invite.loadErrorDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild className="w-full">
-              <Link to={ROUTES.LOGIN}>로그인 페이지로 이동</Link>
+            <Button asChild className="w-full cursor-pointer">
+              <Link to={ROUTES.LOGIN}>{t("invite.goToLogin")}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -97,17 +99,17 @@ export function AcceptInvitePage() {
     }
 
     if (emailMismatch) {
-      toast.error("초대된 이메일과 로그인한 계정의 이메일이 일치하지 않습니다.");
+      toast.error(t("invite.emailMismatch"));
       return;
     }
 
     try {
       await acceptInvite.mutateAsync(token);
-      toast.success("초대를 수락했습니다!");
+      toast.success(t("invite.acceptSuccess"));
       navigate(ROUTES.DASHBOARD);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "초대 수락에 실패했습니다."
+        error instanceof Error ? error.message : t("invite.acceptFailed")
       );
     }
   };
@@ -118,27 +120,27 @@ export function AcceptInvitePage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />
-            Verbsync 초대
+            {t("invite.title")}
           </CardTitle>
           <CardDescription>
-            {inviteInfo.accountOwner.name}님이 Verbsync 계정에 초대했습니다.
+            {inviteInfo.accountOwner.name}{t("invite.description")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* 초대 정보 */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">초대된 이메일</span>
+              <span className="text-sm text-muted-foreground">{t("invite.invitedEmail")}</span>
               <span className="text-sm font-medium">{inviteInfo.email}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">역할</span>
+              <span className="text-sm text-muted-foreground">{t("member.role")}</span>
               <Badge variant={inviteInfo.role === "EDITOR" ? "default" : "secondary"}>
-                {inviteInfo.role === "EDITOR" ? "편집자" : "조회자"}
+                {inviteInfo.role === "EDITOR" ? t("member.editor") : t("member.viewer")}
               </Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">계정 소유자</span>
+              <span className="text-sm text-muted-foreground">{t("invite.accountOwner")}</span>
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">{inviteInfo.accountOwner.name}</span>
@@ -150,8 +152,10 @@ export function AcceptInvitePage() {
           {emailMismatch && (
             <Alert variant="destructive">
               <AlertDescription>
-                초대된 이메일({inviteInfo.email})과 로그인한 계정의 이메일({userEmail})이
-                일치하지 않습니다. 올바른 계정으로 로그인해주세요.
+                {t("invite.emailMismatchDescription", {
+                  invited: inviteInfo.email,
+                  current: userEmail || "",
+                })}
               </AlertDescription>
             </Alert>
           )}
@@ -160,7 +164,7 @@ export function AcceptInvitePage() {
           {!inviteInfo.isUserRegistered && !isAuthenticated && (
             <Alert>
               <AlertDescription>
-                회원가입이 필요합니다. 회원가입 후 초대를 수락할 수 있습니다.
+                {t("invite.signupRequired")}
               </AlertDescription>
             </Alert>
           )}
@@ -170,53 +174,53 @@ export function AcceptInvitePage() {
             {!isAuthenticated ? (
               <>
                 {inviteInfo.isUserRegistered ? (
-                  <Button onClick={handleAcceptInvite} className="w-full" size="lg">
-                    로그인하고 수락하기
+                  <Button onClick={handleAcceptInvite} className="w-full cursor-pointer" size="lg">
+                    {t("invite.loginAndAccept")}
                   </Button>
                 ) : (
                   <>
                     <Button
                       variant="outline"
                       asChild
-                      className="w-full"
+                      className="w-full cursor-pointer"
                       size="lg"
                     >
                       <Link to={`${ROUTES.REGISTER}?email=${encodeURIComponent(inviteInfo.email)}&inviteToken=${token}`}>
-                        회원가입하고 수락하기
+                        {t("invite.signupAndAccept")}
                       </Link>
                     </Button>
                     <Button
                       variant="ghost"
                       asChild
-                      className="w-full"
+                      className="w-full cursor-pointer"
                     >
                       <Link to={`${ROUTES.LOGIN}?email=${encodeURIComponent(inviteInfo.email)}&inviteToken=${token}`}>
-                        이미 계정이 있으신가요? 로그인
+                        {t("invite.alreadyHaveAccount")}
                       </Link>
                     </Button>
                   </>
                 )}
               </>
             ) : emailMismatch ? (
-              <Button variant="outline" asChild className="w-full" size="lg">
-                <Link to={ROUTES.LOGIN}>올바른 계정으로 로그인</Link>
+              <Button variant="outline" asChild className="w-full cursor-pointer" size="lg">
+                <Link to={ROUTES.LOGIN}>{t("invite.loginWithCorrectAccount")}</Link>
               </Button>
             ) : (
               <Button
                 onClick={handleAcceptInvite}
-                className="w-full"
+                className="w-full cursor-pointer"
                 size="lg"
                 disabled={acceptInvite.isPending}
               >
                 {acceptInvite.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    수락 중...
+                    {t("invite.accepting")}
                   </>
                 ) : (
                   <>
                     <CheckCircle2 className="mr-2 h-4 w-4" />
-                    초대 수락하기
+                    {t("invite.accept")}
                   </>
                 )}
               </Button>
