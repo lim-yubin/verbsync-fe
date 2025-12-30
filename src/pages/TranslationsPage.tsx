@@ -62,7 +62,7 @@ export function TranslationsPage() {
   const navigate = useNavigate();
   const { data: project } = useProject(projectId!);
   const { data: planInfo } = usePlan();
-  
+
   // 편집 권한 확인 (OWNER 또는 EDITOR만 편집 가능, VIEWER는 조회만)
   const canEdit = project?.isOwner || project?.role === "EDITOR";
   const canImport = planInfo?.features.canImport ?? false;
@@ -163,13 +163,7 @@ export function TranslationsPage() {
       ...sortedMatrix,
       rows: filtered,
     };
-  }, [
-    sortedMatrix,
-    searchQuery,
-    selectedNamespaces,
-    sortBy,
-    keys,
-  ]);
+  }, [sortedMatrix, searchQuery, selectedNamespaces, sortBy, keys]);
 
   // Namespace 목록 추출
   const availableNamespaces = useMemo(() => {
@@ -221,7 +215,9 @@ export function TranslationsPage() {
       { updates },
       {
         onSuccess: () => {
-          toast.success(t("translation.saveSuccess", { count: updates.length }));
+          toast.success(
+            t("translation.saveSuccess", { count: updates.length })
+          );
           setChanges({});
         },
         onError: (error: Error) => {
@@ -261,18 +257,15 @@ export function TranslationsPage() {
             : planInfo.plan === "PRO"
             ? 10000
             : Infinity;
-        toast.error(
-          t("translation.keyLimitReached", { limit }),
-          {
-            description: getUpgradeMessage(planInfo.plan, "keys"),
-            action: {
-              label: t("translation.viewPlan"),
-              onClick: () => {
-                navigate(ROUTES.PRICING);
-              },
+        toast.error(t("translation.keyLimitReached", { limit }), {
+          description: getUpgradeMessage(planInfo.plan, "keys"),
+          action: {
+            label: t("translation.viewPlan"),
+            onClick: () => {
+              navigate(ROUTES.PRICING);
             },
-          }
-        );
+          },
+        });
         return;
       }
     }
@@ -379,7 +372,8 @@ export function TranslationsPage() {
             response?: { data?: { message?: string } };
           };
           toast.error(
-            axiosError.response?.data?.message || t("translation.keyUpdateFailed")
+            axiosError.response?.data?.message ||
+              t("translation.keyUpdateFailed")
           );
         },
       }
@@ -444,7 +438,9 @@ export function TranslationsPage() {
           completed++;
           if (completed + failed === keysToDelete.length) {
             if (failed === 0) {
-              toast.success(t("translation.keysDeleteSuccess", { count: completed }));
+              toast.success(
+                t("translation.keysDeleteSuccess", { count: completed })
+              );
             } else {
               toast.warning(
                 t("translation.keysDeletePartial", { completed, failed })
@@ -648,13 +644,10 @@ export function TranslationsPage() {
                   <ExportButton
                     matrix={displayMatrix}
                     projectName={project.name}
-                    isFiltered={
-                      !!searchQuery ||
-                      selectedNamespaces.length > 0
-                    }
+                    isFiltered={!!searchQuery || selectedNamespaces.length > 0}
                   />
-                  {canEdit && (
-                    canImport ? (
+                  {canEdit &&
+                    (canImport ? (
                       <Button
                         variant="outline"
                         onClick={() => setImportDialogOpen(true)}
@@ -672,18 +665,20 @@ export function TranslationsPage() {
                             className="cursor-not-allowed opacity-50"
                           >
                             <Upload className="mr-2 h-4 w-4" />
-                            가져오기
+                            {t("translation.import")}
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
                           {t("translation.importNotAvailable")}{" "}
-                          <a href="/pricing" className="underline cursor-pointer">
+                          <a
+                            href="/pricing"
+                            className="underline cursor-pointer"
+                          >
                             {t("translation.importUpgrade")}
                           </a>
                         </TooltipContent>
                       </Tooltip>
-                    )
-                  )}
+                    ))}
                 </>
               )}
               {canEdit && (
@@ -696,7 +691,9 @@ export function TranslationsPage() {
                   {isSaving
                     ? t("translation.saving")
                     : hasChanges
-                    ? `${t("translation.save")} (${Object.keys(changes).length})`
+                    ? `${t("translation.save")} (${
+                        Object.keys(changes).length
+                      })`
                     : t("translation.save")}
                 </Button>
               )}
@@ -902,7 +899,8 @@ export function TranslationsPage() {
               onClick={() => setIsAddingKey(true)}
               className="w-full max-w-md"
             >
-              <Plus className="mr-2 h-4 w-4" />{t("translation.addKey")}
+              <Plus className="mr-2 h-4 w-4" />
+              {t("translation.addKey")}
             </Button>
             <span className="text-xs text-muted-foreground">
               {t("translation.quickAddHint", {
@@ -922,7 +920,9 @@ export function TranslationsPage() {
               <Save className="mr-2 h-5 w-5" />
               {isSaving
                 ? t("translation.saving")
-                : t("translation.changesCount", { count: Object.keys(changes).length })}
+                : t("translation.changesCount", {
+                    count: Object.keys(changes).length,
+                  })}
             </Button>
           </div>
         )}
@@ -934,15 +934,23 @@ export function TranslationsPage() {
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>{t("translation.deleteSelectedTitle")}</AlertDialogTitle>
+              <AlertDialogTitle>
+                {t("translation.deleteSelectedTitle")}
+              </AlertDialogTitle>
               <AlertDialogDescription>
-                {t("translation.deleteSelectedDescription", { count: selectedKeys.size })}
-                <br />{t("translation.deleteSelectedWarning")}
+                {t("translation.deleteSelectedDescription", {
+                  count: selectedKeys.size,
+                })}
+                <br />
+                {t("translation.deleteSelectedWarning")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeleteSelectedKeys} className="cursor-pointer">
+              <AlertDialogAction
+                onClick={handleDeleteSelectedKeys}
+                className="cursor-pointer"
+              >
                 {t("common.delete")}
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -956,14 +964,17 @@ export function TranslationsPage() {
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>{t("translation.deleteKeyTitle")}</AlertDialogTitle>
+              <AlertDialogTitle>
+                {t("translation.deleteKeyTitle")}
+              </AlertDialogTitle>
               <AlertDialogDescription>
                 <span className="font-mono font-semibold">
                   {deleteDialogKey}
                 </span>{" "}
                 {t("translation.deleteKeyDescription")}
                 <br />
-                <br />{t("translation.deleteKeyWarning")}
+                <br />
+                {t("translation.deleteKeyWarning")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
