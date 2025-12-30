@@ -1,6 +1,8 @@
 {
   "common": {
     "appName": "Verbsync",
+    "metaDescription": "개발자를 위한 다국어 관리 플랫폼",
+    "metaTitle": "Verbsync - 개발자를 위한 다국어 관리 플랫폼",
     "loading": "로딩 중...",
     "error": "오류",
     "success": "성공",

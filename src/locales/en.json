@@ -1,6 +1,8 @@
 {
   "common": {
     "appName": "Verbsync",
+    "metaDescription": "Multilingual management platform for developers",
+    "metaTitle": "Verbsync - Multilingual Management Platform for Developers",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
