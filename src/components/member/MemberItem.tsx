@@ -29,7 +29,6 @@ import {
   useRemoveMember,
 } from "@/hooks/useMembers";
 import type { ProjectMember } from "@/types/api";
-import { ROLE_LABELS } from "@/lib/permissions";
 import { useAuthStore } from "@/store/authStore";
 
 interface MemberItemProps {

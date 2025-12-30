@@ -1,10 +1,11 @@
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Globe } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ROUTES } from "@/lib/constants";
 import { formatDistanceToNow } from "date-fns";
-import { ko } from "date-fns/locale";
+import { ko, enUS } from "date-fns/locale";
 
 interface ProjectCardProps {
   id: string;
