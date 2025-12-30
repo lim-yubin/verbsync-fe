@@ -1,4 +1,5 @@
 import type { Plan } from "@/types/api";
+import type { TFunction } from "i18next";
 
 export const PLAN_LABELS: Record<Plan, string> = {
   FREE: "Free",
@@ -7,12 +8,15 @@ export const PLAN_LABELS: Record<Plan, string> = {
   ENTERPRISE: "Enterprise",
 };
 
-export const PLAN_DESCRIPTIONS: Record<Plan, string> = {
-  FREE: "개인 개발자 및 사이드 프로젝트를 위한 무료 플랜",
-  STARTER: "성장하는 프로젝트와 소규모 팀을 위한 플랜",
-  PRO: "대규모 프로젝트와 전문적인 관리가 필요한 팀",
-  ENTERPRISE: "대기업, 대규모 조직, 엔터프라이즈급 요구사항",
-};
+/**
+ * 플랜 설명을 다국어로 반환
+ * @param t i18n 번역 함수
+ * @param plan 플랜 타입
+ * @returns 번역된 플랜 설명
+ */
+export function getPlanDescription(t: TFunction, plan: Plan): string {
+  return t(`plans.descriptions.${plan}`);
+}
 
 // ========== 플랜별 사용량 제한 ==========
 export const PLAN_LIMITS = {
@@ -43,11 +47,17 @@ export const PLAN_LIMITS = {
 } as const;
 
 // ========== 플랜 제한 체크 유틸리티 ==========
-export function getPlanLimit(plan: Plan, type: "projects" | "keys" | "locales" | "members"): number {
+export function getPlanLimit(
+  plan: Plan,
+  type: "projects" | "keys" | "locales" | "members"
+): number {
   return PLAN_LIMITS[plan][type];
 }
 
-export function canCreateProject(plan: Plan, currentProjectCount: number): boolean {
+export function canCreateProject(
+  plan: Plan,
+  currentProjectCount: number
+): boolean {
   const limit = getPlanLimit(plan, "projects");
   return currentProjectCount <= limit;
 }
@@ -62,24 +72,32 @@ export function canAddLocale(plan: Plan, currentLocaleCount: number): boolean {
   return currentLocaleCount <= limit;
 }
 
-export function canInviteMember(plan: Plan, currentMemberCount: number): boolean {
+export function canInviteMember(
+  plan: Plan,
+  currentMemberCount: number
+): boolean {
   const limit = getPlanLimit(plan, "members");
   return currentMemberCount <= limit;
 }
 
-export function getUpgradeMessage(plan: Plan, type: "projects" | "keys" | "locales" | "members"): string {
-  const typeLabels = {
-    projects: "프로젝트",
-    keys: "번역 키",
-    locales: "언어",
-    members: "멤버",
-  };
+/**
+ * 업그레이드 메시지를 다국어로 반환
+ * @param t i18n 번역 함수
+ * @param plan 현재 플랜
+ * @param type 제한 타입 (projects, keys, locales, members)
+ * @returns 번역된 업그레이드 메시지
+ */
+export function getUpgradeMessage(
+  t: TFunction,
+  plan: Plan,
+  type: "projects" | "keys" | "locales" | "members"
+): string {
+  const typeLabel = t(`plans.typeLabels.${type}`);
 
   if (plan === "FREE") {
-    return `Starter 플랜으로 업그레이드하면 ${typeLabels[type]} 제한이 늘어납니다.`;
+    return t("plans.upgradeToStarter", { type: typeLabel });
   } else if (plan === "STARTER") {
-    return `Pro 플랜으로 업그레이드하면 ${typeLabels[type]} 제한이 늘어납니다.`;
+    return t("plans.upgradeToPro", { type: typeLabel });
   }
   return "";
 }
-

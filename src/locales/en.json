@@ -277,6 +277,22 @@
     "starterCta": "Upgrade",
     "proCta": "Upgrade"
   },
+  "plans": {
+    "descriptions": {
+      "FREE": "Free plan for individual developers and side projects",
+      "STARTER": "Plan for growing projects and small teams",
+      "PRO": "For large-scale projects and teams requiring professional management",
+      "ENTERPRISE": "For large enterprises, large organizations, and enterprise-level requirements"
+    },
+    "typeLabels": {
+      "projects": "projects",
+      "keys": "translation keys",
+      "locales": "languages",
+      "members": "members"
+    },
+    "upgradeToStarter": "Upgrade to Starter plan to increase {{type}} limit.",
+    "upgradeToPro": "Upgrade to Pro plan to increase {{type}} limit."
+  },
   "pricing": {
     "title": "Pricing",
     "subtitle": "Simple and Transparent Pricing",
@@ -299,6 +315,8 @@
     "accountInfoDescription": "View your account information",
     "preferences": "Preferences",
     "language": "Language",
+    "korean": "Korean",
+    "english": "English",
     "theme": "Theme",
     "dark": "Dark Mode",
     "light": "Light Mode",

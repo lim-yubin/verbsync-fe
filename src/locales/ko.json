@@ -277,6 +277,22 @@
     "starterCta": "업그레이드",
     "proCta": "업그레이드"
   },
+  "plans": {
+    "descriptions": {
+      "FREE": "개인 개발자 및 사이드 프로젝트를 위한 무료 플랜",
+      "STARTER": "성장하는 프로젝트와 소규모 팀을 위한 플랜",
+      "PRO": "대규모 프로젝트와 전문적인 관리가 필요한 팀",
+      "ENTERPRISE": "대기업, 대규모 조직, 엔터프라이즈급 요구사항"
+    },
+    "typeLabels": {
+      "projects": "프로젝트",
+      "keys": "번역 키",
+      "locales": "언어",
+      "members": "멤버"
+    },
+    "upgradeToStarter": "Starter 플랜으로 업그레이드하면 {{type}} 제한이 늘어납니다.",
+    "upgradeToPro": "Pro 플랜으로 업그레이드하면 {{type}} 제한이 늘어납니다."
+  },
   "pricing": {
     "title": "요금제",
     "subtitle": "간단하고 투명한 가격",
@@ -299,6 +315,8 @@
     "accountInfoDescription": "계정 정보를 확인할 수 있습니다",
     "preferences": "환경 설정",
     "language": "언어",
+    "korean": "한국어",
+    "english": "English",
     "theme": "테마",
     "dark": "다크 모드",
     "light": "라이트 모드",

@@ -148,7 +148,7 @@ export function ProjectSettingsPage() {
 
     const finalDomain = isWildcard ? `*.${normalizedDomain}` : normalizedDomain;
     if (allowedDomains.includes(finalDomain)) {
-      toast.error("이미 추가된 도메인입니다");
+      toast.error(t("projectSettings.domainExists"));
       return;
     }
 
@@ -390,11 +390,6 @@ export function ProjectSettingsPage() {
                 )}
                 <p className="text-xs text-muted-foreground">
                   {t("projectSettings.domainHint")}
-                  <br />
-                  <span className="font-semibold text-primary">
-                    {t("projectSettings.localTest")}
-                  </span>{" "}
-                  {t("projectSettings.localhost")}
                   <br />
                   <span className="font-semibold">{t("projectSettings.wildcard")}</span>{" "}
                   <code className="text-xs bg-muted px-1 rounded">
