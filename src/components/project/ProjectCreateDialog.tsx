@@ -127,7 +127,7 @@ export function ProjectCreateDialog({
             ? 5
             : Infinity;
         toast.error(t("projectCreate.projectLimitReached", { limit }), {
-          description: getUpgradeMessage(planInfo.plan, "projects"),
+          description: getUpgradeMessage(t, planInfo.plan, "projects"),
           action: {
             label: t("projectCreate.viewPlan"),
             onClick: () => {
@@ -224,9 +224,6 @@ export function ProjectCreateDialog({
                 {errors.defaultLocale.message}
               </p>
             )}
-            <p className="text-xs text-muted-foreground">
-              {t("projectCreate.defaultLocaleHint")}
-            </p>
           </div>
 
           {/* 버튼 */}

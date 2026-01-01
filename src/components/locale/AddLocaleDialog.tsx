@@ -91,7 +91,7 @@ export function AddLocaleDialog({
         toast.error(
           t("addLocale.localeLimitReached", { limit }),
           {
-            description: getUpgradeMessage(planInfo.plan, "locales"),
+            description: getUpgradeMessage(t, planInfo.plan, "locales"),
             action: {
               label: t("projectCreate.viewPlan"),
               onClick: () => {

@@ -277,6 +277,22 @@
     "starterCta": "업그레이드",
     "proCta": "업그레이드"
   },
+  "plans": {
+    "descriptions": {
+      "FREE": "개인 개발자 및 사이드 프로젝트를 위한 무료 플랜",
+      "STARTER": "성장하는 프로젝트와 소규모 팀을 위한 플랜",
+      "PRO": "대규모 프로젝트와 전문적인 관리가 필요한 팀",
+      "ENTERPRISE": "대기업, 대규모 조직, 엔터프라이즈급 요구사항"
+    },
+    "typeLabels": {
+      "projects": "프로젝트",
+      "keys": "번역 키",
+      "locales": "언어",
+      "members": "멤버"
+    },
+    "upgradeToStarter": "Starter 플랜으로 업그레이드하면 {{type}} 제한이 늘어납니다.",
+    "upgradeToPro": "Pro 플랜으로 업그레이드하면 {{type}} 제한이 늘어납니다."
+  },
   "pricing": {
     "title": "요금제",
     "subtitle": "간단하고 투명한 가격",
@@ -299,6 +315,8 @@
     "accountInfoDescription": "계정 정보를 확인할 수 있습니다",
     "preferences": "환경 설정",
     "language": "언어",
+    "korean": "한국어",
+    "english": "English",
     "theme": "테마",
     "dark": "다크 모드",
     "light": "라이트 모드",
@@ -487,8 +505,8 @@
     "addFailed": "언어 추가에 실패했습니다"
   },
   "apiKey": {
-    "title": "i18next 연동 및 사용 가이드",
-    "description": "Verbsync는 i18next와 완벽하게 호환됩니다. 아래 가이드를 따라 실시간 번역 동기화를 시작하세요.",
+    "integrationTitle": "통합 가이드",
+    "integrationDescription": "프로젝트에 Verbsync Translation API를 연동하는 방법을 선택하세요.",
     "projectApiKey": "프로젝트 API Key",
     "secret": "Secret",
     "loadError": "API Key를 불러올 수 없습니다.",
@@ -496,16 +514,20 @@
     "copyFailed": "복사에 실패했습니다",
     "codeCopySuccess": "{{type}} 코드가 복사되었습니다",
     "codeCopyFailed": "복사에 실패했습니다",
-    "step1Title": "1. 대시보드에 키 등록하기",
-    "step1Description": "점(.)을 사용하여 네임스페이스와 키를 구분합니다. i18next 설정의 ns(namespaces) 배열에 등록한 이름을 맨 앞에 붙여주세요.",
-    "keyName": "Key Name",
-    "homeWelcome": "홈 네임스페이스의 환영 문구",
-    "commonSave": "공통 네임스페이스의 저장 버튼",
-    "step2Title": "2. i18n.ts 설정 (표준 방식)",
-    "step2Description": "프로젝트 루트의 설정 파일에 아래 코드를 추가합니다.",
+    "integrationMethodTitle": "통합 방법 선택",
+    "integrationMethodDescription": "사용 중인 프레임워크에 맞는 통합 방법을 선택하세요.",
+    "installTitle": "1. 패키지 설치",
+    "configTitle": "2. 설정",
+    "configDescription": "프로젝트 루트에 설정 파일을 생성하고 아래 코드를 추가하세요.",
+    "nextAppConfigDescription": "i18n.ts 파일에 아래 코드를 추가하세요. 여러 네임스페이스를 한 번에 로드합니다.",
+    "nextPagesConfigDescription": "getServerSideProps를 사용하여 서버 사이드에서 번역을 불러옵니다. 여러 네임스페이스를 지원합니다.",
+    "nextI18nextConfigDescription": "Next.js에서도 React와 동일한 i18next 설정을 사용할 수 있습니다. API Key는 클라이언트에 노출됩니다.",
+    "providerTitle": "3. Provider 설정",
+    "providerDescription": "app/[locale]/layout.tsx에서 NextIntlClientProvider를 설정하세요.",
+    "serverUsageTitle": "4. Server Component 사용",
+    "clientUsageTitle": "5. Client Component 사용",
+    "usageTitle": "3. 사용 예시",
     "copyCode": "코드 복사",
-    "step3Title": "3. React 컴포넌트에서 사용",
-    "step3Description": "네임스페이스를 지정하여 번역을 불러옵니다.",
     "securityTitle": "도메인 제한 필수",
     "securityDescription": "브라우저에서 직접 호출할 경우, 반드시 프로젝트 설정 > 도메인 제한에서 서비스 도메인을 등록하세요."
   },

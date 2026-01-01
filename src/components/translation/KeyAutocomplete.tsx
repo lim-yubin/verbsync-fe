@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -17,10 +18,12 @@ export function KeyAutocomplete({
   onChange,
   onKeyDown,
   existingKeys,
-  placeholder = "새 키 이름 (예: login.title)",
+  placeholder,
   className,
   autoFocus,
 }: KeyAutocompleteProps) {
+  const { t } = useTranslation();
+  const defaultPlaceholder = placeholder || t("addKey.namePlaceholder");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -162,7 +165,7 @@ export function KeyAutocomplete({
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        placeholder={placeholder}
+        placeholder={defaultPlaceholder}
         className={cn("font-mono text-sm h-9", className)}
         autoFocus={autoFocus}
       />

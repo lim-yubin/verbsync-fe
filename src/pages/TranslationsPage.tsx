@@ -258,7 +258,7 @@ export function TranslationsPage() {
             ? 10000
             : Infinity;
         toast.error(t("translation.keyLimitReached", { limit }), {
-          description: getUpgradeMessage(planInfo.plan, "keys"),
+          description: getUpgradeMessage(t, planInfo.plan, "keys"),
           action: {
             label: t("translation.viewPlan"),
             onClick: () => {

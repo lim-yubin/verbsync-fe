@@ -277,6 +277,22 @@
     "starterCta": "Upgrade",
     "proCta": "Upgrade"
   },
+  "plans": {
+    "descriptions": {
+      "FREE": "Free plan for individual developers and side projects",
+      "STARTER": "Plan for growing projects and small teams",
+      "PRO": "For large-scale projects and teams requiring professional management",
+      "ENTERPRISE": "For large enterprises, large organizations, and enterprise-level requirements"
+    },
+    "typeLabels": {
+      "projects": "projects",
+      "keys": "translation keys",
+      "locales": "languages",
+      "members": "members"
+    },
+    "upgradeToStarter": "Upgrade to Starter plan to increase {{type}} limit.",
+    "upgradeToPro": "Upgrade to Pro plan to increase {{type}} limit."
+  },
   "pricing": {
     "title": "Pricing",
     "subtitle": "Simple and Transparent Pricing",
@@ -299,6 +315,8 @@
     "accountInfoDescription": "View your account information",
     "preferences": "Preferences",
     "language": "Language",
+    "korean": "Korean",
+    "english": "English",
     "theme": "Theme",
     "dark": "Dark Mode",
     "light": "Light Mode",
@@ -487,8 +505,8 @@
     "addFailed": "Failed to add languages"
   },
   "apiKey": {
-    "title": "i18next Integration & Usage Guide",
-    "description": "Verbsync is fully compatible with i18next. Follow the guide below to start real-time translation synchronization.",
+    "integrationTitle": "Integration Guide",
+    "integrationDescription": "Choose how to integrate Verbsync Translation API into your project.",
     "projectApiKey": "Project API Key",
     "secret": "Secret",
     "loadError": "Unable to load API Key.",
@@ -496,16 +514,20 @@
     "copyFailed": "Failed to copy",
     "codeCopySuccess": "{{type}} code copied",
     "codeCopyFailed": "Failed to copy",
-    "step1Title": "1. Register Keys in Dashboard",
-    "step1Description": "Use dots (.) to separate namespaces and keys. Add the name registered in the i18next ns (namespaces) array at the beginning.",
-    "keyName": "Key Name",
-    "homeWelcome": "Welcome message in home namespace",
-    "commonSave": "Save button in common namespace",
-    "step2Title": "2. i18n.ts Configuration (Standard Method)",
-    "step2Description": "Add the code below to the configuration file in your project root.",
+    "integrationMethodTitle": "Choose Integration Method",
+    "integrationMethodDescription": "Select the integration method that matches your framework.",
+    "installTitle": "1. Install Packages",
+    "configTitle": "2. Configuration",
+    "configDescription": "Create a configuration file in your project root and add the code below.",
+    "nextAppConfigDescription": "Add the code below to your i18n.ts file. Loads multiple namespaces at once.",
+    "nextPagesConfigDescription": "Use getServerSideProps to load translations on the server side. Supports multiple namespaces.",
+    "nextI18nextConfigDescription": "You can use the same i18next setup as React in Next.js. API key will be exposed to the client.",
+    "providerTitle": "3. Provider Setup",
+    "providerDescription": "Set up NextIntlClientProvider in app/[locale]/layout.tsx.",
+    "serverUsageTitle": "4. Server Component Usage",
+    "clientUsageTitle": "5. Client Component Usage",
+    "usageTitle": "3. Usage Example",
     "copyCode": "Copy Code",
-    "step3Title": "3. Use in React Components",
-    "step3Description": "Load translations by specifying namespaces.",
     "securityTitle": "Domain Restriction Required",
     "securityDescription": "When calling directly from the browser, be sure to register your service domain in Project Settings > Domain Restrictions."
   },

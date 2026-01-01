@@ -10,10 +10,7 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useLogin } from "@/hooks/useAuth";
 import { ROUTES } from "@/lib/constants";
 
@@ -68,7 +65,8 @@ export function LoginForm() {
         console.error(error);
         const axiosError = error as AxiosError<{ message?: string }>;
         toast.error(
-          axiosError.response?.data?.message || t("auth.login") + " " + t("common.error")
+          axiosError.response?.data?.message ||
+            t("auth.login") + " " + t("common.error")
         );
       },
     });
@@ -102,11 +100,17 @@ export function LoginForm() {
               disabled={isPending}
             />
             {errors.password && (
-              <p className="text-sm text-destructive">{errors.password.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
-          <Button type="submit" className="w-full cursor-pointer" disabled={isPending}>
+          <Button
+            type="submit"
+            className="w-full cursor-pointer"
+            disabled={isPending}
+          >
             {isPending ? t("common.loading") : t("auth.login")}
           </Button>
         </form>
