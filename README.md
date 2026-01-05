@@ -1,73 +1,49 @@
-# React + TypeScript + Vite
+# Verbsync
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern i18n management platform for developers
 
-Currently, two official plugins are available:
+## About
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Verbsync is a web-based translation management tool that lets you manage translation keys and values in an intuitive, spreadsheet-like interface. Organize multilingual content by project and deploy translations in real-time via API.
 
-## React Compiler
+## Key Features
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+- 📝 **Spreadsheet-style Translation Table**: Intuitive editing interface with keys as rows and languages as columns
+- 🌍 **Project-based Multilingual Management**: Independent language settings and translation management per project
+- 🔑 **API Key-based Deployment**: Over-the-air (OTA) translation deployment via RESTful API
+- 👥 **Team Collaboration**: Invite members and manage permissions (Owner/Editor/Viewer)
+- 💳 **Subscription Plans**: Free, Starter, Pro, and Enterprise plans
+- 🎨 **Modern UI**: Minimal, professional design inspired by Linear and Vercel
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Project Management
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Create and organize multiple projects, each with its own API key and translation settings. Monitor project statistics and manage configurations from a centralized dashboard.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Language Management
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Add languages using ISO 639-1 codes, enable or disable them as needed, and protect default languages from deletion. Manage your project's supported locales with ease.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Translation Key Management
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Create translation keys using dot notation (e.g., `login.title`, `home.hero.title`), add descriptions for context, and search through your key list efficiently.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Translation Editing
+
+- **Inline Editing**: Double-click any cell to edit translations directly
+- **Batch Save**: Save multiple translations at once
+- **Real-time Status**: Visual indicators for empty, modified, and saved translations
+- **Keyboard Shortcuts**: Navigate and edit with Enter, Tab, Shift+Enter, and more
+
+### Team Collaboration
+
+Invite team members via email, assign roles (Owner/Editor/Viewer), and manage access permissions. Work together seamlessly on translation projects.
+
+### Subscription Management
+
+Choose from flexible plans that scale with your needs. Monitor usage and upgrade or downgrade as your project grows.
+
+---
+
+**Verbsync** - Make translation management easier and more efficient 🚀
