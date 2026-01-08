@@ -99,7 +99,7 @@ api.interceptors.response.use(
         // 초대 수락 페이지에서는 리다이렉트하지 않음 (사용자가 초대 정보를 볼 수 있어야 함)
         const currentPath = window.location.pathname;
         if (!currentPath.includes("/accept-invite")) {
-          window.location.href = "/login";
+        window.location.href = "/login";
         }
         
         return Promise.reject(refreshError);

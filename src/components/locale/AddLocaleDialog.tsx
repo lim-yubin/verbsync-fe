@@ -98,11 +98,11 @@ export function AddLocaleDialog({
             description: getUpgradeMessage(t, planInfo.plan, "locales", isOwner),
             action: isOwner
               ? {
-                  label: t("projectCreate.viewPlan"),
-                  onClick: () => {
-                    navigate(ROUTES.PRICING);
-                    onOpenChange(false);
-                  },
+              label: t("projectCreate.viewPlan"),
+              onClick: () => {
+                navigate(ROUTES.PRICING);
+                onOpenChange(false);
+              },
                 }
               : undefined,
           }

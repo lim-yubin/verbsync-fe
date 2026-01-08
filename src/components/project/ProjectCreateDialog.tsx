@@ -134,11 +134,11 @@ export function ProjectCreateDialog({
           description: getUpgradeMessage(t, planInfo.plan, "projects", isOwner),
           action: isOwner
             ? {
-                label: t("projectCreate.viewPlan"),
-                onClick: () => {
-                  navigate(ROUTES.PRICING);
-                  onOpenChange(false);
-                },
+            label: t("projectCreate.viewPlan"),
+            onClick: () => {
+              navigate(ROUTES.PRICING);
+              onOpenChange(false);
+            },
               }
             : undefined,
         });
