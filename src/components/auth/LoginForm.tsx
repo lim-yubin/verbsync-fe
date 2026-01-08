@@ -115,16 +115,26 @@ export function LoginForm() {
           </Button>
         </form>
 
-        <div className="mt-4 text-center text-sm">
-          <span className="text-muted-foreground">
-            {t("auth.dontHaveAccount")}{" "}
-          </span>
-          <Link
-            to={ROUTES.REGISTER}
-            className="text-foreground font-medium hover:underline cursor-pointer"
-          >
-            {t("auth.register")}
-          </Link>
+        <div className="mt-4 space-y-2">
+          <div className="text-center text-sm">
+            <Link
+              to={ROUTES.FORGOT_PASSWORD}
+              className="text-foreground font-medium hover:underline cursor-pointer"
+            >
+              {t("auth.forgotPassword")}
+            </Link>
+          </div>
+          <div className="text-center text-sm">
+            <span className="text-muted-foreground">
+              {t("auth.dontHaveAccount")}{" "}
+            </span>
+            <Link
+              to={ROUTES.REGISTER}
+              className="text-foreground font-medium hover:underline cursor-pointer"
+            >
+              {t("auth.register")}
+            </Link>
+          </div>
         </div>
       </CardContent>
     </Card>

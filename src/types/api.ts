@@ -49,6 +49,22 @@ export interface ChangePasswordDto {
   newPassword: string;
 }
 
+// 비밀번호 찾기
+export interface ForgotPasswordDto {
+  email: string;
+}
+
+export interface VerifyCodeDto {
+  email: string;
+  code: string;
+}
+
+export interface ResetPasswordDto {
+  email: string;
+  code: string;
+  newPassword: string;
+}
+
 // ========== Project ==========
 export interface Project {
   id: string;

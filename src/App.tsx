@@ -3,6 +3,9 @@ import { ROUTES } from "@/lib/constants";
 import {
   LoginPage,
   RegisterPage,
+  ForgotPasswordPage,
+  VerifyCodePage,
+  ResetPasswordPage,
   VerifyEmailPage,
   VerifyEmailSuccessPage,
   EmailVerificationPendingPage,
@@ -51,6 +54,30 @@ function App() {
           element={
             <PublicRoute>
               <RegisterPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path={ROUTES.FORGOT_PASSWORD}
+          element={
+            <PublicRoute>
+              <ForgotPasswordPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path={ROUTES.VERIFY_CODE}
+          element={
+            <PublicRoute>
+              <VerifyCodePage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path={ROUTES.RESET_PASSWORD}
+          element={
+            <PublicRoute>
+              <ResetPasswordPage />
             </PublicRoute>
           }
         />
