@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, CheckCircle2, XCircle, Mail, User } from "lucide-react";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 export function AcceptInvitePage() {
   const { t } = useTranslation();
@@ -63,16 +64,21 @@ export function AcceptInvitePage() {
 
   // 에러 처리 (토큰이 있고 로딩이 완료되었지만 에러가 발생한 경우)
   if (token && !isLoading && (error || !inviteInfo)) {
+    // 401 에러인지 확인
+    const is401Error = error instanceof AxiosError && error.response?.status === 401;
+    
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <XCircle className="h-5 w-5 text-destructive" />
-              {t("invite.loadError")}
+              {is401Error ? t("invite.authRequired") : t("invite.loadError")}
             </CardTitle>
             <CardDescription>
-              {error instanceof Error
+              {is401Error
+                ? t("invite.authRequiredDescription")
+                : error instanceof Error
                 ? error.message
                 : t("invite.loadErrorDescription")}
             </CardDescription>

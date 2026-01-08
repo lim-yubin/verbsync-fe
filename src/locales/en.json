@@ -433,6 +433,8 @@
     "loading": "Loading invitation information...",
     "loadError": "Unable to load invitation information",
     "loadErrorDescription": "Invalid invitation link or it has already expired.",
+    "authRequired": "Authentication Required",
+    "authRequiredDescription": "Please complete registration or login with the invited email address, then access the link again from your email.",
     "emailMismatch": "The invited email does not match the logged-in account email.",
     "emailMismatchDescription": "The invited email ({{invited}}) does not match the logged-in account email ({{current}}). Please log in with the correct account.",
     "signupRequired": "Registration is required. You can accept the invitation after signing up.",
