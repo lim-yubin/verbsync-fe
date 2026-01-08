@@ -12,6 +12,9 @@ import type {
   ChangePasswordDto,
   VerifyEmailDto,
   ResendVerificationDto,
+  ForgotPasswordDto,
+  VerifyCodeDto,
+  ResetPasswordDto,
 } from "@/types/api";
 
 // 로그인
@@ -134,6 +137,45 @@ export function useDeleteAccount() {
       queryClient.clear();
       // 로컬 상태 클리어
       logout();
+    },
+  });
+}
+
+// 비밀번호 찾기 - 이메일로 인증 코드 전송
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: async (dto: ForgotPasswordDto) => {
+      const { data } = await api.post<{ message: string }>(
+        "/auth/forgot-password",
+        dto
+      );
+      return data;
+    },
+  });
+}
+
+// 비밀번호 찾기 - 인증 코드 검증
+export function useVerifyCode() {
+  return useMutation({
+    mutationFn: async (dto: VerifyCodeDto) => {
+      const { data } = await api.post<{ message: string; verified: boolean }>(
+        "/auth/verify-code",
+        dto
+      );
+      return data;
+    },
+  });
+}
+
+// 비밀번호 찾기 - 새 비밀번호 설정
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: async (dto: ResetPasswordDto) => {
+      const { data } = await api.post<{ message: string }>(
+        "/auth/reset-password",
+        dto
+      );
+      return data;
     },
   });
 }
