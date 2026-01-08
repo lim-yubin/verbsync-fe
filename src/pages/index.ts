@@ -9,6 +9,7 @@ export { LocalesPage } from "./LocalesPage";
 export { TranslationsPage } from "./TranslationsPage";
 export { ProjectSettingsPage } from "./ProjectSettingsPage";
 export { MembersPage } from "./MembersPage";
+export { TeamPage } from "./TeamPage";
 export { SettingsPage } from "./SettingsPage";
 export { PricingPage } from "./PricingPage";
 export { SubscriptionPage } from "./SubscriptionPage";

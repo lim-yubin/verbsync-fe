@@ -41,6 +41,7 @@ export const ROUTES = {
   PROJECT_TRANSLATIONS: (id: string) => `/projects/${id}/translations`,
   PROJECT_SETTINGS: (id: string) => `/projects/${id}/settings`,
   MEMBERS: "/members",
+  TEAM: "/team",
   ACCEPT_INVITE: "/accept-invite",
   TERMS: "/terms",
   PRIVACY: "/privacy",

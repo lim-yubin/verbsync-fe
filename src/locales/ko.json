@@ -73,6 +73,7 @@
     "projects": "프로젝트",
     "settings": "설정",
     "members": "멤버",
+    "team": "팀 정보",
     "subscription": "구독",
     "pricing": "요금제"
   },
@@ -447,6 +448,15 @@
     "acceptSuccess": "초대를 수락했습니다!",
     "acceptFailed": "초대 수락에 실패했습니다.",
     "goToLogin": "로그인 페이지로 이동"
+  },
+  "team": {
+    "title": "팀 정보",
+    "description": "계정 소유자와 팀 멤버 정보를 확인할 수 있습니다",
+    "accountOwner": "계정 소유자",
+    "accountOwnerDescription": "이 계정의 소유자입니다",
+    "teamMembers": "팀 멤버",
+    "teamMembersDescription": "계정에 초대된 팀 멤버 목록입니다",
+    "noTeamMembers": "팀 멤버가 없습니다"
   },
   "verifyEmail": {
     "title": "이메일 인증",

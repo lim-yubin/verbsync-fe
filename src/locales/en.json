@@ -73,6 +73,7 @@
     "projects": "Projects",
     "settings": "Settings",
     "members": "Members",
+    "team": "Team Info",
     "subscription": "Subscription",
     "pricing": "Pricing"
   },
@@ -447,6 +448,15 @@
     "acceptSuccess": "Invitation accepted!",
     "acceptFailed": "Failed to accept invitation.",
     "goToLogin": "Go to Login Page"
+  },
+  "team": {
+    "title": "Team Information",
+    "description": "View account owner and team member information",
+    "accountOwner": "Account Owner",
+    "accountOwnerDescription": "The owner of this account",
+    "teamMembers": "Team Members",
+    "teamMembersDescription": "List of team members invited to this account",
+    "noTeamMembers": "No team members"
   },
   "verifyEmail": {
     "title": "Email Verification",

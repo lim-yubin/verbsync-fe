@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Settings, Users, CreditCard } from "lucide-react";
+import { Home, Settings, Users, CreditCard, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 import { useMemberPermissions } from "@/hooks/useMembers";
@@ -23,6 +23,11 @@ const allNavItems: NavItem[] = [
     titleKey: "nav.members",
     href: ROUTES.MEMBERS,
     icon: Users,
+  },
+  {
+    titleKey: "nav.team",
+    href: ROUTES.TEAM,
+    icon: Building2,
   },
   {
     titleKey: "nav.subscription",
@@ -51,6 +56,13 @@ export function Sidebar() {
     (item) => {
       if (item.titleKey === "nav.members") {
         return canSeeMembers;
+      }
+      // 멤버인 경우 구독 메뉴 숨기고 팀 정보 메뉴 표시
+      if (item.titleKey === "nav.subscription") {
+        return isOwner; // 소유자만 구독 메뉴 표시
+      }
+      if (item.titleKey === "nav.team") {
+        return !isOwner; // 멤버만 팀 정보 메뉴 표시
       }
       return true;
     }

@@ -12,6 +12,7 @@ import {
   TranslationsPage,
   ProjectSettingsPage,
   MembersPage,
+  TeamPage,
   SettingsPage,
   PricingPage,
   SubscriptionPage,
@@ -53,10 +54,7 @@ function App() {
             </PublicRoute>
           }
         />
-        <Route
-          path={ROUTES.VERIFY_EMAIL}
-          element={<VerifyEmailPage />}
-        />
+        <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmailPage />} />
         <Route
           path={ROUTES.VERIFY_EMAIL_SUCCESS}
           element={<VerifyEmailSuccessPage />}
@@ -65,26 +63,11 @@ function App() {
           path="/email-verification-pending"
           element={<EmailVerificationPendingPage />}
         />
-        <Route
-          path={ROUTES.ACCEPT_INVITE}
-          element={<AcceptInvitePage />}
-        />
-        <Route
-          path={ROUTES.TERMS}
-          element={<TermsPage />}
-        />
-        <Route
-          path={ROUTES.PRIVACY}
-          element={<PrivacyPage />}
-        />
-        <Route
-          path={ROUTES.REFUND}
-          element={<RefundPage />}
-        />
-        <Route
-          path={ROUTES.PRICING}
-          element={<PricingPage />}
-        />
+        <Route path={ROUTES.ACCEPT_INVITE} element={<AcceptInvitePage />} />
+        <Route path={ROUTES.TERMS} element={<TermsPage />} />
+        <Route path={ROUTES.PRIVACY} element={<PrivacyPage />} />
+        <Route path={ROUTES.REFUND} element={<RefundPage />} />
+        <Route path={ROUTES.PRICING} element={<PricingPage />} />
 
         {/* Protected Routes (비로그인 시 로그인 페이지로 리다이렉트) */}
         <Route
@@ -156,6 +139,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MembersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.TEAM}
+          element={
+            <ProtectedRoute>
+              <TeamPage />
             </ProtectedRoute>
           }
         />
