@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Globe } from "lucide-react";
@@ -29,10 +30,12 @@ export function ProjectCard({
     navigate(ROUTES.PROJECT_DETAIL(id));
   };
 
-  const timeAgo = formatDistanceToNow(new Date(createdAt), {
-    addSuffix: true,
-    locale: i18n.language === "ko" ? ko : enUS,
-  });
+  const timeAgo = useMemo(() => {
+    return formatDistanceToNow(new Date(createdAt), {
+      addSuffix: true,
+      locale: i18n.language === "ko" ? ko : enUS,
+    });
+  }, [createdAt, i18n.language]);
 
   return (
     <Card
