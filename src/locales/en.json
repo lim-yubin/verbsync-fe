@@ -220,6 +220,8 @@
     "inviteButton": "Invite",
     "inviteSuccess": "Member invitation email sent",
     "inviteFailed": "Failed to invite member",
+    "memberLimitReached": "Member invitation limit reached. (Current plan: {{limit}} members)",
+    "viewPlan": "View Plans",
     "roleChangeSuccess": "Member role changed",
     "roleChangeFailed": "Failed to change role",
     "roleChangeTitle": "Change Member Role",

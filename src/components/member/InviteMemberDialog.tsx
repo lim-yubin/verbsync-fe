@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useInviteMember } from "@/hooks/useMembers";
+import { useInviteMember, useMembers } from "@/hooks/useMembers";
+import { usePlan } from "@/hooks/usePlan";
+import { canInviteMember, getUpgradeMessage } from "@/lib/plans";
+import { ROUTES } from "@/lib/constants";
 
 interface InviteMemberDialogProps {
   open: boolean;
@@ -32,13 +36,13 @@ export function InviteMemberDialog({
   onOpenChange,
 }: InviteMemberDialogProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { mutate: inviteMember, isPending } = useInviteMember();
-  
+  const { data: members } = useMembers();
+  const { data: planInfo } = usePlan();
+
   const inviteMemberSchema = z.object({
-    email: z
-      .string()
-      .min(1, t("auth.email"))
-      .email(t("auth.emailInvalid")),
+    email: z.string().min(1, t("auth.email")).email(t("auth.emailInvalid")),
     role: z.enum(["EDITOR", "VIEWER"] as const),
   });
 
@@ -64,6 +68,32 @@ export function InviteMemberDialog({
   const selectedRole = watch("role");
 
   const onSubmit = (data: InviteMemberFormData) => {
+    // 플랜 제한 체크
+    if (planInfo && members) {
+      // 소유자 포함하여 총 멤버 수 계산
+      const currentMemberCount = members.length;
+
+      if (!canInviteMember(planInfo.plan, currentMemberCount)) {
+        const limit =
+          planInfo.plan === "FREE"
+            ? 1
+            : planInfo.plan === "STARTER"
+            ? 3
+            : Infinity;
+        toast.error(t("member.memberLimitReached", { limit }), {
+          description: getUpgradeMessage(t, planInfo.plan, "members"),
+          action: {
+            label: t("member.viewPlan"),
+            onClick: () => {
+              navigate(ROUTES.PRICING);
+              onOpenChange(false);
+            },
+          },
+        });
+        return;
+      }
+    }
+
     inviteMember(data, {
       onSuccess: () => {
         toast.success(t("member.inviteSuccess"));
@@ -86,16 +116,15 @@ export function InviteMemberDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>{t("member.inviteTitle")}</DialogTitle>
-          <DialogDescription>
-            {t("member.inviteDescription")}
-          </DialogDescription>
+          <DialogDescription>{t("member.inviteDescription")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
           {/* 이메일 */}
           <div className="space-y-2">
             <Label htmlFor="email">
-              {t("member.emailRequired")} <span className="text-destructive">*</span>
+              {t("member.emailRequired")}{" "}
+              <span className="text-destructive">*</span>
             </Label>
             <Input
               id="email"
@@ -112,7 +141,8 @@ export function InviteMemberDialog({
           {/* 역할 */}
           <div className="space-y-2">
             <Label htmlFor="role">
-              {t("member.roleRequired")} <span className="text-destructive">*</span>
+              {t("member.roleRequired")}{" "}
+              <span className="text-destructive">*</span>
             </Label>
             <Select
               value={selectedRole}
@@ -150,7 +180,11 @@ export function InviteMemberDialog({
             >
               {t("common.cancel")}
             </Button>
-            <Button type="submit" disabled={isPending} className="cursor-pointer">
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="cursor-pointer"
+            >
               {isPending ? t("member.inviting") : t("member.inviteButton")}
             </Button>
           </div>
@@ -159,4 +193,3 @@ export function InviteMemberDialog({
     </Dialog>
   );
 }
-

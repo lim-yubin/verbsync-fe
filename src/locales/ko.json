@@ -220,6 +220,8 @@
     "inviteButton": "초대하기",
     "inviteSuccess": "멤버 초대 이메일이 발송되었습니다",
     "inviteFailed": "멤버 초대에 실패했습니다",
+    "memberLimitReached": "멤버 초대 제한에 도달했습니다. (현재 플랜: {{limit}}명)",
+    "viewPlan": "플랜 보기",
     "roleChangeSuccess": "멤버 역할이 변경되었습니다",
     "roleChangeFailed": "역할 변경에 실패했습니다",
     "roleChangeTitle": "멤버 역할 변경",

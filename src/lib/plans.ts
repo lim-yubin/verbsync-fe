@@ -59,16 +59,25 @@ export function canCreateProject(
   currentProjectCount: number
 ): boolean {
   const limit = getPlanLimit(plan, "projects");
-  return currentProjectCount <= limit;
+  // Infinity인 경우 항상 true
+  if (limit === Infinity) return true;
+  // 현재 개수가 제한 이하이면 생성 가능
+  return currentProjectCount < limit;
 }
 
 export function canAddKey(plan: Plan, currentKeyCount: number): boolean {
   const limit = getPlanLimit(plan, "keys");
+  // Infinity인 경우 항상 true
+  if (limit === Infinity) return true;
+  // 현재 개수가 제한 이하이면 추가 가능
   return currentKeyCount <= limit;
 }
 
 export function canAddLocale(plan: Plan, currentLocaleCount: number): boolean {
   const limit = getPlanLimit(plan, "locales");
+  // Infinity인 경우 항상 true
+  if (limit === Infinity) return true;
+  // 현재 개수가 제한 이하이면 추가 가능
   return currentLocaleCount <= limit;
 }
 
@@ -77,6 +86,9 @@ export function canInviteMember(
   currentMemberCount: number
 ): boolean {
   const limit = getPlanLimit(plan, "members");
+  // Infinity인 경우 항상 true
+  if (limit === Infinity) return true;
+  // 현재 개수가 제한 이하이면 초대 가능
   return currentMemberCount <= limit;
 }
 
