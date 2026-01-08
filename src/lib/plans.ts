@@ -127,13 +127,20 @@ export function getEffectivePlan(
  * @param t i18n 번역 함수
  * @param plan 현재 플랜
  * @param type 제한 타입 (projects, keys, locales, members)
+ * @param isOwner 소유자 여부 (멤버인 경우 다른 메시지 표시)
  * @returns 번역된 업그레이드 메시지
  */
 export function getUpgradeMessage(
   t: TFunction,
   plan: Plan,
-  type: "projects" | "keys" | "locales" | "members"
+  type: "projects" | "keys" | "locales" | "members",
+  isOwner: boolean = true
 ): string {
+  // 멤버인 경우 팀 소유자에게 요청하라는 메시지
+  if (!isOwner) {
+    return t("plans.requestOwner", { type: t(`plans.typeLabels.${type}`) });
+  }
+
   const typeLabel = t(`plans.typeLabels.${type}`);
 
   if (plan === "FREE") {

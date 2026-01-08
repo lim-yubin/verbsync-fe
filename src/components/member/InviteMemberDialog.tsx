@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useInviteMember, useMembers } from "@/hooks/useMembers";
+import { useInviteMember, useMembers, useMemberPermissions } from "@/hooks/useMembers";
 import { usePlan } from "@/hooks/usePlan";
 import { canInviteMember, getUpgradeMessage } from "@/lib/plans";
 import { ROUTES } from "@/lib/constants";
@@ -40,6 +40,8 @@ export function InviteMemberDialog({
   const { mutate: inviteMember, isPending } = useInviteMember();
   const { data: members } = useMembers();
   const { data: planInfo } = usePlan();
+  const { data: permissions } = useMemberPermissions();
+  const isOwner = permissions?.role === "OWNER";
 
   const inviteMemberSchema = z.object({
     email: z.string().min(1, t("auth.email")).email(t("auth.emailInvalid")),
@@ -81,14 +83,16 @@ export function InviteMemberDialog({
             ? 3
             : Infinity;
         toast.error(t("member.memberLimitReached", { limit }), {
-          description: getUpgradeMessage(t, planInfo.plan, "members"),
-          action: {
-            label: t("member.viewPlan"),
-            onClick: () => {
-              navigate(ROUTES.PRICING);
-              onOpenChange(false);
-            },
-          },
+          description: getUpgradeMessage(t, planInfo.plan, "members", isOwner),
+          action: isOwner
+            ? {
+                label: t("member.viewPlan"),
+                onClick: () => {
+                  navigate(ROUTES.PRICING);
+                  onOpenChange(false);
+                },
+              }
+            : undefined,
         });
         return;
       }

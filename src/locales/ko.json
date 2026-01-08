@@ -327,7 +327,8 @@
       "members": "멤버"
     },
     "upgradeToStarter": "Starter 플랜으로 업그레이드하면 {{type}} 제한이 늘어납니다.",
-    "upgradeToPro": "Pro 플랜으로 업그레이드하면 {{type}} 제한이 늘어납니다."
+    "upgradeToPro": "Pro 플랜으로 업그레이드하면 {{type}} 제한이 늘어납니다.",
+    "requestOwner": "{{type}} 제한에 도달했습니다. 늘리려면 팀 소유자에게 요청하세요."
   },
   "pricing": {
     "title": "요금제",

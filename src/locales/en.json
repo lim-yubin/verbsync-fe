@@ -327,7 +327,8 @@
       "members": "members"
     },
     "upgradeToStarter": "Upgrade to Starter plan to increase {{type}} limit.",
-    "upgradeToPro": "Upgrade to Pro plan to increase {{type}} limit."
+    "upgradeToPro": "Upgrade to Pro plan to increase {{type}} limit.",
+    "requestOwner": "Limit reached. Please ask the team owner to increase {{type}} limit."
   },
   "pricing": {
     "title": "Pricing",

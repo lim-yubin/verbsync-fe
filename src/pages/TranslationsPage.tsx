@@ -22,6 +22,7 @@ import {
 } from "@/hooks/useKeys";
 import { useProject } from "@/hooks/useProjects";
 import { usePlan } from "@/hooks/usePlan";
+import { useMemberPermissions } from "@/hooks/useMembers";
 import { ExportButton } from "@/components/translation/ExportButton";
 import { ImportDialog } from "@/components/translation/ImportDialog";
 import {
@@ -62,6 +63,8 @@ export function TranslationsPage() {
   const navigate = useNavigate();
   const { data: project } = useProject(projectId!);
   const { data: planInfo } = usePlan();
+  const { data: permissions } = useMemberPermissions();
+  const isOwner = permissions?.role === "OWNER";
 
   // 편집 권한 확인 (OWNER 또는 EDITOR만 편집 가능, VIEWER는 조회만)
   const canEdit = project?.isOwner || project?.role === "EDITOR";
@@ -260,13 +263,15 @@ export function TranslationsPage() {
             ? 10000
             : Infinity;
         toast.error(t("translation.keyLimitReached", { limit }), {
-          description: getUpgradeMessage(t, planInfo.plan, "keys"),
-          action: {
-            label: t("translation.viewPlan"),
-            onClick: () => {
-              navigate(ROUTES.PRICING);
-            },
-          },
+          description: getUpgradeMessage(t, planInfo.plan, "keys", isOwner),
+          action: isOwner
+            ? {
+                label: t("translation.viewPlan"),
+                onClick: () => {
+                  navigate(ROUTES.PRICING);
+                },
+              }
+            : undefined,
         });
         return;
       }

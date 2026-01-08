@@ -25,6 +25,7 @@ import {
 import { useCreateProject, useProjects } from "@/hooks/useProjects";
 import { useCreateLocale } from "@/hooks/useLocales";
 import { usePlan } from "@/hooks/usePlan";
+import { useMemberPermissions } from "@/hooks/useMembers";
 import { ROUTES } from "@/lib/constants";
 import { SUPPORTED_LOCALES, getLocaleName } from "@/lib/locales";
 import { canCreateProject, getUpgradeMessage } from "@/lib/plans";
@@ -54,6 +55,8 @@ export function ProjectCreateDialog({
     useCreateProject();
   const { data: projects } = useProjects();
   const { data: planInfo } = usePlan();
+  const { data: permissions } = useMemberPermissions();
+  const isOwner = permissions?.role === "OWNER";
 
   const {
     register,
@@ -128,14 +131,16 @@ export function ProjectCreateDialog({
             ? 5
             : Infinity;
         toast.error(t("projectCreate.projectLimitReached", { limit }), {
-          description: getUpgradeMessage(t, planInfo.plan, "projects"),
-          action: {
-            label: t("projectCreate.viewPlan"),
-            onClick: () => {
-              navigate(ROUTES.PRICING);
-              onOpenChange(false);
-            },
-          },
+          description: getUpgradeMessage(t, planInfo.plan, "projects", isOwner),
+          action: isOwner
+            ? {
+                label: t("projectCreate.viewPlan"),
+                onClick: () => {
+                  navigate(ROUTES.PRICING);
+                  onOpenChange(false);
+                },
+              }
+            : undefined,
         });
         return;
       }
