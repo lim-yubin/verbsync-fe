@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
-import { Globe, Languages, Settings, ArrowRight, Plus, Users } from "lucide-react";
+import { Globe, Languages, Settings, ArrowRight, Plus, Users, AlertTriangle, Mail } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,6 +15,7 @@ import { MemberList } from "@/components/member";
 import { useMemberPermissions } from "@/hooks/useMembers";
 import { usePlan } from "@/hooks/usePlan";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Card,
   CardContent,
@@ -96,6 +97,14 @@ export function ProjectDetailPage() {
     );
   }
 
+  // Owner 플랜 상태 확인 (멤버인 경우에만)
+  const isMember = project.isOwner === false;
+  const ownerPlanInfo = project.ownerPlanInfo;
+  const isOwnerPlanExpired = ownerPlanInfo && (
+    ownerPlanInfo.plan === "FREE" ||
+    (ownerPlanInfo.planEndsAt && new Date(ownerPlanInfo.planEndsAt) <= new Date())
+  );
+
   return (
     <AppLayout>
       <div className="mx-auto max-w-7xl space-y-6">
@@ -111,6 +120,49 @@ export function ProjectDetailPage() {
             </div>
           }
         />
+
+        {/* Owner 플랜 만료 알림 (멤버인 경우에만) */}
+        {isMember && ownerPlanInfo && isOwnerPlanExpired && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>{t("project.ownerPlanExpiredTitle")}</AlertTitle>
+            <AlertDescription className="space-y-2">
+              <p>{t("project.ownerPlanExpiredDescription")}</p>
+              {ownerPlanInfo.ownerEmail && (
+                <div className="flex items-center gap-2 mt-3">
+                  <span className="text-sm text-muted-foreground">
+                    {t("project.contactOwner")}:
+                  </span>
+                  <a
+                    href={`mailto:${ownerPlanInfo.ownerEmail}`}
+                    className="text-sm font-medium text-primary hover:underline cursor-pointer flex items-center gap-1"
+                  >
+                    <Mail className="h-3 w-3" />
+                    {ownerPlanInfo.ownerEmail}
+                  </a>
+                </div>
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Owner 플랜 취소 알림 (멤버인 경우, 구독 취소되었지만 아직 만료 전) */}
+        {isMember &&
+          ownerPlanInfo &&
+          ownerPlanInfo.plan === "FREE" &&
+          ownerPlanInfo.originalPlan !== "FREE" &&
+          ownerPlanInfo.planEndsAt &&
+          new Date(ownerPlanInfo.planEndsAt) > new Date() && (
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>{t("project.ownerPlanCancelledTitle")}</AlertTitle>
+              <AlertDescription>
+                {t("project.ownerPlanCancelledDescription", {
+                  date: new Date(ownerPlanInfo.planEndsAt).toLocaleDateString(),
+                })}
+              </AlertDescription>
+            </Alert>
+          )}
 
         {/* Quick Actions */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

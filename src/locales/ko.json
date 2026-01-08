@@ -113,7 +113,12 @@
     "startTranslationDescription": "번역 키를 추가하고 번역을 작성하세요",
     "teamMembers": "팀 멤버",
     "teamMembersDescription": "이 프로젝트에 접근할 수 있는 팀 멤버 목록입니다",
-    "noMembers": "멤버가 없습니다"
+    "noMembers": "멤버가 없습니다",
+    "ownerPlanExpiredTitle": "프로젝트 소유자의 구독이 만료되었습니다",
+    "ownerPlanExpiredDescription": "이 프로젝트의 소유자 계정 구독이 만료되어 일부 기능이 제한될 수 있습니다. 소유자에게 구독 갱신을 요청해주세요.",
+    "ownerPlanCancelledTitle": "프로젝트 소유자의 구독이 취소되었습니다",
+    "ownerPlanCancelledDescription": "이 프로젝트의 소유자 계정 구독이 취소되었습니다. {{date}}까지는 정상적으로 사용할 수 있으며, 이후에는 Free 플랜으로 전환됩니다.",
+    "contactOwner": "소유자에게 연락"
   },
   "locale": {
     "title": "언어 관리",

@@ -113,7 +113,12 @@
     "startTranslationDescription": "Add translation keys and create translations",
     "teamMembers": "Team Members",
     "teamMembersDescription": "List of team members who can access this project",
-    "noMembers": "No members"
+    "noMembers": "No members",
+    "ownerPlanExpiredTitle": "Project Owner's Subscription Has Expired",
+    "ownerPlanExpiredDescription": "The subscription for this project's owner account has expired, which may limit some features. Please contact the owner to renew their subscription.",
+    "ownerPlanCancelledTitle": "Project Owner's Subscription Has Been Cancelled",
+    "ownerPlanCancelledDescription": "The subscription for this project's owner account has been cancelled. You can continue using the project normally until {{date}}, after which it will be downgraded to the Free plan.",
+    "contactOwner": "Contact Owner"
   },
   "locale": {
     "title": "Language Management",

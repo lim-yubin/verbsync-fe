@@ -62,6 +62,14 @@ export interface Project {
   // 멤버 정보 (프로젝트 목록 조회 시 포함)
   isOwner?: boolean; // 자신이 소유자인지 여부
   role?: "OWNER" | "EDITOR" | "VIEWER"; // 자신의 역할
+  // Owner 플랜 정보 (멤버가 Owner의 구독 상태 확인 가능)
+  ownerPlanInfo?: {
+    plan: Plan; // 실제 사용 가능한 플랜 (getEffectivePlan 적용)
+    originalPlan: Plan; // 원래 플랜 (취소 상태 표시용)
+    planEndsAt: string | null; // 구독 만료일
+    ownerEmail?: string; // Owner 이메일 (멤버인 경우에만)
+    ownerName?: string; // Owner 이름 (멤버인 경우에만)
+  };
 }
 
 export interface ProjectApiKey {

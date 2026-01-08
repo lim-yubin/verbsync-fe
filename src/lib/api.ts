@@ -52,13 +52,14 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // 401 에러 && 재시도 아님 && 인증 엔드포인트 아님
+    // 401 에러 && 재시도 아님 && 인증 엔드포인트 아님 && 인증 불필요 엔드포인트 아님
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
       !originalRequest.url?.includes("/auth/refresh") &&
       !originalRequest.url?.includes("/auth/login") &&
-      !originalRequest.url?.includes("/auth/register")
+      !originalRequest.url?.includes("/auth/register") &&
+      !originalRequest.url?.includes("/members/invite/") // 초대 정보 조회는 인증 불필요
     ) {
       if (isRefreshing) {
         // 다른 요청이 이미 토큰 갱신 중이면 대기
@@ -94,7 +95,13 @@ api.interceptors.response.use(
         const axiosError = refreshError as AxiosError<unknown>;
         processQueue(axiosError, null);
         useAuthStore.getState().logout();
-        window.location.href = "/login";
+        
+        // 초대 수락 페이지에서는 리다이렉트하지 않음 (사용자가 초대 정보를 볼 수 있어야 함)
+        const currentPath = window.location.pathname;
+        if (!currentPath.includes("/accept-invite")) {
+          window.location.href = "/login";
+        }
+        
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
