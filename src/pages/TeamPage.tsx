@@ -7,7 +7,7 @@ import { useMembers } from "@/hooks/useMembers";
 
 export function TeamPage() {
   const { t } = useTranslation();
-  const { data: members, isLoading: isMembersLoading } = useMembers();
+  const { isLoading: isMembersLoading } = useMembers();
 
   const isLoading = isMembersLoading;
 
