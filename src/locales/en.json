@@ -73,6 +73,7 @@
     "projects": "Projects",
     "settings": "Settings",
     "members": "Members",
+    "team": "Team Info",
     "subscription": "Subscription",
     "pricing": "Pricing"
   },
@@ -113,7 +114,12 @@
     "startTranslationDescription": "Add translation keys and create translations",
     "teamMembers": "Team Members",
     "teamMembersDescription": "List of team members who can access this project",
-    "noMembers": "No members"
+    "noMembers": "No members",
+    "ownerPlanExpiredTitle": "Project Owner's Subscription Has Expired",
+    "ownerPlanExpiredDescription": "The subscription for this project's owner account has expired, which may limit some features. Please contact the owner to renew their subscription.",
+    "ownerPlanCancelledTitle": "Project Owner's Subscription Has Been Cancelled",
+    "ownerPlanCancelledDescription": "The subscription for this project's owner account has been cancelled. You can continue using the project normally until {{date}}, after which it will be downgraded to the Free plan.",
+    "contactOwner": "Contact Owner"
   },
   "locale": {
     "title": "Language Management",
@@ -220,6 +226,8 @@
     "inviteButton": "Invite",
     "inviteSuccess": "Member invitation email sent",
     "inviteFailed": "Failed to invite member",
+    "memberLimitReached": "Member invitation limit reached. (Current plan: {{limit}} members)",
+    "viewPlan": "View Plans",
     "roleChangeSuccess": "Member role changed",
     "roleChangeFailed": "Failed to change role",
     "roleChangeTitle": "Change Member Role",
@@ -255,6 +263,12 @@
     "updateLater": "Update Coming Soon",
     "enterpriseInquiry": "Need an Enterprise plan for large teams?",
     "contactSales": "Contact Sales",
+    "contactSalesTitle": "Contact Sales",
+    "contactSalesDescription": "Please contact us at the email below for inquiries about Enterprise plans.",
+    "contactSalesEmailLabel": "Email Address",
+    "emailCopied": "Email address copied to clipboard.",
+    "emailCopyFailed": "Failed to copy email address.",
+    "openEmailClient": "Open Email App",
     "freeDescription": "Free plan for individual developers and side projects",
     "starterDescription": "Plan for growing projects and small teams",
     "proDescription": "For large-scale projects and teams requiring professional management",
@@ -275,7 +289,29 @@
     "proFeatures5": "Translation history & rollback",
     "freeCta": "Current Plan",
     "starterCta": "Upgrade",
-    "proCta": "Upgrade"
+    "proCta": "Upgrade",
+    "processing": "Processing...",
+    "initializing": "Initializing...",
+    "checkoutFailed": "Failed to create checkout link",
+    "paymentSuccess": "Payment completed!",
+    "paymentSuccessDescription": "Your account has been upgraded to Starter plan.",
+    "planStartDate": "Plan Start Date",
+    "goToDashboard": "Go to Dashboard",
+    "proComingSoon": "Pro plan coming soon",
+    "checkingPlan": "Checking plan status...",
+    "planUpdatePending": "Plan update is in progress. Please refresh the page in a moment.",
+    "subscriptionStartDate": "Subscription Start Date",
+    "subscriptionEndDate": "Subscription End Date",
+    "willExpire": "Will expire",
+    "cancelSubscription": "Cancel Subscription",
+    "cancelSubscriptionTitle": "Confirm Cancellation",
+    "cancelSubscriptionDescription": "Are you sure you want to cancel your subscription? You will continue to have access until the end of your current billing period, after which your account will be downgraded to the Free plan.",
+    "cancelSubscriptionSuccess": "Subscription cancelled successfully.",
+    "cancelSubscriptionError": "Failed to cancel subscription.",
+    "confirmCancel": "Cancel Subscription",
+    "cancelled": "Cancelled",
+    "cancellationNotice": "Subscription has been cancelled",
+    "cancellationDescription": "You can continue using premium features until the end of your current billing period. After the expiration date, your account will automatically switch to the Free plan."
   },
   "plans": {
     "descriptions": {
@@ -291,7 +327,8 @@
       "members": "members"
     },
     "upgradeToStarter": "Upgrade to Starter plan to increase {{type}} limit.",
-    "upgradeToPro": "Upgrade to Pro plan to increase {{type}} limit."
+    "upgradeToPro": "Upgrade to Pro plan to increase {{type}} limit.",
+    "requestOwner": "Limit reached. Please ask the team owner to increase {{type}} limit."
   },
   "pricing": {
     "title": "Pricing",
@@ -398,6 +435,8 @@
     "loading": "Loading invitation information...",
     "loadError": "Unable to load invitation information",
     "loadErrorDescription": "Invalid invitation link or it has already expired.",
+    "authRequired": "Authentication Required",
+    "authRequiredDescription": "Please complete registration or login with the invited email address, then access the link again from your email.",
     "emailMismatch": "The invited email does not match the logged-in account email.",
     "emailMismatchDescription": "The invited email ({{invited}}) does not match the logged-in account email ({{current}}). Please log in with the correct account.",
     "signupRequired": "Registration is required. You can accept the invitation after signing up.",
@@ -410,6 +449,15 @@
     "acceptSuccess": "Invitation accepted!",
     "acceptFailed": "Failed to accept invitation.",
     "goToLogin": "Go to Login Page"
+  },
+  "team": {
+    "title": "Team Information",
+    "description": "View account owner and team member information",
+    "accountOwner": "Account Owner",
+    "accountOwnerDescription": "The owner of this account",
+    "teamMembers": "Team Members",
+    "teamMembersDescription": "List of team members invited to this account",
+    "noTeamMembers": "No team members"
   },
   "verifyEmail": {
     "title": "Email Verification",

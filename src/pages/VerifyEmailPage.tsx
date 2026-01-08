@@ -5,7 +5,13 @@ import { toast } from "sonner";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
@@ -20,13 +26,20 @@ export function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
 
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [status, setStatus] = useState<"loading" | "success" | "error">(
+    !token ? "error" : "loading"
+  );
+  const [errorMessage, setErrorMessage] = useState<string>(
+    !token ? t("verifyEmail.noToken") : ""
+  );
 
   useEffect(() => {
     if (!token) {
-      setStatus("error");
-      setErrorMessage(t("verifyEmail.noToken"));
+      // 다음 렌더 사이클에서 상태 업데이트
+      setTimeout(() => {
+        setStatus("error");
+        setErrorMessage(t("verifyEmail.noToken"));
+      }, 0);
       return;
     }
 
@@ -35,14 +48,16 @@ export function VerifyEmailPage() {
         await api.post("/auth/verify-email", { token });
         setStatus("success");
         toast.success(t("verifyEmail.successDescription"));
-        
+
         // 2초 후 로그인 페이지로 이동
         setTimeout(() => {
           navigate(ROUTES.LOGIN);
         }, 2000);
       } catch (error: unknown) {
         setStatus("error");
-        const axiosError = error as { response?: { data?: { message?: string } } };
+        const axiosError = error as {
+          response?: { data?: { message?: string } };
+        };
         setErrorMessage(
           axiosError.response?.data?.message || t("verifyEmail.verifyFailed")
         );
@@ -68,7 +83,9 @@ export function VerifyEmailPage() {
               className="inline-flex items-center gap-2 justify-center cursor-pointer"
             >
               <Logo width={32} height={32} />
-              <h1 className="text-2xl font-bold text-foreground">{t("common.appName")}</h1>
+              <h1 className="text-2xl font-bold text-foreground">
+                {t("common.appName")}
+              </h1>
             </a>
           </div>
 
@@ -137,4 +154,3 @@ export function VerifyEmailPage() {
     </div>
   );
 }
-

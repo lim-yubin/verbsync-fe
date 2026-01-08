@@ -25,6 +25,7 @@ import {
 import { useCreateProject, useProjects } from "@/hooks/useProjects";
 import { useCreateLocale } from "@/hooks/useLocales";
 import { usePlan } from "@/hooks/usePlan";
+import { useMemberPermissions } from "@/hooks/useMembers";
 import { ROUTES } from "@/lib/constants";
 import { SUPPORTED_LOCALES, getLocaleName } from "@/lib/locales";
 import { canCreateProject, getUpgradeMessage } from "@/lib/plans";
@@ -54,6 +55,8 @@ export function ProjectCreateDialog({
     useCreateProject();
   const { data: projects } = useProjects();
   const { data: planInfo } = usePlan();
+  const { data: permissions } = useMemberPermissions();
+  const isOwner = permissions?.role === "OWNER";
 
   const {
     register,
@@ -119,6 +122,7 @@ export function ProjectCreateDialog({
     // 플랜 제한 체크
     if (planInfo) {
       const ownedProjects = projects?.filter((p) => p.isOwner) || [];
+      // 백엔드에서 이미 getEffectivePlan이 적용된 plan 사용
       if (!canCreateProject(planInfo.plan, ownedProjects.length)) {
         const limit =
           planInfo.plan === "FREE"
@@ -127,14 +131,16 @@ export function ProjectCreateDialog({
             ? 5
             : Infinity;
         toast.error(t("projectCreate.projectLimitReached", { limit }), {
-          description: getUpgradeMessage(t, planInfo.plan, "projects"),
-          action: {
-            label: t("projectCreate.viewPlan"),
-            onClick: () => {
-              navigate(ROUTES.PRICING);
-              onOpenChange(false);
-            },
-          },
+          description: getUpgradeMessage(t, planInfo.plan, "projects", isOwner),
+          action: isOwner
+            ? {
+                label: t("projectCreate.viewPlan"),
+                onClick: () => {
+                  navigate(ROUTES.PRICING);
+                  onOpenChange(false);
+                },
+              }
+            : undefined,
         });
         return;
       }

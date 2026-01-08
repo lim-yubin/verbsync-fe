@@ -22,6 +22,7 @@ import {
 } from "@/hooks/useKeys";
 import { useProject } from "@/hooks/useProjects";
 import { usePlan } from "@/hooks/usePlan";
+import { useMemberPermissions } from "@/hooks/useMembers";
 import { ExportButton } from "@/components/translation/ExportButton";
 import { ImportDialog } from "@/components/translation/ImportDialog";
 import {
@@ -62,9 +63,12 @@ export function TranslationsPage() {
   const navigate = useNavigate();
   const { data: project } = useProject(projectId!);
   const { data: planInfo } = usePlan();
+  const { data: permissions } = useMemberPermissions();
+  const isOwner = permissions?.role === "OWNER";
 
   // 편집 권한 확인 (OWNER 또는 EDITOR만 편집 가능, VIEWER는 조회만)
   const canEdit = project?.isOwner || project?.role === "EDITOR";
+  // 백엔드에서 이미 getEffectivePlan이 적용된 plan 사용
   const canImport = planInfo?.features.canImport ?? false;
   const { data: matrix, isLoading, error } = useTranslationMatrix(projectId!);
   const { data: keys } = useKeys(projectId!); // 키 목록 (createdAt 포함)
@@ -248,6 +252,7 @@ export function TranslationsPage() {
 
     // 플랜 제한 체크
     if (planInfo && keys) {
+      // 백엔드에서 이미 getEffectivePlan이 적용된 plan 사용
       if (!canAddKey(planInfo.plan, keys.length)) {
         const limit =
           planInfo.plan === "FREE"
@@ -258,13 +263,15 @@ export function TranslationsPage() {
             ? 10000
             : Infinity;
         toast.error(t("translation.keyLimitReached", { limit }), {
-          description: getUpgradeMessage(t, planInfo.plan, "keys"),
-          action: {
-            label: t("translation.viewPlan"),
-            onClick: () => {
-              navigate(ROUTES.PRICING);
-            },
-          },
+          description: getUpgradeMessage(t, planInfo.plan, "keys", isOwner),
+          action: isOwner
+            ? {
+                label: t("translation.viewPlan"),
+                onClick: () => {
+                  navigate(ROUTES.PRICING);
+                },
+              }
+            : undefined,
         });
         return;
       }

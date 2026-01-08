@@ -112,6 +112,8 @@ export function useGetInviteInfo(token: string) {
       return data;
     },
     enabled: !!token,
+    retry: false, // 초대 토큰이 유효하지 않으면 재시도하지 않음
+    refetchOnWindowFocus: false, // 포커스 시 자동 refetch 방지
   });
 }
 

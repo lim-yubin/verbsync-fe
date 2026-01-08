@@ -17,6 +17,7 @@ import { api } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS, ROUTES } from "@/lib/constants";
 import { usePlan } from "@/hooks/usePlan";
+import { useMemberPermissions } from "@/hooks/useMembers";
 import { canAddLocale, getUpgradeMessage } from "@/lib/plans";
 import { useNavigate } from "react-router-dom";
 
@@ -40,6 +41,8 @@ export function AddLocaleDialog({
   const [isAdding, setIsAdding] = useState(false);
   const queryClient = useQueryClient();
   const { data: planInfo } = usePlan();
+  const { data: permissions } = useMemberPermissions();
+  const isOwner = permissions?.role === "OWNER";
   const navigate = useNavigate();
 
   // 이미 추가된 언어 제외
@@ -76,6 +79,7 @@ export function AddLocaleDialog({
     // 플랜 제한 체크
     if (planInfo) {
       const activeLocales = existingLocales.filter((l) => l.isActive);
+      // 백엔드에서 이미 getEffectivePlan이 적용된 plan 사용
       const willExceedLimit = !canAddLocale(
         planInfo.plan,
         activeLocales.length + selectedLocaleCodes.size
@@ -91,14 +95,16 @@ export function AddLocaleDialog({
         toast.error(
           t("addLocale.localeLimitReached", { limit }),
           {
-            description: getUpgradeMessage(t, planInfo.plan, "locales"),
-            action: {
-              label: t("projectCreate.viewPlan"),
-              onClick: () => {
-                navigate(ROUTES.PRICING);
-                onOpenChange(false);
-              },
-            },
+            description: getUpgradeMessage(t, planInfo.plan, "locales", isOwner),
+            action: isOwner
+              ? {
+                  label: t("projectCreate.viewPlan"),
+                  onClick: () => {
+                    navigate(ROUTES.PRICING);
+                    onOpenChange(false);
+                  },
+                }
+              : undefined,
           }
         );
         return;

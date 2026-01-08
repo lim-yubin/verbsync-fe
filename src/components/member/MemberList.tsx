@@ -44,6 +44,7 @@ export function MemberList({ canManage, members: propMembers }: MemberListProps)
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const { data: fetchedMembers, isLoading } = useMembers();
   const { data: planInfo } = usePlan();
+  // 백엔드에서 이미 getEffectivePlan이 적용된 features 사용
   const canInviteMembers = planInfo?.features.canInviteMembers ?? false;
   
   // prop으로 전달된 members가 있으면 사용, 없으면 fetchedMembers 사용

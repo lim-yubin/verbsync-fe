@@ -73,6 +73,7 @@
     "projects": "프로젝트",
     "settings": "설정",
     "members": "멤버",
+    "team": "팀 정보",
     "subscription": "구독",
     "pricing": "요금제"
   },
@@ -113,7 +114,12 @@
     "startTranslationDescription": "번역 키를 추가하고 번역을 작성하세요",
     "teamMembers": "팀 멤버",
     "teamMembersDescription": "이 프로젝트에 접근할 수 있는 팀 멤버 목록입니다",
-    "noMembers": "멤버가 없습니다"
+    "noMembers": "멤버가 없습니다",
+    "ownerPlanExpiredTitle": "프로젝트 소유자의 구독이 만료되었습니다",
+    "ownerPlanExpiredDescription": "이 프로젝트의 소유자 계정 구독이 만료되어 일부 기능이 제한될 수 있습니다. 소유자에게 구독 갱신을 요청해주세요.",
+    "ownerPlanCancelledTitle": "프로젝트 소유자의 구독이 취소되었습니다",
+    "ownerPlanCancelledDescription": "이 프로젝트의 소유자 계정 구독이 취소되었습니다. {{date}}까지는 정상적으로 사용할 수 있으며, 이후에는 Free 플랜으로 전환됩니다.",
+    "contactOwner": "소유자에게 연락"
   },
   "locale": {
     "title": "언어 관리",
@@ -220,6 +226,8 @@
     "inviteButton": "초대하기",
     "inviteSuccess": "멤버 초대 이메일이 발송되었습니다",
     "inviteFailed": "멤버 초대에 실패했습니다",
+    "memberLimitReached": "멤버 초대 제한에 도달했습니다. (현재 플랜: {{limit}}명)",
+    "viewPlan": "플랜 보기",
     "roleChangeSuccess": "멤버 역할이 변경되었습니다",
     "roleChangeFailed": "역할 변경에 실패했습니다",
     "roleChangeTitle": "멤버 역할 변경",
@@ -255,6 +263,12 @@
     "updateLater": "추후 업데이트 예정",
     "enterpriseInquiry": "대규모 팀을 위한 엔터프라이즈 플랜이 필요하신가요?",
     "contactSales": "영업팀에 문의하기",
+    "contactSalesTitle": "영업팀에 문의하기",
+    "contactSalesDescription": "엔터프라이즈 플랜에 대해 문의하시려면 아래 이메일로 연락해주세요.",
+    "contactSalesEmailLabel": "이메일 주소",
+    "emailCopied": "이메일 주소가 클립보드에 복사되었습니다.",
+    "emailCopyFailed": "이메일 주소 복사에 실패했습니다.",
+    "openEmailClient": "이메일 앱 열기",
     "freeDescription": "개인 개발자 및 사이드 프로젝트를 위한 무료 플랜",
     "starterDescription": "성장하는 프로젝트와 소규모 팀을 위한 플랜",
     "proDescription": "대규모 프로젝트와 전문적인 관리가 필요한 팀",
@@ -275,7 +289,29 @@
     "proFeatures5": "번역 히스토리 및 롤백",
     "freeCta": "현재 플랜",
     "starterCta": "업그레이드",
-    "proCta": "업그레이드"
+    "proCta": "업그레이드",
+    "processing": "처리 중...",
+    "initializing": "초기화 중...",
+    "checkoutFailed": "결제 링크 생성에 실패했습니다",
+    "paymentSuccess": "결제가 완료되었습니다!",
+    "paymentSuccessDescription": "Starter 플랜으로 업그레이드되었습니다.",
+    "planStartDate": "플랜 시작일",
+    "goToDashboard": "대시보드로 이동",
+    "proComingSoon": "Pro 플랜은 곧 출시 예정입니다",
+    "checkingPlan": "플랜 정보를 확인하는 중...",
+    "planUpdatePending": "플랜 업데이트가 진행 중입니다. 잠시 후 새로고침해주세요.",
+    "subscriptionStartDate": "구독 시작일",
+    "subscriptionEndDate": "구독 만료일",
+    "willExpire": "만료 예정",
+    "cancelSubscription": "구독 취소",
+    "cancelSubscriptionTitle": "구독 취소 확인",
+    "cancelSubscriptionDescription": "구독을 취소하시겠습니까? 취소 후 현재 구독 기간이 끝날 때까지 서비스를 이용할 수 있으며, 기간 종료 후에는 Free 플랜으로 전환됩니다.",
+    "cancelSubscriptionSuccess": "구독이 취소되었습니다.",
+    "cancelSubscriptionError": "구독 취소에 실패했습니다.",
+    "confirmCancel": "구독 취소",
+    "cancelled": "취소됨",
+    "cancellationNotice": "구독이 취소되었습니다",
+    "cancellationDescription": "현재 결제 기간이 끝날 때까지 유료 플랜 기능을 사용할 수 있습니다. 만료일 이후에는 Free 플랜으로 자동 전환됩니다."
   },
   "plans": {
     "descriptions": {
@@ -291,7 +327,8 @@
       "members": "멤버"
     },
     "upgradeToStarter": "Starter 플랜으로 업그레이드하면 {{type}} 제한이 늘어납니다.",
-    "upgradeToPro": "Pro 플랜으로 업그레이드하면 {{type}} 제한이 늘어납니다."
+    "upgradeToPro": "Pro 플랜으로 업그레이드하면 {{type}} 제한이 늘어납니다.",
+    "requestOwner": "{{type}} 제한에 도달했습니다. 늘리려면 팀 소유자에게 요청하세요."
   },
   "pricing": {
     "title": "요금제",
@@ -398,6 +435,8 @@
     "loading": "초대 정보를 불러오는 중...",
     "loadError": "초대 정보를 불러올 수 없습니다",
     "loadErrorDescription": "유효하지 않은 초대 링크이거나 이미 만료되었습니다.",
+    "authRequired": "인증이 필요합니다",
+    "authRequiredDescription": "초대받은 이메일로 회원가입 또는 로그인을 완료한 후, 이메일의 링크를 통해 다시 접속해주세요.",
     "emailMismatch": "초대된 이메일과 로그인한 계정의 이메일이 일치하지 않습니다.",
     "emailMismatchDescription": "초대된 이메일({{invited}})과 로그인한 계정의 이메일({{current}})이 일치하지 않습니다. 올바른 계정으로 로그인해주세요.",
     "signupRequired": "회원가입이 필요합니다. 회원가입 후 초대를 수락할 수 있습니다.",
@@ -410,6 +449,15 @@
     "acceptSuccess": "초대를 수락했습니다!",
     "acceptFailed": "초대 수락에 실패했습니다.",
     "goToLogin": "로그인 페이지로 이동"
+  },
+  "team": {
+    "title": "팀 정보",
+    "description": "계정 소유자와 팀 멤버 정보를 확인할 수 있습니다",
+    "accountOwner": "계정 소유자",
+    "accountOwnerDescription": "이 계정의 소유자입니다",
+    "teamMembers": "팀 멤버",
+    "teamMembersDescription": "계정에 초대된 팀 멤버 목록입니다",
+    "noTeamMembers": "팀 멤버가 없습니다"
   },
   "verifyEmail": {
     "title": "이메일 인증",

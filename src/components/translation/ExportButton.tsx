@@ -27,6 +27,7 @@ export function ExportButton({
 }: ExportButtonProps) {
   const { t } = useTranslation();
   const { data: planInfo } = usePlan();
+  // 백엔드에서 이미 getEffectivePlan이 적용된 features 사용
   const canExportExcel = planInfo?.features.canExportExcel ?? false;
 
   const handleExportExcel = async () => {

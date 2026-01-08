@@ -410,7 +410,7 @@ const isDummyGeneratorEnabled =
   import.meta.env.VITE_ENABLE_DUMMY_GENERATOR === "true";
 
 if (isDummyGeneratorEnabled && typeof window !== "undefined") {
-  (window as any).generateDummyKeys = generateDummyKeys;
+  (window as Window & { generateDummyKeys?: typeof generateDummyKeys }).generateDummyKeys = generateDummyKeys;
   console.log(
     "💡 더미 키 생성 함수가 등록되었습니다.\n" +
     "사용법: await generateDummyKeys('project-id', 100)"

@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, CheckCircle2, XCircle, Mail, User } from "lucide-react";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 export function AcceptInvitePage() {
   const { t } = useTranslation();
@@ -61,18 +62,23 @@ export function AcceptInvitePage() {
     );
   }
 
-  // 에러 처리
-  if (error || !inviteInfo) {
+  // 에러 처리 (토큰이 있고 로딩이 완료되었지만 에러가 발생한 경우)
+  if (token && !isLoading && (error || !inviteInfo)) {
+    // 401 에러인지 확인
+    const is401Error = error instanceof AxiosError && error.response?.status === 401;
+    
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <XCircle className="h-5 w-5 text-destructive" />
-              {t("invite.loadError")}
+              {is401Error ? t("invite.authRequired") : t("invite.loadError")}
             </CardTitle>
             <CardDescription>
-              {error instanceof Error
+              {is401Error
+                ? t("invite.authRequiredDescription")
+                : error instanceof Error
                 ? error.message
                 : t("invite.loadErrorDescription")}
             </CardDescription>
@@ -85,6 +91,40 @@ export function AcceptInvitePage() {
         </Card>
       </div>
     );
+  }
+
+  // inviteInfo가 없으면 로딩 중이거나 토큰이 없는 경우이므로 위에서 처리됨
+  // 하지만 명시적으로 로딩 상태를 표시하여 리다이렉트 방지
+  if (!inviteInfo && !error && !isLoading) {
+    // 토큰이 있지만 inviteInfo가 없고 에러도 없고 로딩도 완료된 경우
+    // 이는 이상한 상태이므로 에러로 처리
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <XCircle className="h-5 w-5 text-destructive" />
+              {t("invite.loadError")}
+            </CardTitle>
+            <CardDescription>
+              {t("invite.loadErrorDescription")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild className="w-full cursor-pointer">
+              <Link to={ROUTES.LOGIN}>{t("invite.goToLogin")}</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // inviteInfo가 없으면 렌더링하지 않음 (에러는 위에서 처리됨)
+  if (!inviteInfo) {
+    // 로딩 중이거나 에러가 있는 경우는 위에서 처리됨
+    // 이 경우는 방어적 코드로 null 반환 (실제로는 도달하지 않아야 함)
+    return null;
   }
 
   // 이메일 불일치 체크 (로그인한 경우)
