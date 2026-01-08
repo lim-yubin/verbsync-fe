@@ -239,7 +239,8 @@ export interface PlanFeatures {
 }
 
 export interface PlanInfo {
-  plan: Plan;
+  plan: Plan; // 실제 사용 가능한 플랜 (planEndsAt 고려)
+  originalPlan: Plan; // DB에 저장된 이전 플랜 (취소 상태 표시용)
   features: PlanFeatures;
   planStartedAt: string | null;
   planEndsAt: string | null;

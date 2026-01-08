@@ -72,7 +72,7 @@ export function InviteMemberDialog({
     if (planInfo && members) {
       // 소유자 포함하여 총 멤버 수 계산
       const currentMemberCount = members.length;
-
+      // 백엔드에서 이미 getEffectivePlan이 적용된 plan 사용
       if (!canInviteMember(planInfo.plan, currentMemberCount)) {
         const limit =
           planInfo.plan === "FREE"

@@ -12,6 +12,7 @@ export { MembersPage } from "./MembersPage";
 export { SettingsPage } from "./SettingsPage";
 export { PricingPage } from "./PricingPage";
 export { SubscriptionPage } from "./SubscriptionPage";
+export { SubscriptionSuccessPage } from "./SubscriptionSuccessPage";
 export { AcceptInvitePage } from "./AcceptInvitePage";
 export { PrivacyPage } from "./PrivacyPage";
 export { TermsPage } from "./TermsPage";

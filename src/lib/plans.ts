@@ -93,6 +93,36 @@ export function canInviteMember(
 }
 
 /**
+ * 실제 사용 가능한 플랜 계산
+ * 구독 취소 후 planEndsAt까지는 유료 플랜 기능 사용 가능
+ * @param plan DB에 저장된 플랜
+ * @param planEndsAt 구독 만료일 (null이면 만료 없음)
+ * @returns 실제 사용 가능한 플랜
+ */
+export function getEffectivePlan(
+  plan: Plan,
+  planEndsAt: string | null
+): Plan {
+  // planEndsAt이 없으면 현재 플랜 그대로 사용
+  if (!planEndsAt) {
+    return plan;
+  }
+
+  // planEndsAt이 미래 날짜면 유료 플랜 기능 사용 가능
+  const now = new Date();
+  const endsAt = new Date(planEndsAt);
+  
+  if (endsAt > now) {
+    // 만료일이 지나지 않았으면 원래 플랜 사용
+    // 단, plan이 FREE면 FREE 그대로
+    return plan;
+  }
+
+  // 만료일이 지났으면 FREE로 전환
+  return "FREE";
+}
+
+/**
  * 업그레이드 메시지를 다국어로 반환
  * @param t i18n 번역 함수
  * @param plan 현재 플랜

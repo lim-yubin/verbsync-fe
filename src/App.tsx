@@ -15,6 +15,7 @@ import {
   SettingsPage,
   PricingPage,
   SubscriptionPage,
+  SubscriptionSuccessPage,
   AcceptInvitePage,
   PrivacyPage,
   TermsPage,
@@ -107,6 +108,14 @@ function App() {
           element={
             <ProtectedRoute>
               <SubscriptionPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.SUBSCRIPTION_SUCCESS}
+          element={
+            <ProtectedRoute>
+              <SubscriptionSuccessPage />
             </ProtectedRoute>
           }
         />

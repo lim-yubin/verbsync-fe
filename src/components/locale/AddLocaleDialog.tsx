@@ -76,6 +76,7 @@ export function AddLocaleDialog({
     // 플랜 제한 체크
     if (planInfo) {
       const activeLocales = existingLocales.filter((l) => l.isActive);
+      // 백엔드에서 이미 getEffectivePlan이 적용된 plan 사용
       const willExceedLimit = !canAddLocale(
         planInfo.plan,
         activeLocales.length + selectedLocaleCodes.size

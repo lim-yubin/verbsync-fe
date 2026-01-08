@@ -119,6 +119,7 @@ export function ProjectCreateDialog({
     // 플랜 제한 체크
     if (planInfo) {
       const ownedProjects = projects?.filter((p) => p.isOwner) || [];
+      // 백엔드에서 이미 getEffectivePlan이 적용된 plan 사용
       if (!canCreateProject(planInfo.plan, ownedProjects.length)) {
         const limit =
           planInfo.plan === "FREE"

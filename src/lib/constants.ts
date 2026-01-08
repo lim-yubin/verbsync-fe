@@ -33,6 +33,7 @@ export const ROUTES = {
   SETTINGS: "/settings",
   PRICING: "/pricing",
   SUBSCRIPTION: "/subscription",
+  SUBSCRIPTION_SUCCESS: "/subscription/success",
   PROJECT_NEW: "/projects/new",
   PROJECT_DETAIL: (id: string) => `/projects/${id}`,
   PROJECT_LOCALES: (id: string) => `/projects/${id}/locales`,
