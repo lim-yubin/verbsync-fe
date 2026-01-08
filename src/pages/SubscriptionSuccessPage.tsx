@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,7 +17,7 @@ export function SubscriptionSuccessPage() {
   const queryClient = useQueryClient();
   const { data: planInfo, refetch, isLoading } = usePlan();
   const [isCheckingPlan, setIsCheckingPlan] = useState(true);
-  const [pollCount, setPollCount] = useState(0);
+  const pollCountRef = useRef(0);
   const MAX_POLL_COUNT = 20; // 최대 20번 (약 10초)
 
   // 플랜 정보 새로고침 (Webhook 처리 대기)
@@ -31,25 +31,22 @@ export function SubscriptionSuccessPage() {
 
     const startPolling = () => {
       intervalId = setInterval(async () => {
-        setPollCount((prev) => {
-          const newCount = prev + 1;
+        pollCountRef.current += 1;
+        const newCount = pollCountRef.current;
 
-          // 최대 시도 횟수에 도달하면 중지
-          if (newCount >= MAX_POLL_COUNT) {
-            setIsCheckingPlan(false);
-            if (intervalId) {
-              clearInterval(intervalId);
-              intervalId = null;
-            }
-            return newCount;
+        // 최대 시도 횟수에 도달하면 중지
+        if (newCount >= MAX_POLL_COUNT) {
+          setIsCheckingPlan(false);
+          if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
           }
+          return;
+        }
 
-          // 플랜 정보 refetch
-          refetch().then(() => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PLAN });
-          });
-
-          return newCount;
+        // 플랜 정보 refetch
+        refetch().then(() => {
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PLAN });
         });
       }, 500); // 0.5초마다 체크
     };
@@ -67,7 +64,10 @@ export function SubscriptionSuccessPage() {
   // 플랜이 업그레이드되면 polling 중지
   useEffect(() => {
     if (planInfo?.plan === "STARTER" || planInfo?.plan === "PRO") {
-      setIsCheckingPlan(false);
+      // 다음 렌더 사이클에서 상태 업데이트
+      setTimeout(() => {
+        setIsCheckingPlan(false);
+      }, 0);
     }
   }, [planInfo?.plan]);
 

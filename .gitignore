@@ -33,3 +33,6 @@ dist-ssr
 .env.local
 .env.dev
 .env.prod
+
+# Documentation (md 폴더는 로컬에서만 관리)
+md/
