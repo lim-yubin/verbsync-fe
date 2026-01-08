@@ -12,12 +12,15 @@ import { ProjectCreateDialog } from "@/components/project/ProjectCreateDialog";
 import { useProjects } from "@/hooks/useProjects";
 import { usePlan } from "@/hooks/usePlan";
 import { ROUTES } from "@/lib/constants";
+import { useMemberPermissions } from "@/hooks/useMembers";
 
 export function DashboardPage() {
   const { t } = useTranslation();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const { data: projects, isLoading } = useProjects();
   const { data: planInfo } = usePlan();
+  const { data: permissions } = useMemberPermissions();
+  const isOwner = permissions?.role === "OWNER";
 
   // 소유한 프로젝트와 팀 프로젝트 구분
   const ownedProjects = projects?.filter((p) => p.isOwner) || [];
@@ -39,7 +42,7 @@ export function DashboardPage() {
     <AppLayout>
       <div className="mx-auto max-w-7xl space-y-4 sm:space-y-6">
         {/* Free 플랜 업그레이드 배너 */}
-        {planInfo && planInfo.plan === "FREE" && (
+        {planInfo && planInfo.plan === "FREE" && isOwner && (
           <Alert className="mb-6">
             <AlertDescription>
               {t("pricing.upgradeBanner")}{" "}
@@ -52,21 +55,21 @@ export function DashboardPage() {
             </AlertDescription>
           </Alert>
         )}
-
-        <PageHeader
-          title={t("project.title")}
-          description={description}
-          action={
-            <Button
-              className="w-full sm:w-auto cursor-pointer"
-              onClick={() => setCreateDialogOpen(true)}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              {t("project.newProject")}
-            </Button>
-          }
-        />
-
+        {isOwner && (
+          <PageHeader
+            title={t("project.title")}
+            description={description}
+            action={
+              <Button
+                className="w-full sm:w-auto cursor-pointer"
+                onClick={() => setCreateDialogOpen(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                {t("project.newProject")}
+              </Button>
+            }
+          />
+        )}
         {/* 프로젝트 목록 */}
         {isLoading ? (
           <ProjectsLoadingSkeleton />
