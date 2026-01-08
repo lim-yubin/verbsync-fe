@@ -119,7 +119,7 @@ export function LoginForm() {
           <div className="text-center text-sm">
             <Link
               to={ROUTES.FORGOT_PASSWORD}
-              className="text-foreground font-medium hover:underline cursor-pointer"
+              className="text-muted-foreground hover:text-foreground hover:underline cursor-pointer text-xs"
             >
               {t("auth.forgotPassword")}
             </Link>
