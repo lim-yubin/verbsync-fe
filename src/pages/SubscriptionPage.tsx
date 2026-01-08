@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, AlertTriangle } from "lucide-react";
+import { Check, AlertTriangle, Copy, Mail } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import {
@@ -11,6 +11,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -50,6 +52,8 @@ export function SubscriptionPage() {
   const [isPaddleInitialized, setIsPaddleInitialized] = useState(false);
   const [isOpeningCheckout, setIsOpeningCheckout] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showContactSalesDialog, setShowContactSalesDialog] = useState(false);
+  const [emailCopied, setEmailCopied] = useState(false);
 
   // Paddle.js 초기화
   useEffect(() => {
@@ -91,7 +95,7 @@ export function SubscriptionPage() {
         t("subscription.starterFeatures5"),
       ],
       cta: t("subscription.starterCta"),
-      featured: false,
+      featured: true,
       comingSoon: false, // Starter 플랜 결제 활성화
     },
     {
@@ -324,11 +328,11 @@ export function SubscriptionPage() {
                 )}
               >
                 {/* 추후 사용 예정: Most Popular 배지 */}
-                {/* {plan.featured && !plan.comingSoon && (
+                {plan.featured && !plan.comingSoon && (
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
                     Most Popular
                   </div>
-                )} */}
+                )}
                 {plan.comingSoon && (
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted border border-border px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     {t("subscription.comingSoon")}
@@ -430,12 +434,12 @@ export function SubscriptionPage() {
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
                 {t("subscription.enterpriseInquiry")}{" "}
-                <a
-                  href="mailto:support@verbsync.com"
+                <button
+                  onClick={() => setShowContactSalesDialog(true)}
                   className="font-semibold text-primary hover:underline underline-offset-4 cursor-pointer"
                 >
                   {t("subscription.contactSales")}
-                </a>
+                </button>
               </p>
             </div>
           </CardContent>
@@ -498,6 +502,70 @@ export function SubscriptionPage() {
                   : t("subscription.confirmCancel")}
               </Button>
             </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* 영업팀 문의 다이얼로그 */}
+        <Dialog
+          open={showContactSalesDialog}
+          onOpenChange={setShowContactSalesDialog}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5 text-primary" />
+                {t("subscription.contactSalesTitle")}
+              </DialogTitle>
+              <DialogDescription>
+                {t("subscription.contactSalesDescription")}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="sales-email">
+                  {t("subscription.contactSalesEmailLabel")}
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="sales-email"
+                    value="verbsync@gmail.com"
+                    readOnly
+                    className="font-mono"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(
+                          "verbsync@gmail.com"
+                        );
+                        setEmailCopied(true);
+                        toast.success(t("subscription.emailCopied"));
+                        setTimeout(() => setEmailCopied(false), 2000);
+                      } catch {
+                        toast.error(t("subscription.emailCopyFailed"));
+                      }
+                    }}
+                  >
+                    {emailCopied ? (
+                      <Check className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowContactSalesDialog(false)}
+                >
+                  {t("common.close")}
+                </Button>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

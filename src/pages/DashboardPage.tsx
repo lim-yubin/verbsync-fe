@@ -43,7 +43,10 @@ export function DashboardPage() {
           <Alert className="mb-6">
             <AlertDescription>
               {t("pricing.upgradeBanner")}{" "}
-              <a href={ROUTES.PRICING} className="font-semibold underline cursor-pointer">
+              <a
+                href={ROUTES.SUBSCRIPTION}
+                className="font-semibold underline cursor-pointer"
+              >
                 {t("pricing.learnMore")}
               </a>
             </AlertDescription>
@@ -75,7 +78,9 @@ export function DashboardPage() {
             {hasOwnedProjects && (
               <div className="space-y-4">
                 <div>
-                  <h2 className="text-lg font-semibold">{t("project.ownedProjects")}</h2>
+                  <h2 className="text-lg font-semibold">
+                    {t("project.ownedProjects")}
+                  </h2>
                   <p className="text-sm text-muted-foreground mt-1">
                     {t("project.projectCount", { count: ownedProjects.length })}
                   </p>
@@ -99,7 +104,9 @@ export function DashboardPage() {
               <div className="space-y-4">
                 {hasOwnedProjects && <div className="border-t pt-6" />}
                 <div>
-                  <h2 className="text-lg font-semibold">{t("project.teamProjects")}</h2>
+                  <h2 className="text-lg font-semibold">
+                    {t("project.teamProjects")}
+                  </h2>
                   <p className="text-sm text-muted-foreground mt-1">
                     {t("project.projectCount", { count: teamProjects.length })}
                   </p>
@@ -141,4 +148,3 @@ function ProjectsLoadingSkeleton() {
     </div>
   );
 }
-
