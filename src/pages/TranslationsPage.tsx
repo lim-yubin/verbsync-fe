@@ -266,10 +266,10 @@ export function TranslationsPage() {
           description: getUpgradeMessage(t, planInfo.plan, "keys", isOwner),
           action: isOwner
             ? {
-                label: t("translation.viewPlan"),
-                onClick: () => {
-                  navigate(ROUTES.PRICING);
-                },
+            label: t("translation.viewPlan"),
+            onClick: () => {
+              navigate(ROUTES.PRICING);
+            },
               }
             : undefined,
         });

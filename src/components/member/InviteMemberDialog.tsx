@@ -42,7 +42,7 @@ export function InviteMemberDialog({
   const { data: planInfo } = usePlan();
   const { data: permissions } = useMemberPermissions();
   const isOwner = permissions?.role === "OWNER";
-
+  
   const inviteMemberSchema = z.object({
     email: z.string().min(1, t("auth.email")).email(t("auth.emailInvalid")),
     role: z.enum(["EDITOR", "VIEWER"] as const),

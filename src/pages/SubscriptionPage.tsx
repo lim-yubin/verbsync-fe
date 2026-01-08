@@ -66,7 +66,7 @@ export function SubscriptionPage() {
         toast.error("Paddle 초기화에 실패했습니다.");
       });
   }, []);
-
+  
   const plans: PlanOption[] = [
     {
       name: "FREE",
@@ -278,8 +278,8 @@ export function SubscriptionPage() {
                     >
                       {t("subscription.cancelSubscription")}
                     </Button>
-                  </div>
-                )}
+                </div>
+              )}
             </CardContent>
           </Card>
         ) : null}
@@ -299,7 +299,7 @@ export function SubscriptionPage() {
             const targetPlanIndex = planOrder.indexOf(plan.name);
 
             // 현재 플랜이 아닐 때만 업그레이드/다운그레이드 가능
-            const isUpgradeable =
+            const isUpgradeable = 
               !isCurrentPlan &&
               currentPlanIndex >= 0 &&
               targetPlanIndex >= 0 &&
